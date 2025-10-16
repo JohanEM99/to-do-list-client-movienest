@@ -1,0 +1,251 @@
+// Paleta de colores
+$primary: #4f46e5; // morado elegante
+$secondary: #6366f1;
+$background: #f3f4f6;
+$text: #111827;
+$white: #ffffff;
+$error: #ef4444;
+
+// Fuente y transiciones
+$font: "Inter", sans-serif;
+$transition: all 0.3s ease;
+
+// RESET básico
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: $font;
+}
+
+body {
+  background-color: $background;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+// Contenedor principal
+.container-login {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 4rem;
+  background: $white;
+  padding: 2rem 3rem;
+  border-radius: 1.2rem;
+  box-shadow: 0 4px 25px rgba(0, 0, 0, 0.1);
+  width: 90%;
+  max-width: 950px;
+  transition: $transition;
+
+  @media (max-width: 850px) {
+    flex-direction: column-reverse;
+    padding: 2rem;
+  }
+}
+
+// Imagen lateral
+.image-container {
+  flex: 1;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden; // evita que la imagen se salga del área
+
+  img {
+    width: 90%;
+    max-width: 380px;
+    height: auto;
+    object-fit: contain;
+    transition: transform 0.5s ease, opacity 0.3s ease;
+    opacity: 0.95;
+
+    &:hover {
+      transform: scale(1.05);
+      opacity: 1;
+    }
+  }
+}
+
+// Asegura que el contenedor general no colapse
+.container-login {
+  flex-wrap: wrap; // <- permite que la imagen baje si no hay espacio
+  min-height: 500px;
+}
+
+// Formulario
+.form-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  text-align: left;
+
+  h1 {
+    font-size: 2rem;
+    color: $primary;
+    margin-bottom: 0.5rem;
+  }
+
+  h2 {
+    font-size: 1.2rem;
+    color: $text;
+    margin-bottom: 2rem;
+  }
+
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+
+    input {
+      padding: 0.9rem 1rem;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 1rem;
+      outline: none;
+      transition: $transition;
+
+      &:focus {
+        border-color: $primary;
+        box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+      }
+    }
+
+    button[type="submit"] {
+      background: $primary;
+      color: $white;
+      border: none;
+      padding: 0.9rem;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: $transition;
+
+      &:hover {
+        background: $secondary;
+      }
+    }
+  }
+}
+
+// Password con ícono 👁️
+.password-container {
+  position: relative;
+
+  input {
+    width: 100%;
+    padding-right: 3rem;
+  }
+
+  .toggle-password {
+    position: absolute;
+    top: 50%;
+    right: 0.8rem;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #6b7280;
+    font-size: 1.1rem;
+    transition: $transition;
+
+    &:hover {
+      color: $primary;
+    }
+  }
+}
+
+// Mensajes
+#loginMsg {
+  margin-top: 1rem;
+  color: $error;
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+// Links
+p {
+  font-size: 0.9rem;
+  color: #374151;
+  margin-top: 0.5rem;
+
+  a {
+    color: $primary;
+    text-decoration: none;
+    font-weight: 600;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+// Footer
+.footer {
+  margin-top: 2rem;
+  text-align: center;
+  color: #6b7280;
+  font-size: 0.85rem;
+
+  .footer-nav {
+    margin-bottom: 0.5rem;
+
+    a {
+      color: $primary;
+      margin: 0 0.5rem;
+      font-weight: 600;
+
+      &:hover {
+        color: $secondary;
+      }
+    }
+
+    span {
+      color: #9ca3af;
+    }
+  }
+}
+
+// Modal
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  .modal-content {
+    background: $white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 25px rgba(0, 0, 0, 0.15);
+    text-align: center;
+    width: 90%;
+    max-width: 400px;
+
+    button {
+      background: $primary;
+      color: $white;
+      border: none;
+      padding: 0.7rem 1.5rem;
+      border-radius: 8px;
+      font-weight: 600;
+      margin-top: 1rem;
+      cursor: pointer;
+      transition: $transition;
+
+      &:hover {
+        background: $secondary;
+      }
+    }
+  }
+}

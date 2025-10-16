@@ -1,0 +1,108 @@
+// Paleta de colores
+$primary: #0078ff;
+$secondary: #005fcc;
+$background: #f3f4f6;
+$text: #333;
+
+.container-register {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #e2e2e2, #ffffff);
+
+    .form-container {
+        background: white;
+        padding: 2rem 3rem;
+        border-radius: 20px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        max-width: 400px;
+        width: 100%;
+
+        h1 {
+            color: $text;
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+        }
+
+        input {
+            width: 100%;
+            margin: 0.5rem 0;
+            padding: 0.8rem;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+
+            &:focus {
+                outline: none;
+                border-color: $primary;
+                box-shadow: 0 0 0 2px rgba(0, 120, 255, 0.1);
+            }
+        }
+
+        button[type="submit"] {
+            background: $primary;
+            color: white;
+            border: none;
+            padding: 0.8rem 1.2rem;
+            border-radius: 10px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 1rem;
+            font-weight: bold;
+            transition: background 0.3s;
+
+            &:hover {
+                background: $secondary;
+            }
+        }
+
+        .password-container {
+            position: relative;
+            width: 100%;
+            margin: 0.5rem 0;
+
+            input {
+                width: 100%;
+                margin: 0;
+                padding: 0.8rem 2.5rem 0.8rem 0.8rem; // espacio para el botón
+                border-radius: 8px;
+                border: 1px solid #ccc;
+                font-size: 1rem;
+                transition: all 0.3s ease;
+
+                &:focus {
+                    outline: none;
+                    border-color: $primary;
+                    box-shadow: 0 0 0 2px rgba(0, 120, 255, 0.1);
+                }
+            }
+
+            .toggle-password {
+                position: absolute;
+                top: 50%;
+                right: 0.8rem;
+                transform: translateY(-50%);
+                background: transparent;
+                border: none;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 10;
+                padding: 0;
+
+                .eye-icon {
+                    font-size: 1.2rem;
+                    color: #6b7280;
+                    transition: color 0.2s ease;
+                }
+
+                &:hover .eye-icon {
+                    color: $primary;
+                }
+            }
+        }
+    }
+}
