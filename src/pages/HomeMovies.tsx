@@ -162,7 +162,7 @@ const HomeMovies: React.FC = () => {
           <img src="/logo.png" alt="MovieNest Logo" />
         </div>
         <nav className="nav-menu">
-          <a href="/#/">Home</a>
+          <a href="/#/homemovies">Home</a>
           <a href="/#/movies">Movies</a>
           <a href="/#/about">About Us</a>
         </nav>

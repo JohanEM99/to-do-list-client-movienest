@@ -4,6 +4,7 @@ import Register from "./pages/register";
 import AboutUs from "./pages/AboutUs";
 import HomeMovies from "./pages/HomeMovies";
 import ProfileEdit from "./pages/ProfileEdit";
+import Movies from "./pages/Movies";
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
         <Route path="/about" element={<AboutUs />} />
         <Route path="/homemovies" element={<HomeMovies />} />
         <Route path="/profile" element={<ProfileEdit />} />
+        <Route path="/movies" element={<Movies />} />
       </Routes>
     </Router>
   );
