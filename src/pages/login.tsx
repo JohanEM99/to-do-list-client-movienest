@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "../styles/Home.scss";
+import "../styles/login.scss";
 
 import { FaEye, FaEyeSlash } from "react-icons/fa"; // íconos de Font Awesome (vía react-icons)
 
@@ -70,11 +70,11 @@ const Home: React.FC = () => {
 
       <footer className="footer">
         <nav className="footer-nav">
-          <a href="#/home">Acceder</a>
+          <a href="#/login">Acceder</a>
           <span>|</span>
           <a href="#/board">Home</a>
           <span>|</span>
-          <a href="#/about-us">Nosotros</a>
+          <a href="#/about">Nosotros</a>
         </nav>
         <p className="footer-copy">
           &copy; 2025. Sitio web desarrollado por NEXTSTEP. Todos los derechos
