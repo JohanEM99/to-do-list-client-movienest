@@ -72,7 +72,7 @@ const Home: React.FC = () => {
         <nav className="footer-nav">
           <a href="#/login">Acceder</a>
           <span>|</span>
-          <a href="#/board">Home</a>
+          <a href="#/homemovies">Home</a>
           <span>|</span>
           <a href="#/about">Nosotros</a>
         </nav>
