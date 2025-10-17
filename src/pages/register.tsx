@@ -1,4 +1,3 @@
-import React from "react";
 import "../styles/Register.scss";
 import { useRegister } from "../hooks/useRegister";
 
