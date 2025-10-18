@@ -118,7 +118,7 @@ export const useRegister = () => {
 
       // Enviar los datos del formulario al backend
       const response = await axios.post(
-        "http://localhost:8080/api/auth/register",
+        "https://backend-de-peliculas.onrender.com/api/auth/register",
         dataToSend,
         {
           headers: {
