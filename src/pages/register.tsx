@@ -10,6 +10,9 @@ export default function Register() {
     toggleConfirmPassword,
     showPassword,
     showConfirmPassword,
+    isLoading,
+    error,
+    success,
   } = useRegister();
 
   return (
@@ -39,7 +42,8 @@ export default function Register() {
           />
 
           <label>Fecha de Nacimiento</label>
-          <input className="date-color"
+          <input
+            className="date-color"
             type="date"
             name="birthdate"
             value={formData.birthdate}
@@ -84,10 +88,28 @@ export default function Register() {
             </button>
           </div>
 
-          <button type="submit">¡Unirme ahora!</button>
+          {/* Mensaje de error */}
+          {error && (
+            <div className="error-message">
+              {error}
+            </div>
+          )}
+
+          {/* Mensaje de éxito */}
+          {success && (
+            <div className="success-message">
+              ✅ Registro exitoso. Redirigiendo...
+            </div>
+          )}
+
+          <button type="submit" disabled={isLoading}>
+            {isLoading ? "Registrando..." : "¡Unirme ahora!"}
+          </button>
         </form>
 
-        <p>¿Ya tienes una cuenta? <a href="/">Ingreso</a></p>
+        <p>
+          ¿Ya tienes una cuenta? <a href="/">Ingreso</a>
+        </p>
       </div>
     </div>
   );
