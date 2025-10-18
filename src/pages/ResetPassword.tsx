@@ -12,7 +12,11 @@ const ResetPassword = () => {
     e.preventDefault();  // Evitar el comportamiento por defecto del formulario
 
     if (!email) {
+<<<<<<< HEAD
       setMessage("❌ Please enter your email address");  // Mensaje si no se ingresa el correo
+=======
+      setMessage("❌ Por favor, introduzca su dirección de correo electrónico");
+>>>>>>> ef88470fee262eb329cb8b841d422e040c4c81d1
       return;
     }
 
@@ -32,13 +36,13 @@ const ResetPassword = () => {
       const data = await response.json();  // Obtener la respuesta del backend
 
       if (response.ok) {
-        setMessage("✅ Reset link sent! Check your email inbox.");  // Mensaje de éxito
+        setMessage("✅ ¡Enlace de restablecimiento enviado! Revisa tu bandeja de entrada.");
       } else {
-        setMessage(data.message || "❌ Error while sending reset link.");  // Mensaje de error
+        setMessage(data.message || "❌ Error al enviar el enlace de restablecimiento.");
       }
     } catch (error) {
-      setMessage("❌ Error al intentar enviar el enlace de restablecimiento");  // Manejo de errores
-      console.error("Error sending reset password link:", error);  // Mostrar en consola el error
+      setMessage("❌ Error al intentar enviar el enlace de restablecimiento");
+      console.error("Error al enviar el enlace de restablecimiento de contraseña:", error);
     } finally {
       setIsLoading(false);  // Desactivar estado de carga después de la respuesta
     }
@@ -86,7 +90,11 @@ const ResetPassword = () => {
                   type="email"
                   id="email"
                   name="email"
+<<<<<<< HEAD
                   placeholder="Ingrese su correo electrónico"
+=======
+                  placeholder="Introduce tu correo electrónico"
+>>>>>>> ef88470fee262eb329cb8b841d422e040c4c81d1
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}  // Actualizar el estado del email
                 />
@@ -98,7 +106,11 @@ const ResetPassword = () => {
               onClick={handleSubmit}
               disabled={isLoading}  // Deshabilitar el botón mientras se está enviando la solicitud
             >
+<<<<<<< HEAD
               {isLoading ? "Enviando..." : "Enviar enlace de restablecimiento"}  {/* Mostrar mensaje de carga */}
+=======
+              {isLoading ? "Eviando..." : "Enviar enlace de reinicio"}
+>>>>>>> ef88470fee262eb329cb8b841d422e040c4c81d1
             </button>
 
             {message && (
