@@ -43,18 +43,18 @@ const ProfileEdit: React.FC = () => {
     e.preventDefault();
     
     if (profileData.newPassword && profileData.newPassword !== profileData.confirmPassword) {
-      alert("Passwords do not match!");
+      alert("¡Las contraseñas no coinciden!");
       return;
     }
 
-    console.log("Saving profile changes:", profileData);
-    alert("Profile updated successfully!");
+    console.log("Guardar cambios de perfil:", profileData);
+    alert("¡Perfil actualizado exitosamente!");
   };
 
   const handleDeleteAccount = () => {
-    if (window.confirm("Are you sure you want to delete your account? This action cannot be undone.")) {
-      console.log("Deleting account...");
-      alert("Account deleted successfully!");
+    if (window.confirm("¿Seguro que quieres eliminar tu cuenta? Esta acción no se puede deshacer..")) {
+      console.log("Eliminando cuenta...");
+      alert("¡Cuenta eliminada exitosamente!");
       window.location.href = "/#/";
     }
   };
