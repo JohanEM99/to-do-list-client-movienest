@@ -150,8 +150,8 @@ const HomeMovies: React.FC = () => {
       {/* Browse Movies Section */}
       <section className="browse-section">
         <div className="section-header">
-          <h2>Browse Movies</h2>
-          <a href="/#/movies" className="view-all">View All</a>
+          <h2>Buscar películas</h2>
+          <a href="/#/movies" className="view-all">Ver todos</a>
         </div>
         <div className="movies-grid">
           {movies.slice(0, 6).map((movie) => (
