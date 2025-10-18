@@ -11,7 +11,7 @@ const ResetPassword = () => {
     e.preventDefault();
 
     if (!email) {
-      setMessage("❌ Please enter your email address");
+      setMessage("❌ Por favor, introduzca su dirección de correo electrónico");
       return;
     }
 
@@ -31,13 +31,13 @@ const ResetPassword = () => {
       const data = await response.json();
 
       if (response.ok) {
-        setMessage("✅ Reset link sent! Check your email inbox.");
+        setMessage("✅ ¡Enlace de restablecimiento enviado! Revisa tu bandeja de entrada.");
       } else {
-        setMessage(data.message || "❌ Error while sending reset link.");
+        setMessage(data.message || "❌ Error al enviar el enlace de restablecimiento.");
       }
     } catch (error) {
       setMessage("❌ Error al intentar enviar el enlace de restablecimiento");
-      console.error("Error sending reset password link:", error);
+      console.error("Error al enviar el enlace de restablecimiento de contraseña:", error);
     } finally {
       setIsLoading(false);
     }
@@ -85,7 +85,7 @@ const ResetPassword = () => {
                   type="email"
                   id="email"
                   name="email"
-                  placeholder="Enter your email"
+                  placeholder="Introduce tu correo electrónico"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                 />
@@ -97,7 +97,7 @@ const ResetPassword = () => {
               onClick={handleSubmit}
               disabled={isLoading}
             >
-              {isLoading ? "Sending..." : "Send Reset Link"}
+              {isLoading ? "Eviando..." : "Enviar enlace de reinicio"}
             </button>
 
             {message && (
