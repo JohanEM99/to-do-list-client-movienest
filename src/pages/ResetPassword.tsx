@@ -7,23 +7,40 @@ const ResetPassword = () => {
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!email) {
-      setMessage("Please enter your email address");
+      setMessage("❌ Please enter your email address");
       return;
     }
 
     setIsLoading(true);
     setMessage("");
 
-    // Simulación de envío de email
-    setTimeout(() => {
+    try {
+      // Realizar la solicitud al backend para enviar el enlace de restablecimiento
+      const response = await fetch("http://localhost:8080/api/auth/request-password-reset", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setMessage("✅ Reset link sent! Check your email inbox.");
+      } else {
+        setMessage(data.message || "❌ Error while sending reset link.");
+      }
+    } catch (error) {
+      setMessage("❌ Error al intentar enviar el enlace de restablecimiento");
+      console.error("Error sending reset password link:", error);
+    } finally {
       setIsLoading(false);
-      setMessage("Reset link sent! Check your email inbox.");
-      console.log("Reset password link sent to:", email);
-    }, 1500);
+    }
   };
 
   return (
