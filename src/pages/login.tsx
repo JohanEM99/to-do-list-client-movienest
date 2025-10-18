@@ -70,7 +70,7 @@ const Home: React.FC = () => {
 
       <footer className="footer">
         <nav className="footer-nav">
-          <a href="#/login">Acceder</a>
+          <a href="/">Acceder</a>
           <span>|</span>
           <a href="#/homemovies">Home</a>
           <span>|</span>

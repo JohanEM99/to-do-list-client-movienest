@@ -12,12 +12,12 @@ const AboutUs: React.FC = () => {
         </div>
         <nav className="nav-menu">
           <a href="/">Home</a>
-          <a href="/movies">Películas</a>
-          <a href="/about">Sobre Nosotros</a>
+          <a href="#/movies">Películas</a>
+          <a href="#/about">Sobre Nosotros</a>
         </nav>
         <div className="auth-buttons">
           <a href="/" className="login-btn">Ingreso</a>
-          <a href="/register" className="signup-btn">Registro</a>
+          <a href="#/register" className="signup-btn">Registro</a>
         </div>
       </header>
 
@@ -141,16 +141,16 @@ const AboutUs: React.FC = () => {
             <h4>Navegación</h4>
             <ul>
               <li><a href="/">Home</a></li>
-              <li><a href="/movies">Buscar películas</a></li>
-              <li><a href="/about">Sobre nosotros</a></li>
+              <li><a href="#/movies">Buscar películas</a></li>
+              <li><a href="#/about">Sobre nosotros</a></li>
             </ul>
           </div>
           <div className="footer-column">
             <h4>Cuenta</h4>
             <ul>
               <li><a href="/">Ingreso</a></li>
-              <li><a href="/register">Registro</a></li>
-              <li><a href="/profile">Mi perfil</a></li>
+              <li><a href="#/register">Registro</a></li>
+              <li><a href="#/profile">Mi perfil</a></li>
             </ul>
           </div>
           <div className="footer-column">
