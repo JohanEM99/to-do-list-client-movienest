@@ -1,15 +1,15 @@
 // Paleta de colores
-$primary: #0078ff;
-$secondary: #005fcc;
-$background: #f3f4f6;
-$text: #333;
+$primary: #e50914;
+$secondary: #b20710;
+$background: #ffffff;
+$text: #333333;
 
 .container-register {
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background: linear-gradient(135deg, #e2e2e2, #ffffff);
+  background: linear-gradient(135deg, #ffffff, #ffffff);
 
   .form-container {
     background: white;
@@ -24,10 +24,6 @@ $text: #333;
       color: $text;
       font-size: 1.8rem;
       margin-bottom: 1.5rem;
-    }
-    input[type="date"]::-webkit-calendar-picker-indicator {
-      background-color: rgb(7, 0, 0); /* Fondo del ícono */
-      color: rgb(253, 253, 253); /* Color del ícono */
     }
 
     input {
@@ -44,8 +40,25 @@ $text: #333;
       &:focus {
         outline: none;
         border-color: $primary;
-        box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
+        box-shadow: 0 0 0 2px rgba(229, 9, 20, 0.1);
       }
+    }
+
+    // Estilos específicos para input date
+    input[type="date"]::-webkit-calendar-picker-indicator {
+      cursor: pointer;
+      filter: invert(50%); // Gris
+      opacity: 0.7;
+      
+      &:hover {
+        opacity: 1;
+      }
+    }
+
+    input[type="date"]::-moz-calendar-picker-indicator {
+      cursor: pointer;
+      filter: invert(50%);
+      opacity: 0.7;
     }
 
     button[type="submit"] {
@@ -64,6 +77,7 @@ $text: #333;
         background: $secondary;
       }
     }
+
     label {
       color: black;
     }
@@ -80,7 +94,7 @@ $text: #333;
       input {
         width: 100%;
         margin: 0;
-        padding: 0.8rem 3rem 0.8rem 0.8rem; /* Espacio adicional en la derecha para el ícono */
+        padding: 0.8rem 2.5rem 0.8rem 0.8rem;
         border-radius: 8px;
         border: 1px solid #ccc;
         font-size: 1rem;
@@ -89,14 +103,14 @@ $text: #333;
         &:focus {
           outline: none;
           border-color: $primary;
-          box-shadow: 0 0 0 2px rgba(0, 120, 255, 0.1);
+          box-shadow: 0 0 0 2px rgba(229, 9, 20, 0.1);
         }
       }
 
-      .toggle-password {
+      button {
         position: absolute;
         top: 50%;
-        right: 10px; /* Ajusta para que el ícono esté más cercano al borde */
+        right: 0.8rem;
         transform: translateY(-50%);
         background: transparent;
         border: none;
@@ -106,16 +120,13 @@ $text: #333;
         justify-content: center;
         z-index: 10;
         padding: 0;
-      }
-
-      .eye-icon {
-        font-size: 1.2rem;
         color: #6b7280;
+        font-size: 1.2rem;
         transition: color 0.2s ease;
-      }
 
-      .toggle-password:hover .eye-icon {
-        color: $primary;
+        &:hover {
+          color: $primary;
+        }
       }
     }
   }
