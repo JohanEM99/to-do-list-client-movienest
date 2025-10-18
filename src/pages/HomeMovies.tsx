@@ -34,8 +34,8 @@ const HomeMovies: React.FC = () => {
       const mockMovies: Movie[] = [
         {
           id: 1,
-          title: "The Last Stand",
-          description: "An epic action thriller about a sheriff defending his town from a dangerous cartel.",
+          title: "La última batalla",
+          description: "Un thriller de acción épico sobre un sheriff que defiende su ciudad de un peligroso cártel.",
           year: 2023,
           duration: "125 min",
           rating: 4.5,
@@ -50,7 +50,7 @@ const HomeMovies: React.FC = () => {
       setFeaturedMovie(mockMovies[0]);
       setLoading(false);
     } catch (error) {
-      console.error("Error fetching movies:", error);
+      console.error("Error al obtener películas:", error);
       setLoading(false);
     }
   };
@@ -59,7 +59,7 @@ const HomeMovies: React.FC = () => {
     const token = localStorage.getItem("token");
     if (token) {
       try {
-        const response = await fetch("http://localhost:8080/api/v1/user/profile", {
+        const response = await fetch("https://backend-de-peliculas.onrender.com/api/v1/user/profile", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -72,7 +72,7 @@ const HomeMovies: React.FC = () => {
         const data = await response.json();
         setUser(data.user);
       } catch (error) {
-        console.error("Error fetching user profile:", error);
+        console.error("Error al obtener el perfil de usuario:", error);
       }
     }
   };
@@ -85,7 +85,7 @@ const HomeMovies: React.FC = () => {
   };
 
   if (loading) {
-    return <div className="loading">Loading movies...</div>;
+    return <div className="loading">Cargando películas...</div>;
   }
 
   return (
@@ -97,8 +97,8 @@ const HomeMovies: React.FC = () => {
         </div>
         <nav className="nav-menu">
           <a href="#/homemovies">Home</a>
-          <a href="#/movies">Movies</a>
-          <a href="#/about">About Us</a>
+          <a href="#/movies">Películas</a>
+          <a href="#/about">Sobre Nosotros</a>
         </nav>
         <div className="auth-buttons">
           {user ? (
@@ -113,8 +113,8 @@ const HomeMovies: React.FC = () => {
             </>
           ) : (
             <>
-              <a href="/" className="login-btn">Login</a>
-              <a href="#/register" className="signup-btn">Sign Up</a>
+              <a href="/" className="login-btn">Ingreso</a>
+              <a href="#/register" className="signup-btn">Registro</a>
               <a href="#/profile" className="profile-btn">Mi perfil</a>
             </>
           )}
@@ -130,7 +130,7 @@ const HomeMovies: React.FC = () => {
             style={{ backgroundImage: `url(${featuredMovie.image})` }}
           ></div>
           <div className="hero-content">
-            <span className="featured-badge">⭐ Featured</span>
+            <span className="featured-badge">⭐ Presentada</span>
             <h1>{featuredMovie.title}</h1>
             <p className="hero-description">{featuredMovie.description}</p>
             <div className="hero-meta">
@@ -141,7 +141,7 @@ const HomeMovies: React.FC = () => {
               <span>{featuredMovie.duration}</span>
             </div>
             <button className="watch-btn">
-              <FaPlay /> Watch Now
+              <FaPlay /> Ver ahora
             </button>
           </div>
         </section>
