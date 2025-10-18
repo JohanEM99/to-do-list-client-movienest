@@ -51,7 +51,7 @@ const ProfileEdit = () => {
       }
 
       const response = await axios.get(
-        "https://backend-de-peliculas.onrender.com/api/v1/user",
+        "http://localhost:8080/api/v1/users/profile",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -134,7 +134,7 @@ const ProfileEdit = () => {
       }
 
       await axios.put(
-        "https://backend-de-peliculas.onrender.com/api/v1/user",
+        "http://localhost:8080/api/v1/users",
         updateData,
         {
           headers: {
@@ -185,7 +185,7 @@ const ProfileEdit = () => {
       }
 
       await axios.delete(
-        "https://backend-de-peliculas.onrender.com/api/v1/user",
+        "http://localhost:8080/api/v1/users",
         {
           headers: {
             Authorization: `Bearer ${token}`,
