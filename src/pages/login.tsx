@@ -55,7 +55,7 @@ const Home: React.FC = () => {
         <div id="loginMsg">{loginMsg}</div>
 
         <p>
-          ¿Necesitas una cuenta?&nbsp;<a href="#register">Crear cuenta</a>
+          ¿Necesitas una cuenta?&nbsp;<a href="#/register">Crear cuenta</a>
         </p>
 
         <p>
@@ -70,7 +70,7 @@ const Home: React.FC = () => {
 
       <footer className="footer">
         <nav className="footer-nav">
-          <a href="#/login">Acceder</a>
+          <a href="/">Acceder</a>
           <span>|</span>
           <a href="#/homemovies">Home</a>
           <span>|</span>
