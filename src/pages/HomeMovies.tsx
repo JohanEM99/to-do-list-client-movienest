@@ -238,9 +238,9 @@ const HomeMovies: React.FC = () => {
 
       {/* Call to Action */}
       <section className="cta-section">
-        <h2>Ready to Watch?</h2>
-        <p>Create an account to start streaming thousands of movies and TV shows instantly.</p>
-        <a href="/#/register" className="cta-button">Get Started</a>
+        <h2>¿Listo para mirar?</h2>
+        <p>Crea una cuenta para comenzar a transmitir miles de películas y programas de TV al instante.</p>
+        <a href="/#/register" className="cta-button">Empezar</a>
       </section>
 
       {/* Footer */}
@@ -250,39 +250,39 @@ const HomeMovies: React.FC = () => {
             <div className="footer-logo">
               <img src="/logo.png" alt="MovieNest" />
             </div>
-            <p>Your ultimate destination for streaming the best movies online.</p>
+            <p>Tu destino definitivo para transmitir las mejores películas en línea.</p>
           </div>
           <div className="footer-column">
-            <h4>Navigation</h4>
+            <h4>Navegación</h4>
             <ul>
               <li><a href="#/">Home</a></li>
-              <li><a href="#/movies">Browse Movies</a></li>
-              <li><a href="#/about">About Us</a></li>
+              <li><a href="#/movies">Buscar películas</a></li>
+              <li><a href="#/about">Sobre nosotros</a></li>
             </ul>
           </div>
           <div className="footer-column">
             <h4>Account</h4>
             <ul>
-              <li><a href="#/">Login</a></li>
-              <li><a href="#/register">Sign Up</a></li>
-              <li><a href="#/profile">My Profile</a></li>
+              <li><a href="#/">Acceso</a></li>
+              <li><a href="#/register">Registrarse</a></li>
+              <li><a href="#/profile">Mi perfil</a></li>
             </ul>
           </div>
           <div className="footer-column">
-            <h4>Contact</h4>
+            <h4>Contacto</h4>
             <ul>
-              <li>📧 info@movienest.com</li>
-              <li>📞 +1 (234) 567-890</li>
-              <li>📍 123 Movie Street<br />Los Angeles, CA 90001</li>
+              <li>📧 movienestplataforma@gmail.com</li>
+              <li>📞 +57 (602) 111-22 33</li>
+              <li>📍 123 Calle del cine<br />Los Angeles, CA 90001</li>
             </ul>
           </div>
         </div>
         <div className="footer-bottom">
-          <p>© 2025 MovieNest. All rights reserved.</p>
+          <p>© 2025 MovieNest. Todos los derechos reservados.</p>
           <div className="footer-links">
-            <a href="#/privacy">Privacy Policy</a>
+            <a href="#/privacy"> </a>
             <span>|</span>
-            <a href="#/terms">Terms of Service</a>
+            <a href="#/terms"> </a>
           </div>
         </div>
       </footer>
