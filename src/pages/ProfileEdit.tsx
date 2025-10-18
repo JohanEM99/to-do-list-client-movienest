@@ -133,7 +133,7 @@ const ProfileEdit = () => {
         updateData.password = profileData.newPassword;
       }
 
-      const response = await axios.put(
+      await axios.put(
         "https://backend-de-peliculas.onrender.com/api/v1/user/profile",
         updateData,
         {
