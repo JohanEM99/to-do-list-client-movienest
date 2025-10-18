@@ -19,7 +19,7 @@ function App() {
         <Route path="/profile" element={<ProfileEdit />} />
         <Route path="/movies" element={<Movies />} />
         <Route path="/reset-password" element={<ResetPassword />} />
-        <Route path="/new-password" element={<NewPassword />} />
+        <Route path="/new-password/:token" element={<NewPassword />} />
       </Routes>
     </Router>
   );

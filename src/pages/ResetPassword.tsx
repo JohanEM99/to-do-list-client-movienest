@@ -12,11 +12,7 @@ const ResetPassword = () => {
     e.preventDefault();  // Evitar el comportamiento por defecto del formulario
 
     if (!email) {
-<<<<<<< HEAD
-      setMessage("❌ Please enter your email address");  // Mensaje si no se ingresa el correo
-=======
       setMessage("❌ Por favor, introduzca su dirección de correo electrónico");
->>>>>>> ef88470fee262eb329cb8b841d422e040c4c81d1
       return;
     }
 
@@ -90,11 +86,7 @@ const ResetPassword = () => {
                   type="email"
                   id="email"
                   name="email"
-<<<<<<< HEAD
-                  placeholder="Ingrese su correo electrónico"
-=======
                   placeholder="Introduce tu correo electrónico"
->>>>>>> ef88470fee262eb329cb8b841d422e040c4c81d1
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}  // Actualizar el estado del email
                 />
@@ -106,11 +98,7 @@ const ResetPassword = () => {
               onClick={handleSubmit}
               disabled={isLoading}  // Deshabilitar el botón mientras se está enviando la solicitud
             >
-<<<<<<< HEAD
-              {isLoading ? "Enviando..." : "Enviar enlace de restablecimiento"}  {/* Mostrar mensaje de carga */}
-=======
               {isLoading ? "Eviando..." : "Enviar enlace de reinicio"}
->>>>>>> ef88470fee262eb329cb8b841d422e040c4c81d1
             </button>
 
             {message && (
