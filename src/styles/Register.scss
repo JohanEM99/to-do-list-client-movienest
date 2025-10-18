@@ -73,30 +73,30 @@ $text: #333333;
     }
 
     .password-container {
-      position: relative;
-      width: 100%;
-      margin: 0.5rem 0;
+    position: relative;
+    width: 100%;
+    margin: 0.5rem 0;
 
-      input {
+    input {
         width: 100%;
         margin: 0;
-        padding: 0.8rem 3rem 0.8rem 0.8rem; /* Espacio adicional en la derecha para el ícono */
+        padding: 0.8rem 2.5rem 0.8rem 0.8rem; // Espacio a la derecha para el botón
         border-radius: 8px;
         border: 1px solid #ccc;
         font-size: 1rem;
         transition: all 0.3s ease;
 
         &:focus {
-          outline: none;
-          border-color: $primary;
-          box-shadow: 0 0 0 2px rgba(0, 120, 255, 0.1);
+            outline: none;
+            border-color: $primary;
+            box-shadow: 0 0 0 2px rgba(0, 120, 255, 0.1);
         }
-      }
+    }
 
-      .toggle-password {
+    button {
         position: absolute;
         top: 50%;
-        right: 10px; /* Ajusta para que el ícono esté más cercano al borde */
+        right: 0.8rem;
         transform: translateY(-50%);
         background: transparent;
         border: none;
@@ -106,16 +106,13 @@ $text: #333333;
         justify-content: center;
         z-index: 10;
         padding: 0;
-      }
-
-      .eye-icon {
-        font-size: 1.2rem;
         color: #6b7280;
+        font-size: 1.2rem;
         transition: color 0.2s ease;
-      }
 
-      .toggle-password:hover .eye-icon {
-        color: $primary;
+        &:hover {
+            color: $primary;
+        }
       }
     }
   }
