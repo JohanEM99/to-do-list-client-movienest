@@ -12,12 +12,12 @@ const AboutUs: React.FC = () => {
         </div>
         <nav className="nav-menu">
           <a href="/">Home</a>
-          <a href="/movies">Movies</a>
-          <a href="/about">About Us</a>
+          <a href="/movies">Películas</a>
+          <a href="/about">Sobre Nosotros</a>
         </nav>
         <div className="auth-buttons">
-          <a href="/" className="login-btn">Login</a>
-          <a href="/register" className="signup-btn">Sign Up</a>
+          <a href="/" className="login-btn">Ingreso</a>
+          <a href="/register" className="signup-btn">Registro</a>
         </div>
       </header>
 
@@ -27,10 +27,10 @@ const AboutUs: React.FC = () => {
           <div className="hero-icon">
             <FaFilm />
           </div>
-          <h1>About MovieNest</h1>
+          <h1>Acerca de MovieNest</h1>
           <p>
-            Your ultimate destination for streaming premium movies. We bring the cinema experience right
-            to your home with a vast collection of films across all genres.
+            Tu destino definitivo para ver películas premium en streaming. 
+            Llevamos la experiencia cinematográfica directamente a tu casa con una amplia colección de películas de todos los géneros.
           </p>
         </div>
       </section>
@@ -42,15 +42,15 @@ const AboutUs: React.FC = () => {
             <div className="section-icon">
               <span className="icon-circle">🎯</span>
             </div>
-            <h2>Our Mission</h2>
+            <h2>Nuestra Misión</h2>
             <p>
-              At MovieNest, we're passionate about making quality entertainment accessible to everyone. Our
-              mission is to provide a seamless streaming experience with an extensive library of movies that cater to
-              diverse tastes and preferences.
+              En MovieNest, nos apasiona hacer que el entretenimiento de calidad sea accesible para todos. 
+              Nuestra misión es brindar una experiencia de streaming fluida con una amplia biblioteca de películas que satisface todos los gustos 
+              y preferencias.
             </p>
             <p>
-              We believe in the power of storytelling and its ability to connect people across cultures and
-              backgrounds. Through our platform, we aim to bring the magic of cinema to audiences worldwide.
+              Creemos en el poder de la narración y su capacidad para conectar a personas de distintas culturas y orígenes. 
+              A través de nuestra plataforma, buscamos acercar la magia del cine a públicos de todo el mundo.
             </p>
           </div>
           <div className="mission-image">
@@ -61,33 +61,33 @@ const AboutUs: React.FC = () => {
 
       {/* Features Section */}
       <section className="features-section">
-        <h2>Why Choose MovieNest?</h2>
+        <h2>¿Por qué elegir MovieNest?</h2>
         <div className="features-grid">
           <div className="feature-card">
             <div className="feature-icon">
               <FaFilm />
             </div>
-            <h3>Extensive Library</h3>
+            <h3>Amplia biblioteca</h3>
             <p>
-              Access thousands of movies across all genres, from timeless classics to the latest releases.
+              Acceda a miles de películas de todos los géneros, desde clásicos atemporales hasta los últimos estrenos
             </p>
           </div>
           <div className="feature-card">
             <div className="feature-icon">
               <FaAward />
             </div>
-            <h3>Premium Quality</h3>
+            <h3>Calidad superior</h3>
             <p>
-              Enjoy high-definition streaming with superior audio and video quality for an immersive experience.
+             Disfrute de transmisión de alta definición con calidad de audio y video superior para una experiencia inmersiva.
             </p>
           </div>
           <div className="feature-card">
             <div className="feature-icon">
               <FaUsers />
             </div>
-            <h3>User-Friendly</h3>
+            <h3>Fácil de usar</h3>
             <p>
-              Intuitive interface designed for easy navigation and seamless browsing across all devices.
+              Interfaz intuitiva diseñada para una navegación sencilla y fluida en todos los dispositivos.
             </p>
           </div>
         </div>
@@ -95,37 +95,36 @@ const AboutUs: React.FC = () => {
 
       {/* Stats Section */}
       <section className="stats-section">
-        <h2>MovieNest by the Numbers</h2>
+        <h2>MovieNest en cifras</h2>
         <div className="stats-grid">
           <div className="stat-card">
             <h3>10K+</h3>
-            <p>Movies</p>
+            <p>Películas</p>
           </div>
           <div className="stat-card">
             <h3>1M+</h3>
-            <p>Users</p>
+            <p>Usuarios</p>
           </div>
           <div className="stat-card">
             <h3>50+</h3>
-            <p>Genres</p>
+            <p>Géneros</p>
           </div>
           <div className="stat-card">
             <h3>24/7</h3>
-            <p>Streaming</p>
+            <p>Transmisión</p>
           </div>
         </div>
       </section>
 
       {/* Contact Section */}
       <section className="contact-section">
-        <h2>Get in Touch</h2>
+        <h2>Ponte en contacto</h2>
         <p>
-          Have questions or feedback? We'd love to hear from you. Our dedicated support team is
-          available 24/7 to assist you.
+          ¿Tienes preguntas o comentarios? Nos encantaría saber de ti.
         </p>
         <div className="contact-info">
-          <p>📧 info@movienest.com</p>
-          <p>📞 +1 (234) 567-890</p>
+          <p>📧  movienestplataforma@gmail.com</p>
+          <p>📞 +57 (602) 111-22 33</p>
         </div>
       </section>
 
@@ -136,39 +135,39 @@ const AboutUs: React.FC = () => {
             <div className="footer-logo">
               <img src="/logo.png" alt="MovieNest" />
             </div>
-            <p>Your ultimate destination for streaming the best movies online.</p>
+            <p>Tu destino definitivo para ver las mejores películas en línea.</p>
           </div>
           <div className="footer-column">
-            <h4>Navigation</h4>
+            <h4>Navegación</h4>
             <ul>
               <li><a href="/">Home</a></li>
-              <li><a href="/movies">Browse Movies</a></li>
-              <li><a href="/about">About Us</a></li>
+              <li><a href="/movies">Buscar películas</a></li>
+              <li><a href="/about">Sobre nosotros</a></li>
             </ul>
           </div>
           <div className="footer-column">
-            <h4>Account</h4>
+            <h4>Cuenta</h4>
             <ul>
-              <li><a href="/">Login</a></li>
-              <li><a href="/register">Sign Up</a></li>
-              <li><a href="/profile">My Profile</a></li>
+              <li><a href="/">Ingreso</a></li>
+              <li><a href="/register">Registro</a></li>
+              <li><a href="/profile">Mi perfil</a></li>
             </ul>
           </div>
           <div className="footer-column">
-            <h4>Contact</h4>
+            <h4>Contacto</h4>
             <ul>
-              <li>📧 info@movienest.com</li>
-              <li>📞 +1 (234) 567-890</li>
-              <li>📍 123 Movie Street<br />Los Angeles, CA 90001</li>
+              <li>📧 movienestplataforma@gmail.com</li>
+              <li>📞 +57 (602) 111-22 33</li>
+              <li>📍 123 Calle del cine <br />Los Angeles, CA 90001</li>
             </ul>
           </div>
         </div>
         <div className="footer-bottom">
-          <p>© 2025 MovieNest. All rights reserved.</p>
+          <p>© 2025 MovieNest. Todos los derechos reservados.</p>
           <div className="footer-links">
-            <a href="/privacy">Privacy Policy</a>
-            <span>|</span>
-            <a href="/terms">Terms of Service</a>
+            <a href="/privacy"> </a>
+            <span> </span>
+            <a href="/terms"> </a>
           </div>
         </div>
       </footer>

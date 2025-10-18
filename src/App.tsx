@@ -5,6 +5,7 @@ import AboutUs from "./pages/AboutUs";
 import HomeMovies from "./pages/HomeMovies";
 import ProfileEdit from "./pages/ProfileEdit";
 import Movies from "./pages/Movies";
+import ResetPassword from "./pages/ResetPassword";
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
         <Route path="/homemovies" element={<HomeMovies />} />
         <Route path="/profile" element={<ProfileEdit />} />
         <Route path="/movies" element={<Movies />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
       </Routes>
     </Router>
   );

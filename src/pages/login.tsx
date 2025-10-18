@@ -60,7 +60,7 @@ const Home: React.FC = () => {
 
         <p>
           ¿Problemas para acceder?&emsp;
-          <a href="#/forgot">Restablecer contraseña</a>
+          <a href="#/reset-password">Restablecer contraseña</a>
         </p>
       </div>
 
@@ -77,7 +77,7 @@ const Home: React.FC = () => {
           <a href="#/about">Nosotros</a>
         </nav>
         <p className="footer-copy">
-          &copy; 2025. Sitio web desarrollado por NEXTSTEP. Todos los derechos
+          &copy; 2025. Sitio web desarrollado por MovieNest. Todos los derechos
           reservados.
         </p>
       </footer>
