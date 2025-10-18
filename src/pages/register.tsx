@@ -39,7 +39,7 @@ export default function Register() {
           />
 
           <label>Fecha de Nacimiento</label>
-          <input
+          <input className="date-color"
             type="date"
             name="birthdate"
             value={formData.birthdate}
