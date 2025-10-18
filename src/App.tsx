@@ -6,6 +6,7 @@ import HomeMovies from "./pages/HomeMovies";
 import ProfileEdit from "./pages/ProfileEdit";
 import Movies from "./pages/Movies";
 import ResetPassword from "./pages/ResetPassword";
+import NewPassword from "./pages/NewPassword";
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
         <Route path="/profile" element={<ProfileEdit />} />
         <Route path="/movies" element={<Movies />} />
         <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/new-password" element={<NewPassword />} />
       </Routes>
     </Router>
   );
