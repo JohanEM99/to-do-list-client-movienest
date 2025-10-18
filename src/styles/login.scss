@@ -88,12 +88,14 @@ body {
     font-size: 2rem;
     color: $primary;
     margin-bottom: 0.5rem;
+    text-align: center; // ← AGREGAR ESTA LÍNEA
   }
 
   h2 {
     font-size: 1.2rem;
     color: $text;
     margin-bottom: 2rem;
+    text-align: center; // ← AGREGAR ESTA LÍNEA
   }
 
   form {
@@ -170,9 +172,10 @@ body {
 
 // Links
 p {
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   color: #374151;
-  margin-top: 0.5rem;
+  margin-top: 0.1rem;
+  text-align: center;
 
   a {
     color: $primary;
