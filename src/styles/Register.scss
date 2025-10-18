@@ -9,7 +9,7 @@ $text: #333333;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background: linear-gradient(135deg, #e2e2e2, #ffffff);
+  background: linear-gradient(135deg, #ffffff, #ffffff);
 
   .form-container {
     background: white;
@@ -24,10 +24,6 @@ $text: #333333;
       color: $text;
       font-size: 1.8rem;
       margin-bottom: 1.5rem;
-    }
-    input[type="date"]::-webkit-calendar-picker-indicator {
-      background-color: rgb(7, 0, 0); /* Fondo del ícono */
-      color: rgb(253, 253, 253); /* Color del ícono */
     }
 
     input {
@@ -44,8 +40,25 @@ $text: #333333;
       &:focus {
         outline: none;
         border-color: $primary;
-        box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
+        box-shadow: 0 0 0 2px rgba(229, 9, 20, 0.1);
       }
+    }
+
+    // Estilos específicos para input date
+    input[type="date"]::-webkit-calendar-picker-indicator {
+      cursor: pointer;
+      filter: invert(50%); // Gris
+      opacity: 0.7;
+      
+      &:hover {
+        opacity: 1;
+      }
+    }
+
+    input[type="date"]::-moz-calendar-picker-indicator {
+      cursor: pointer;
+      filter: invert(50%);
+      opacity: 0.7;
     }
 
     button[type="submit"] {
@@ -64,6 +77,7 @@ $text: #333333;
         background: $secondary;
       }
     }
+
     label {
       color: black;
     }
@@ -73,27 +87,27 @@ $text: #333333;
     }
 
     .password-container {
-    position: relative;
-    width: 100%;
-    margin: 0.5rem 0;
+      position: relative;
+      width: 100%;
+      margin: 0.5rem 0;
 
-    input {
+      input {
         width: 100%;
         margin: 0;
-        padding: 0.8rem 2.5rem 0.8rem 0.8rem; // Espacio a la derecha para el botón
+        padding: 0.8rem 2.5rem 0.8rem 0.8rem;
         border-radius: 8px;
         border: 1px solid #ccc;
         font-size: 1rem;
         transition: all 0.3s ease;
 
         &:focus {
-            outline: none;
-            border-color: $primary;
-            box-shadow: 0 0 0 2px rgba(0, 120, 255, 0.1);
+          outline: none;
+          border-color: $primary;
+          box-shadow: 0 0 0 2px rgba(229, 9, 20, 0.1);
         }
-    }
+      }
 
-    button {
+      button {
         position: absolute;
         top: 50%;
         right: 0.8rem;
@@ -111,7 +125,7 @@ $text: #333333;
         transition: color 0.2s ease;
 
         &:hover {
-            color: $primary;
+          color: $primary;
         }
       }
     }
