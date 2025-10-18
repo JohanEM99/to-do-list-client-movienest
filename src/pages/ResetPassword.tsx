@@ -1,45 +1,46 @@
 import { useState } from "react";
-import "../styles/ResetPassword.scss";
+import "../styles/ResetPassword.scss";  // Asegúrate de tener tu archivo de estilos correctamente configurado
 import { FaEnvelope, FaArrowLeft } from "react-icons/fa";
 
 const ResetPassword = () => {
-  const [email, setEmail] = useState("");
-  const [message, setMessage] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [email, setEmail] = useState("");  // Estado para el correo electrónico
+  const [message, setMessage] = useState("");  // Estado para los mensajes (error o éxito)
+  const [isLoading, setIsLoading] = useState(false);  // Estado para manejar la carga mientras se procesa la solicitud
 
+  // Función que se ejecuta cuando el formulario es enviado
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault();  // Evitar el comportamiento por defecto del formulario
 
     if (!email) {
-      setMessage("❌ Please enter your email address");
+      setMessage("❌ Please enter your email address");  // Mensaje si no se ingresa el correo
       return;
     }
 
-    setIsLoading(true);
-    setMessage("");
+    setIsLoading(true);  // Activar estado de carga
+    setMessage("");  // Limpiar cualquier mensaje previo
 
     try {
       // Realizar la solicitud al backend para enviar el enlace de restablecimiento
-      const response = await fetch("https://backend-de-peliculas.onrender.com/api/auth/request-password-reset", {
+      const response = await fetch("http://localhost:8080/api/auth/request-password-reset", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email }),  // Enviar el correo como JSON
       });
 
-      const data = await response.json();
+      const data = await response.json();  // Obtener la respuesta del backend
 
       if (response.ok) {
-        setMessage("✅ Reset link sent! Check your email inbox.");
+        setMessage("✅ Reset link sent! Check your email inbox.");  // Mensaje de éxito
       } else {
-        setMessage(data.message || "❌ Error while sending reset link.");
+        setMessage(data.message || "❌ Error while sending reset link.");  // Mensaje de error
       }
     } catch (error) {
-      setMessage("❌ Error al intentar enviar el enlace de restablecimiento");
-      console.error("Error sending reset password link:", error);
+      setMessage("❌ Error al intentar enviar el enlace de restablecimiento");  // Manejo de errores
+      console.error("Error sending reset password link:", error);  // Mostrar en consola el error
     } finally {
-      setIsLoading(false);
+      setIsLoading(false);  // Desactivar estado de carga después de la respuesta
     }
   };
 
@@ -85,9 +86,9 @@ const ResetPassword = () => {
                   type="email"
                   id="email"
                   name="email"
-                  placeholder="Enter your email"
+                  placeholder="Ingrese su correo electrónico"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => setEmail(e.target.value)}  // Actualizar el estado del email
                 />
               </div>
             </div>
@@ -95,19 +96,19 @@ const ResetPassword = () => {
             <button 
               className="reset-button"
               onClick={handleSubmit}
-              disabled={isLoading}
+              disabled={isLoading}  // Deshabilitar el botón mientras se está enviando la solicitud
             >
-              {isLoading ? "Sending..." : "Send Reset Link"}
+              {isLoading ? "Enviando..." : "Enviar enlace de restablecimiento"}  {/* Mostrar mensaje de carga */}
             </button>
 
             {message && (
               <div className={`message ${message.includes("sent") ? "success" : "error"}`}>
-                {message}
+                {message}  {/* Mostrar el mensaje de éxito o error */}
               </div>
             )}
 
             <a href="/#/" className="back-to-login">
-              <FaArrowLeft />Volver a iniciar sesión
+              <FaArrowLeft /> Volver a iniciar sesión
             </a>
           </div>
         </div>

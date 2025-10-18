@@ -46,24 +46,24 @@ const ProfileEdit = () => {
     try {
       const token = localStorage.getItem("token");
       if (!token) {
-        navigate("/");
+        navigate("/"); // Redirigir al login si no hay token
         return;
       }
 
       const response = await axios.get(
-        "https://backend-de-peliculas.onrender.com/api/v1/user",
+        "https://backend-de-peliculas.onrender.com/api/v1/users",
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${token}`, // Autenticación con el token
           },
         }
       );
 
       const user = response.data.user;
-      
+
       // Separar fecha de nacimiento si viene como string
       const birthDate = user.birthdate ? new Date(user.birthdate) : null;
-      
+
       setProfileData({
         firstName: user.username || user.firstName || "",
         lastName: user.lastname || user.lastName || "",
@@ -94,14 +94,14 @@ const ProfileEdit = () => {
     e.preventDefault();
     setError("");
     setSuccess("");
-    
+
     // Validar contraseñas si se están cambiando
     if (profileData.newPassword || profileData.confirmPassword) {
       if (profileData.newPassword.length < 8) {
         setError("La contraseña debe tener al menos 8 caracteres");
         return;
       }
-      
+
       if (profileData.newPassword !== profileData.confirmPassword) {
         setError("Las contraseñas no coinciden");
         return;
@@ -113,7 +113,7 @@ const ProfileEdit = () => {
     try {
       const token = localStorage.getItem("token");
       if (!token) {
-        navigate("/");
+        navigate("/"); // Redirigir al login si no hay token
         return;
       }
 
@@ -134,7 +134,7 @@ const ProfileEdit = () => {
       }
 
       await axios.put(
-        "https://backend-de-peliculas.onrender.com/api/v1/user",
+        "https://backend-de-peliculas.onrender.com/api/v1/users",
         updateData,
         {
           headers: {
@@ -145,7 +145,7 @@ const ProfileEdit = () => {
       );
 
       setSuccess("¡Perfil actualizado exitosamente!");
-      
+
       // Limpiar campos de contraseña
       setProfileData(prev => ({
         ...prev,
@@ -160,7 +160,7 @@ const ProfileEdit = () => {
 
     } catch (error: any) {
       console.error("Error al actualizar perfil:", error);
-      
+
       if (axios.isAxiosError(error)) {
         const errorMsg = error.response?.data?.message || "Error al actualizar el perfil";
         setError(errorMsg);
@@ -180,12 +180,12 @@ const ProfileEdit = () => {
     try {
       const token = localStorage.getItem("token");
       if (!token) {
-        navigate("/");
+        navigate("/"); // Redirigir al login si no hay token
         return;
       }
 
       await axios.delete(
-        "https://backend-de-peliculas.onrender.com/api/v1/user",
+        "https://backend-de-peliculas.onrender.com/api/v1/users",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -196,7 +196,7 @@ const ProfileEdit = () => {
       alert("Cuenta eliminada exitosamente");
       localStorage.removeItem("token");
       navigate("/");
-      
+
     } catch (error) {
       console.error("Error al eliminar cuenta:", error);
       alert("Error al eliminar la cuenta. Intenta de nuevo.");
@@ -210,6 +210,7 @@ const ProfileEdit = () => {
 
   return (
     <div className="profile-edit-container">
+      {/* Header y menú de navegación */}
       <header className="profile-header">
         <div className="logo">
           <img src="/logo.png" alt="MovieNest Logo" />
@@ -242,6 +243,7 @@ const ProfileEdit = () => {
         </div>
       </header>
 
+      {/* Formulario de edición de perfil */}
       <div className="profile-content">
         <div className="profile-card">
           <div className="profile-avatar-section">
@@ -265,6 +267,7 @@ const ProfileEdit = () => {
               </div>
             )}
 
+            {/* Formulario de datos */}
             <div className="form-row">
               <div className="form-group">
                 <label htmlFor="firstName">Nombre<span className="required">*</span></label>
@@ -288,6 +291,7 @@ const ProfileEdit = () => {
               </div>
             </div>
 
+            {/* Fecha de nacimiento */}
             <div className="form-group">
               <label>Fecha de nacimiento<span className="required">*</span></label>
               <div className="date-inputs">
@@ -322,6 +326,7 @@ const ProfileEdit = () => {
               <small className="form-hint">Debes tener al menos 13 años para registrarte.</small>
             </div>
 
+            {/* Correo electrónico */}
             <div className="form-group">
               <label htmlFor="email">Dirección de correo electrónico<span className="required">*</span></label>
               <div className="input-with-icon">
@@ -336,6 +341,7 @@ const ProfileEdit = () => {
               </div>
             </div>
 
+            {/* Cambiar contraseña */}
             <div className="form-section">
               <h3>Cambiar la contraseña (Opcional)</h3>
               <div className="form-group">
@@ -363,6 +369,7 @@ const ProfileEdit = () => {
               </div>
             </div>
 
+            {/* Botones */}
             <div className="form-actions">
               <button 
                 type="button"
