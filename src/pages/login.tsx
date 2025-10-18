@@ -55,7 +55,7 @@ const Home: React.FC = () => {
         <div id="loginMsg">{loginMsg}</div>
 
         <p>
-          ¿Necesitas una cuenta?&nbsp;<a href="/register">Crear cuenta</a>
+          ¿Necesitas una cuenta?&nbsp;<a href="#/register">Crear cuenta</a>
         </p>
 
         <p>

@@ -132,13 +132,13 @@ const Movies: React.FC = () => {
           <img src="/logo.png" alt="MovieNest Logo" />
         </div>
         <nav className="nav-menu">
-          <a href="/#/home">Home</a>
-          <a href="/#/movies">Movies</a>
-          <a href="/#/about">About Us</a>
+          <a href="#/home">Home</a>
+          <a href="#/movies">Movies</a>
+          <a href="#/about">About Us</a>
         </nav>
         <div className="auth-buttons">
-          <a href="/#/" className="login-btn">Login</a>
-          <a href="/#/register" className="signup-btn">Sign Up</a>
+          <a href="#/" className="login-btn">Login</a>
+          <a href="#/register" className="signup-btn">Sign Up</a>
         </div>
       </header>
 

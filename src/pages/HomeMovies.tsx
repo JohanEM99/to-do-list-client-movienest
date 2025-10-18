@@ -162,13 +162,13 @@ const HomeMovies: React.FC = () => {
           <img src="/logo.png" alt="MovieNest Logo" />
         </div>
         <nav className="nav-menu">
-          <a href="/#/homemovies">Home</a>
-          <a href="/#/movies">Movies</a>
-          <a href="/#/about">About Us</a>
+          <a href="#/homemovies">Home</a>
+          <a href="#/movies">Movies</a>
+          <a href="#/about">About Us</a>
         </nav>
         <div className="auth-buttons">
-          <a href="/#/" className="login-btn">Login</a>
-          <a href="/#/register" className="signup-btn">Sign Up</a>
+          <a href="/" className="login-btn">Login</a>
+          <a href="#/register" className="signup-btn">Sign Up</a>
         </div>
       </header>
 
@@ -255,17 +255,17 @@ const HomeMovies: React.FC = () => {
           <div className="footer-column">
             <h4>Navigation</h4>
             <ul>
-              <li><a href="/#/">Home</a></li>
-              <li><a href="/#/movies">Browse Movies</a></li>
-              <li><a href="/#/about">About Us</a></li>
+              <li><a href="#/">Home</a></li>
+              <li><a href="#/movies">Browse Movies</a></li>
+              <li><a href="#/about">About Us</a></li>
             </ul>
           </div>
           <div className="footer-column">
             <h4>Account</h4>
             <ul>
-              <li><a href="/#/">Login</a></li>
-              <li><a href="/#/register">Sign Up</a></li>
-              <li><a href="/#/profile">My Profile</a></li>
+              <li><a href="#/">Login</a></li>
+              <li><a href="#/register">Sign Up</a></li>
+              <li><a href="#/profile">My Profile</a></li>
             </ul>
           </div>
           <div className="footer-column">
@@ -280,9 +280,9 @@ const HomeMovies: React.FC = () => {
         <div className="footer-bottom">
           <p>© 2025 MovieNest. All rights reserved.</p>
           <div className="footer-links">
-            <a href="/#/privacy">Privacy Policy</a>
+            <a href="#/privacy">Privacy Policy</a>
             <span>|</span>
-            <a href="/#/terms">Terms of Service</a>
+            <a href="#/terms">Terms of Service</a>
           </div>
         </div>
       </footer>

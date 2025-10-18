@@ -66,9 +66,9 @@ const ProfileEdit: React.FC = () => {
           <img src="/logo.png" alt="MovieNest Logo" />
         </div>
         <nav className="nav-menu">
-          <a href="/#/home">Home</a>
-          <a href="/#/movies">Movies</a>
-          <a href="/#/about">About Us</a>
+          <a href="#/home">Home</a>
+          <a href="#/movies">Movies</a>
+          <a href="#/about">About Us</a>
         </nav>
         <div className="user-menu">
           <button 
@@ -82,10 +82,10 @@ const ProfileEdit: React.FC = () => {
           </button>
           {showDropdown && (
             <div className="dropdown-menu">
-              <a href="/#/profile" className="dropdown-item">
+              <a href="#/profile" className="dropdown-item">
                 <FaCog /> Profile Settings
               </a>
-              <a href="/#/" className="dropdown-item">
+              <a href="#/" className="dropdown-item">
                 <FaSignOutAlt /> Logout
               </a>
             </div>
