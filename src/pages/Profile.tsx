@@ -12,7 +12,7 @@ const Profile: React.FC = () => {
     // Hacer una solicitud al backend para obtener la información del usuario
     const fetchUserProfile = async () => {
       try {
-        const response = await fetch("http://localhost:8080/api/v1/user/profile", {
+        const response = await fetch("https://backend-de-peliculas.onrender.com/api/v1/user/profile", {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`, // Usar el token guardado en el LocalStorage
           },
