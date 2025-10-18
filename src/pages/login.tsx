@@ -46,7 +46,7 @@ const Home: React.FC = () => {
 
     try {
       // Enviar la solicitud de login al backend
-      const response = await fetch("http://localhost:8080/api/auth/login", {
+      const response = await fetch("https://backend-de-peliculas.onrender.com/api/auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
