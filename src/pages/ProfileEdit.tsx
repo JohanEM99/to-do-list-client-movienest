@@ -208,6 +208,8 @@ const ProfileEdit = () => {
     navigate("/");
   };
 
+  
+
   return (
     <div className="profile-edit-container">
       {/* Header y menú de navegación */}
