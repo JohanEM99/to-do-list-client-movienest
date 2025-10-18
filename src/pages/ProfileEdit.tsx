@@ -67,8 +67,8 @@ const ProfileEdit: React.FC = () => {
         </div>
         <nav className="nav-menu">
           <a href="#/home">Home</a>
-          <a href="#/movies">Movies</a>
-          <a href="#/about">About Us</a>
+          <a href="#/movies">Películas</a>
+          <a href="#/about">Sobre Nosotros</a>
         </nav>
         <div className="user-menu">
           <button 
@@ -83,10 +83,10 @@ const ProfileEdit: React.FC = () => {
           {showDropdown && (
             <div className="dropdown-menu">
               <a href="#/profile" className="dropdown-item">
-                <FaCog /> Profile Settings
+                <FaCog /> Configuración de perfil
               </a>
               <a href="#/" className="dropdown-item">
-                <FaSignOutAlt /> Logout
+                <FaSignOutAlt /> Salir
               </a>
             </div>
           )}
@@ -99,14 +99,14 @@ const ProfileEdit: React.FC = () => {
             <div className="profile-avatar-large">
               <FaUser />
             </div>
-            <h2>My Profile</h2>
-            <p className="profile-subtitle">Manage your account information</p>
+            <h2>Mi Perfil</h2>
+            <p className="profile-subtitle">Administra la información de tu cuenta</p>
           </div>
 
           <div className="profile-form">
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="firstName">First Name <span className="required">*</span></label>
+                <label htmlFor="firstName">Nombre <span className="required">*</span></label>
                 <input
                   type="text"
                   id="firstName"
@@ -116,7 +116,7 @@ const ProfileEdit: React.FC = () => {
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="lastName">Last Name <span className="required">*</span></label>
+                <label htmlFor="lastName">Apellido <span className="required">*</span></label>
                 <input
                   type="text"
                   id="lastName"
@@ -158,11 +158,11 @@ const ProfileEdit: React.FC = () => {
                   onChange={handleChange}
                 />
               </div>
-              <small className="form-hint">You must be at least 13 years old to register.</small>
+              <small className="form-hint">Debes tener al menos 13 años para registrarte.</small>
             </div>
 
             <div className="form-group">
-              <label htmlFor="email">Email Address <span className="required">*</span></label>
+              <label htmlFor="email">Dirección de correo electrónico <span className="required">*</span></label>
               <div className="input-with-icon">
                 <FaEnvelope className="input-icon" />
                 <input
@@ -176,9 +176,9 @@ const ProfileEdit: React.FC = () => {
             </div>
 
             <div className="form-section">
-              <h3>Change Password (Optional)</h3>
+              <h3>Cambiar la contraseña (Optional)</h3>
               <div className="form-group">
-                <label htmlFor="newPassword">New Password</label>
+                <label htmlFor="newPassword">Nueva contraseña</label>
                 <input
                   type="password"
                   id="newPassword"
@@ -187,10 +187,10 @@ const ProfileEdit: React.FC = () => {
                   value={profileData.newPassword}
                   onChange={handleChange}
                 />
-                <small className="form-hint">Minimum 8 characters</small>
+                <small className="form-hint">Minimo 8 caracteres</small>
               </div>
               <div className="form-group">
-                <label htmlFor="confirmPassword">Confirm New Password</label>
+                <label htmlFor="confirmPassword">Confirmar nueva contraseña</label>
                 <input
                   type="password"
                   id="confirmPassword"
@@ -208,14 +208,14 @@ const ProfileEdit: React.FC = () => {
                 className="save-button"
                 onClick={handleSaveChanges}
               >
-                <FaSave /> Save Changes
+                <FaSave /> Guardar cambios
               </button>
               <button 
                 type="button" 
                 className="delete-button"
                 onClick={handleDeleteAccount}
               >
-                <FaTrash /> Delete Account
+                <FaTrash /> Eliminar cuenta
               </button>
             </div>
           </div>

@@ -87,7 +87,7 @@ export default function Register() {
           <button type="submit">¡Unirme ahora!</button>
         </form>
 
-        <p>¿Ya tienes una cuenta? <a href="/">Acceder</a></p>
+        <p>¿Ya tienes una cuenta? <a href="/">Ingreso</a></p>
       </div>
     </div>
   );

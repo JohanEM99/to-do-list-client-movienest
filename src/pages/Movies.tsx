@@ -122,7 +122,7 @@ const Movies: React.FC = () => {
   };
 
   if (loading) {
-    return <div className="loading">Loading movies...</div>;
+    return <div className="loading">Cargando películas...</div>;
   }
 
   return (
@@ -133,19 +133,19 @@ const Movies: React.FC = () => {
         </div>
         <nav className="nav-menu">
           <a href="#/home">Home</a>
-          <a href="#/movies">Movies</a>
-          <a href="#/about">About Us</a>
+          <a href="#/movies">Películas</a>
+          <a href="#/about">Sobre Nosotros</a>
         </nav>
         <div className="auth-buttons">
-          <a href="#/" className="login-btn">Login</a>
-          <a href="#/register" className="signup-btn">Sign Up</a>
+          <a href="#/" className="login-btn">Ingreso</a>
+          <a href="#/register" className="signup-btn">Registro</a>
         </div>
       </header>
 
       <div className="movies-content">
         <div className="movies-hero">
-          <h1>Browse Movies</h1>
-          <p>Explore our collection of amazing movies</p>
+          <h1>Buscar películas</h1>
+          <p>Explora nuestra colección de películas increíbles</p>
         </div>
 
         <div className="search-filter-section">
@@ -201,7 +201,7 @@ const Movies: React.FC = () => {
 
         {filteredMovies.length === 0 && (
           <div className="no-results">
-            <p>No movies found matching your criteria.</p>
+            <p>No se encontraron películas que coincidan con tus criterios.</p>
           </div>
         )}
       </div>

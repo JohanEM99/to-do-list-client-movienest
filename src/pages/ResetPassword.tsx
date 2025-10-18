@@ -35,12 +35,12 @@ const ResetPassword = () => {
         </div>
         <nav className="nav-menu">
           <a href="#/home">Home</a>
-          <a href="#/movies">Movies</a>
-          <a href="#/about">About Us</a>
+          <a href="#/movies">Películas</a>
+          <a href="#/about">Sobre Nosotros</a>
         </nav>
         <div className="auth-buttons">
-          <a href="/" className="login-btn">Login</a>
-          <a href="#/register" className="signup-btn">Sign Up</a>
+          <a href="/" className="login-btn">Ingreso</a>
+          <a href="#/register" className="signup-btn">Registro</a>
         </div>
       </header>
 
@@ -53,15 +53,15 @@ const ResetPassword = () => {
           </div>
 
           {/* Title and Description */}
-          <h1>Reset Password</h1>
+          <h1>Restablecer contraseña</h1>
           <p className="reset-description">
-            Enter your email address and we'll send you a link to reset your password
+            Ingrese su dirección de correo electrónico y le enviaremos un enlace para restablecer su contraseña.
           </p>
 
           {/* Form */}
           <div className="reset-form">
             <div className="form-group">
-              <label htmlFor="email">Email Address</label>
+              <label htmlFor="email">Dirección de correo electrónico</label>
               <div className="input-with-icon">
                 <FaEnvelope className="input-icon" />
                 <input
@@ -90,7 +90,7 @@ const ResetPassword = () => {
             )}
 
             <a href="/#/" className="back-to-login">
-              <FaArrowLeft /> Back to Login
+              <FaArrowLeft />Volver a iniciar sesión
             </a>
           </div>
         </div>
