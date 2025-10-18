@@ -17,10 +17,10 @@ const Movies: React.FC = () => {
   const [movies, setMovies] = useState<Movie[]>([]);
   const [filteredMovies, setFilteredMovies] = useState<Movie[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedGenre, setSelectedGenre] = useState("All");
+  const [selectedGenre, setSelectedGenre] = useState("Todos");
   const [loading, setLoading] = useState(true);
 
-  const genres = ["All", "Action", "Sci-Fi", "Comedy", "Drama", "Horror"];
+  const genres = ["Todos", "Acción", "Ciencia Ficción", "Comedia", "Drama", "Horror"];
 
   useEffect(() => {
     fetchMovies();
@@ -35,38 +35,38 @@ const Movies: React.FC = () => {
     const mockMovies: Movie[] = [
       {
         id: 1,
-        title: "The Last Stand",
-        description: "An epic action thriller about a sheriff defending his town from a dangerous...",
+        title: "La última batalla",
+        description: "Un thriller de acción épico sobre un sheriff que defiende su ciudad de un peligroso...",
         year: 2023,
         duration: "125 min",
         rating: 4.5,
-        genre: "Action",
+        genre: "Acción",
         image: "https://images.pexels.com/photos/7991579/pexels-photo-7991579.jpeg?auto=compress&cs=tinysrgb&w=800",
       },
       {
         id: 2,
-        title: "Cosmic Journey",
-        description: "A mind-bending tale as it journeys through space and time.",
+        title: "Viaje Cósmico",
+        description: "Un relato alucinante que viaja a través del espacio y el tiempo.",
         year: 2024,
         duration: "140 min",
         rating: 4.7,
-        genre: "Sci-Fi",
+        genre: "Ciencia ficción",
         image: "https://images.pexels.com/photos/12498606/pexels-photo-12498606.jpeg?auto=compress&cs=tinysrgb&w=800",
       },
       {
         id: 3,
-        title: "Laugh Out Lives!",
-        description: "A hilarious comedy that will keep you laughing from start to finish.",
+        title: "¡Ríete a carcajadas!",
+        description: "Una comedia divertidísima que te hará reír de principio a fin.",
         year: 2024,
         duration: "98 min",
         rating: 4.2,
-        genre: "Comedy",
+        genre: "Comedia",
         image: "https://images.pexels.com/photos/2774556/pexels-photo-2774556.jpeg?auto=compress&cs=tinysrgb&w=800",
       },
       {
         id: 4,
-        title: "Heart Strings",
-        description: "An emotional drama about love, loss, and redemption.",
+        title: "Cuerdas del corazón",
+        description: "Un drama emotivo sobre el amor, la pérdida y la redención.",
         year: 2024,
         duration: "132 min",
         rating: 4.6,
@@ -75,8 +75,8 @@ const Movies: React.FC = () => {
       },
       {
         id: 5,
-        title: "The Haunting",
-        description: "A terrifying horror film that will keep you on the edge of your seat.",
+        title: "El inquietante",
+        description: "Una película de terror aterradora que te mantendrá al borde de tu asiento.",
         year: 2023,
         duration: "105 min",
         rating: 4.4,
@@ -85,8 +85,8 @@ const Movies: React.FC = () => {
       },
       {
         id: 6,
-        title: "Cinema Paradiso",
-        description: "A beautiful tribute to the golden age of cinema.",
+        title: "Cine Paraíso",
+        description: "Un bello homenaje a la época dorada del cine.",
         year: 2024,
         duration: "118 min",
         rating: 4.8,
@@ -153,7 +153,7 @@ const Movies: React.FC = () => {
             <FaSearch className="search-icon" />
             <input
               type="text"
-              placeholder="Search movies by title or description..."
+              placeholder="Buscar películas por título o descripción..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
