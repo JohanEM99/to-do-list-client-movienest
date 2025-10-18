@@ -98,6 +98,22 @@ $gray-medium: #6b7280;
         box-shadow: 0 4px 12px rgba(229, 9, 20, 0.3);
       }
     }
+
+    .profile-btn {
+      background: transparent;
+      color: $text;
+      text-decoration: none;
+      padding: 0.5rem 1.5rem;
+      font-weight: 500;
+      border: 2px solid $text;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+
+      &:hover {
+        border-color: $primary;
+        color: $primary;
+      }
+    }
   }
 
   @media (max-width: 768px) {

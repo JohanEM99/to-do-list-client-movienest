@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "../styles/HomeMovies.scss";
 import { FaStar, FaClock, FaPlay } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 interface Movie {
   id: number;
@@ -19,136 +20,69 @@ const HomeMovies: React.FC = () => {
   const [movies, setMovies] = useState<Movie[]>([]);
   const [featuredMovie, setFeaturedMovie] = useState<Movie | null>(null);
   const [loading, setLoading] = useState(true);
-
-  const PEXELS_API_KEY = "YOUR_PEXELS_API_KEY"; // Reemplaza con tu API key
+  const [user, setUser] = useState<any>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchMovies();
+    fetchUserProfile();
   }, []);
 
   const fetchMovies = async () => {
     try {
-      // Fetch videos from Pexels API
-      const response = await fetch(
-        "https://api.pexels.com/videos/search?query=movie&per_page=15",
+      // Simulación de carga de películas
+      const mockMovies: Movie[] = [
         {
-          headers: {
-            Authorization: PEXELS_API_KEY,
-          },
-        }
-      );
+          id: 1,
+          title: "The Last Stand",
+          description: "An epic action thriller about a sheriff defending his town from a dangerous cartel.",
+          year: 2023,
+          duration: "125 min",
+          rating: 4.5,
+          genre: "Drama",
+          image: "https://images.pexels.com/photos/7991579/pexels-photo-7991579.jpeg?auto=compress&cs=tinysrgb&w=800",
+          featured: true,
+        },
+        // Agrega más películas si es necesario
+      ];
 
-      const data = await response.json();
-
-      // Transform Pexels videos to movie format
-      const transformedMovies: Movie[] = data.videos.map((video: any, index: number) => ({
-        id: video.id,
-        title: movieTitles[index] || `Movie ${index + 1}`,
-        description: movieDescriptions[index] || "An epic tale of adventure and discovery.",
-        year: 2023 + (index % 2),
-        duration: `${90 + Math.floor(Math.random() * 60)} min`,
-        rating: 4.0 + Math.random() * 1,
-        genre: genres[index % genres.length],
-        image: video.image,
-        video: video.video_files[0]?.link,
-        featured: index === 0,
-      }));
-
-      setMovies(transformedMovies);
-      setFeaturedMovie(transformedMovies[0]);
+      setMovies(mockMovies);
+      setFeaturedMovie(mockMovies[0]);
       setLoading(false);
     } catch (error) {
       console.error("Error fetching movies:", error);
-      // Fallback to mock data
-      setMovies(mockMovies);
-      setFeaturedMovie(mockMovies[0]);
       setLoading(false);
     }
   };
 
-  const movieTitles = [
-    "The Last Stand",
-    "Cosmic Journey",
-    "Lights Out Lives!",
-    "Heart Strings",
-    "The Haunting",
-    "Cinema Paradiso",
-  ];
+  const fetchUserProfile = async () => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      try {
+        const response = await fetch("http://localhost:8080/api/v1/user/profile", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
-  const movieDescriptions = [
-    "An epic action thriller about a sheriff defending his town from a dangerous cartel.",
-    "A mind-bending tale as it journeys through space and time.",
-    "A timeless concert that will keep you entertained for life!",
-    "An emotional drama about love, loss, and redemption.",
-    "A terrifying sequel that will keep you on the edge of your seat.",
-    "A beautiful tribute to the golden age of cinema.",
-  ];
+        if (!response.ok) {
+          throw new Error("No se pudo obtener el perfil del usuario.");
+        }
 
-  const genres = ["Drama", "Sci-fi", "Comedy", "Drama", "Horror", "Drama"];
+        const data = await response.json();
+        setUser(data.user);
+      } catch (error) {
+        console.error("Error fetching user profile:", error);
+      }
+    }
+  };
 
-  const mockMovies: Movie[] = [
-    {
-      id: 1,
-      title: "The Last Stand",
-      description: "An epic action thriller about a sheriff defending his town from a dangerous cartel.",
-      year: 2023,
-      duration: "125 min",
-      rating: 4.5,
-      genre: "Drama",
-      image: "https://images.pexels.com/photos/7991579/pexels-photo-7991579.jpeg?auto=compress&cs=tinysrgb&w=800",
-      featured: true,
-    },
-    {
-      id: 2,
-      title: "Cosmic Journey",
-      description: "A mind-bending tale as it journeys through space and time.",
-      year: 2024,
-      duration: "140 min",
-      rating: 4.7,
-      genre: "Sci-fi",
-      image: "https://images.pexels.com/photos/12498606/pexels-photo-12498606.jpeg?auto=compress&cs=tinysrgb&w=800",
-    },
-    {
-      id: 3,
-      title: "Lights Out Lives!",
-      description: "A timeless concert that will keep you entertained for life!",
-      year: 2024,
-      duration: "98 min",
-      rating: 4.3,
-      genre: "Comedy",
-      image: "https://images.pexels.com/photos/2774556/pexels-photo-2774556.jpeg?auto=compress&cs=tinysrgb&w=800",
-    },
-    {
-      id: 4,
-      title: "Heart Strings",
-      description: "An emotional drama about love, loss, and redemption.",
-      year: 2024,
-      duration: "132 min",
-      rating: 4.6,
-      genre: "Drama",
-      image: "https://images.pexels.com/photos/3944405/pexels-photo-3944405.jpeg?auto=compress&cs=tinysrgb&w=800",
-    },
-    {
-      id: 5,
-      title: "The Haunting",
-      description: "A terrifying sequel that will keep you on the edge of your seat.",
-      year: 2023,
-      duration: "105 min",
-      rating: 4.4,
-      genre: "Horror",
-      image: "https://images.pexels.com/photos/3945313/pexels-photo-3945313.jpeg?auto=compress&cs=tinysrgb&w=800",
-    },
-    {
-      id: 6,
-      title: "Cinema Paradiso",
-      description: "A beautiful tribute to the golden age of cinema.",
-      year: 2024,
-      duration: "118 min",
-      rating: 4.8,
-      genre: "Drama",
-      image: "https://images.pexels.com/photos/7991579/pexels-photo-7991579.jpeg?auto=compress&cs=tinysrgb&w=800",
-    },
-  ];
+  const handleLogout = () => {
+    // Eliminar el token del localStorage y redirigir a la página de login
+    localStorage.removeItem("token");
+    setUser(null);
+    navigate("/login");
+  };
 
   if (loading) {
     return <div className="loading">Loading movies...</div>;
@@ -167,8 +101,23 @@ const HomeMovies: React.FC = () => {
           <a href="#/about">About Us</a>
         </nav>
         <div className="auth-buttons">
-          <a href="/" className="login-btn">Login</a>
-          <a href="#/register" className="signup-btn">Sign Up</a>
+          {user ? (
+            <>
+              {/* Mostrar el logo del perfil */}
+              <a href="#/profile" className="profile-btn">
+                <img src="/path-to-your-profile-icon.png" alt="Profile" className="profile-icon" />
+              </a>
+              <button className="logout-btn" onClick={handleLogout}>
+                Logout
+              </button>
+            </>
+          ) : (
+            <>
+              <a href="/" className="login-btn">Login</a>
+              <a href="#/register" className="signup-btn">Sign Up</a>
+              <a href="#/profile" className="profile-btn">Mi perfil</a>
+            </>
+          )}
         </div>
       </header>
 
@@ -265,7 +214,6 @@ const HomeMovies: React.FC = () => {
             <ul>
               <li><a href="#/">Acceso</a></li>
               <li><a href="#/register">Registrarse</a></li>
-              <li><a href="#/profile">Mi perfil</a></li>
             </ul>
           </div>
           <div className="footer-column">
