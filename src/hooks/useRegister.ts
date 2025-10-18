@@ -1,6 +1,5 @@
-// src/hooks/useRegister.ts
 import { useState } from "react";
-// import { registerUser } from "../services/api"; // Se activará cuando conectes el backend
+import axios from "axios"; // Importa axios para hacer la solicitud HTTP
 
 export const useRegister = () => {
   const [formData, setFormData] = useState({
@@ -26,18 +25,29 @@ export const useRegister = () => {
   const toggleConfirmPassword = () =>
     setShowConfirmPassword((prev) => !prev);
 
-  // 👉 Enviar el formulario (solo simula registro)
+  // 👉 Enviar el formulario y registrar el usuario
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Verificar que las contraseñas coinciden
     if (formData.password !== formData.confirmPassword) {
       alert("❌ Las contraseñas no coinciden");
       return;
     }
 
-    // Simulación temporal (sin backend)
-    console.log("Datos del formulario:", formData);
-    alert("✅ Registro simulado correctamente");
+    try {
+      // Enviar los datos del formulario al backend
+      const response = await axios.post("http://localhost:8080/api/auth/register", formData);
+
+      console.log("Respuesta del backend:", response.data);
+      alert("✅ Registro exitoso, ahora puedes iniciar sesión.");
+      
+      // Redirigir al login (si es necesario)
+      // navigate('/login'); // Si usas react-router-dom, descomenta esto
+    } catch (error) {
+      console.error("Error al registrar usuario:", error);
+      alert("❌ Error al registrar el usuario. Intenta de nuevo.");
+    }
   };
 
   return {
