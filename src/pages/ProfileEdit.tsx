@@ -216,8 +216,8 @@ const ProfileEdit = () => {
         </div>
         <nav className="nav-menu">
           <a href="/#/homemovies">Home</a>
-          <a href="/#/movies">Movies</a>
-          <a href="/#/about">About Us</a>
+          <a href="/#/movies">Películas</a>
+          <a href="/#/about">Sobre Nosotros</a>
         </nav>
         <div className="user-menu">
           <button 
@@ -235,7 +235,7 @@ const ProfileEdit = () => {
                 <FaCog /> Profile Settings
               </a>
               <button onClick={handleLogout} className="dropdown-item">
-                <FaSignOutAlt /> Logout
+                <FaSignOutAlt /> Salir
               </button>
             </div>
           )}
@@ -248,8 +248,8 @@ const ProfileEdit = () => {
             <div className="profile-avatar-large">
               <FaUser />
             </div>
-            <h2>My Profile</h2>
-            <p className="profile-subtitle">Manage your account information</p>
+            <h2>Mi Perfil</h2>
+            <p className="profile-subtitle">Administra la información de tu cuenta</p>
           </div>
 
           <div className="profile-form">
@@ -267,7 +267,7 @@ const ProfileEdit = () => {
 
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="firstName">First Name <span className="required">*</span></label>
+                <label htmlFor="firstName">Nombre<span className="required">*</span></label>
                 <input
                   type="text"
                   id="firstName"
@@ -277,7 +277,7 @@ const ProfileEdit = () => {
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="lastName">Last Name <span className="required">*</span></label>
+                <label htmlFor="lastName">Apellido <span className="required">*</span></label>
                 <input
                   type="text"
                   id="lastName"
@@ -289,7 +289,7 @@ const ProfileEdit = () => {
             </div>
 
             <div className="form-group">
-              <label>Date of Birth <span className="required">*</span></label>
+              <label>Fecha de nacimiento<span className="required">*</span></label>
               <div className="date-inputs">
                 <select
                   name="birthMonth"
@@ -303,7 +303,7 @@ const ProfileEdit = () => {
                 <input
                   type="number"
                   name="birthDay"
-                  placeholder="Day"
+                  placeholder="Día"
                   min="1"
                   max="31"
                   value={profileData.birthDay}
@@ -312,18 +312,18 @@ const ProfileEdit = () => {
                 <input
                   type="number"
                   name="birthYear"
-                  placeholder="Year"
+                  placeholder="Año"
                   min="1900"
                   max="2025"
                   value={profileData.birthYear}
                   onChange={handleChange}
                 />
               </div>
-              <small className="form-hint">You must be at least 13 years old to register.</small>
+              <small className="form-hint">Debes tener al menos 13 años para registrarte.</small>
             </div>
 
             <div className="form-group">
-              <label htmlFor="email">Email Address <span className="required">*</span></label>
+              <label htmlFor="email">Dirección de correo electrónico<span className="required">*</span></label>
               <div className="input-with-icon">
                 <FaEnvelope className="input-icon" />
                 <input
@@ -337,26 +337,26 @@ const ProfileEdit = () => {
             </div>
 
             <div className="form-section">
-              <h3>Change Password (Optional)</h3>
+              <h3>Cambiar la contraseña (Opcional)</h3>
               <div className="form-group">
-                <label htmlFor="newPassword">New Password</label>
+                <label htmlFor="newPassword">Nueva contraseña</label>
                 <input
                   type="password"
                   id="newPassword"
                   name="newPassword"
-                  placeholder="Leave blank to keep current password"
+                  placeholder="Déjelo en blanco para mantener la contraseña actual"
                   value={profileData.newPassword}
                   onChange={handleChange}
                 />
-                <small className="form-hint">Minimum 8 characters</small>
+                <small className="form-hint">Mínimo 8 caracteres</small>
               </div>
               <div className="form-group">
-                <label htmlFor="confirmPassword">Confirm New Password</label>
+                <label htmlFor="confirmPassword">Confirmar nueva contraseña</label>
                 <input
                   type="password"
                   id="confirmPassword"
                   name="confirmPassword"
-                  placeholder="Re-enter new password"
+                  placeholder="Vuelva a ingresar la nueva contraseña"
                   value={profileData.confirmPassword}
                   onChange={handleChange}
                 />
@@ -370,14 +370,14 @@ const ProfileEdit = () => {
                 onClick={handleSaveChanges}
                 disabled={isLoading}
               >
-                <FaSave /> {isLoading ? "Saving..." : "Save Changes"}
+                <FaSave /> {isLoading ? "Saving..." : "Guardar cambios"}
               </button>
               <button 
                 type="button" 
                 className="delete-button"
                 onClick={handleDeleteAccount}
               >
-                <FaTrash /> Delete Account
+                <FaTrash /> Eliminar cuenta
               </button>
             </div>
           </div>
