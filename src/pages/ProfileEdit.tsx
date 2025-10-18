@@ -232,7 +232,7 @@ const ProfileEdit = () => {
           {showDropdown && (
             <div className="dropdown-menu">
               <a href="/#/profile" className="dropdown-item">
-                <FaCog /> Profile Settings
+                <FaCog /> Configuración de perfil
               </a>
               <button onClick={handleLogout} className="dropdown-item">
                 <FaSignOutAlt /> Salir
