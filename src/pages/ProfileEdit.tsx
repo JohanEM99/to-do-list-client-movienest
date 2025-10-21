@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import "../styles/ProfileEdit.scss";
-import { FaUser, FaCog, FaSignOutAlt, FaSave, FaTrash, FaEnvelope, FaEye, FaEyeSlash } from "react-icons/fa";
+import { FaUser, FaSignOutAlt, FaSave, FaTrash, FaEnvelope, FaEye, FaEyeSlash } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
@@ -53,7 +53,8 @@ const ProfileEdit = () => {
       }
 
       const response = await axios.get(
-        "http://localhost:8080/api/v1/users/profile",
+        "https://backend-de-peliculas.onrender.com/api/v1/users/profile",
+      //"http://localhost:8080/api/v1/users/profile",
         {
           headers: {
             Authorization: `Bearer ${token}`, // Autenticación con el token
@@ -136,7 +137,8 @@ const ProfileEdit = () => {
       }
 
       await axios.put(
-        "http://localhost:8080/api/v1/users",
+        "https://backend-de-peliculas.onrender.com/api/v1/users/profile",
+      //"http://localhost:8080/api/v1/users/profile",
         updateData,
         {
           headers: {
@@ -187,7 +189,8 @@ const ProfileEdit = () => {
       }
 
       await axios.delete(
-        "http://localhost:8080/api/v1/users",
+        "https://backend-de-peliculas.onrender.com/api/v1/users/profile",
+    //  "http://localhost:8080/api/v1/users/profile",
         {
           headers: {
             Authorization: `Bearer ${token}`,

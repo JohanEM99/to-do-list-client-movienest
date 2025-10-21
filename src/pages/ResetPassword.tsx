@@ -21,7 +21,8 @@ const ResetPassword = () => {
 
     try {
       // Realizar la solicitud al backend para enviar el enlace de restablecimiento
-      const response = await fetch("http://localhost:8080/api/auth/request-password-reset", {
+      const response = await fetch("https://backend-de-peliculas.onrender.com/api/auth/request-password-reset", {
+  //  const response = await fetch("http://localhost:8080/api/auth/request-password-reset", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

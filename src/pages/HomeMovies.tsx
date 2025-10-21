@@ -59,7 +59,8 @@ const HomeMovies: React.FC = () => {
     const token = localStorage.getItem("token");
     if (token) {
       try {
-        const response = await fetch("http://localhost:8080/api/v1/users/profile", {
+        const response = await fetch("https://backend-de-peliculas.onrender.com/api/v1/users/profile", {
+      //const response = await fetch("http://localhost:8080/api/v1/users/profile", {
           headers: {
             Authorization: `Bearer ${token}`,
           },

@@ -51,7 +51,8 @@ const NewPassword = () => {
 
     try {
       // Enviar el token y la nueva contraseña al backend para actualizarlas
-      const response = await axios.post("http://localhost:8080/api/v1/users/reset-password", {
+      await axios.post("https://backend-de-peliculas.onrender.com/api/v1/users/reset-password", {
+   // await axios.post("http://localhost:8080/api/v1/users/reset-password", {
         token,        // El token que se obtiene de la URL
         newPassword,  // La nueva contraseña
       });
