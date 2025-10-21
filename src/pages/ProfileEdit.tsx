@@ -39,7 +39,7 @@ const ProfileEdit = () => {
     "July", "August", "September", "October", "November", "December"
   ];
 
-  // Cargar datos del usuario al montar el componente
+  // Cargar datos del usuario al montar el componente.
   useEffect(() => {
     fetchUserProfile();
   }, []);
