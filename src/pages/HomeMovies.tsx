@@ -81,7 +81,7 @@ const HomeMovies: React.FC = () => {
     // Eliminar el token del localStorage y redirigir a la página de login
     localStorage.removeItem("token");
     setUser(null);
-    navigate("/login");
+    navigate("/");
   };
 
   if (loading) {
@@ -105,7 +105,7 @@ const HomeMovies: React.FC = () => {
             <>
               {/* Mostrar el logo del perfil */}
               <a href="#/profile" className="profile-btn">
-                <img src="/path-to-your-profile-icon.png" alt="Profile" className="profile-icon" />
+                <img src="editar.png" alt="Profile" className="profile-icon" />
               </a>
               <button className="logout-btn" onClick={handleLogout}>
                 Logout

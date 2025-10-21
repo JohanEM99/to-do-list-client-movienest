@@ -1,12 +1,16 @@
 // Paleta de colores
 $primary: #e50914;
 $secondary: #b20710;
-$background: #ffffff;
-$text: #333333;
+$background: #fafafa;
+$text: #1a1a1a;
+$text-secondary: #4a5568;
 $white: #ffffff;
-$gray-light: #f3f4f6;
-$gray-medium: #6b7280;
-$border: #d1d5db;
+$gray-light: #f7fafc;
+$gray-medium: #718096;
+$border: #e2e8f0;
+$shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04);
+$shadow-md: 0 4px 6px rgba(0, 0, 0, 0.05);
+$shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.08);
 
 * {
   margin: 0;
@@ -18,7 +22,9 @@ $border: #d1d5db;
   width: 100%;
   min-height: 100vh;
   background: $background;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 // Header
@@ -26,32 +32,54 @@ $border: #d1d5db;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem 4rem;
+  padding: 1.25rem 5rem;
   background: $white;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  box-shadow: $shadow-sm;
   position: sticky;
   top: 0;
   z-index: 1000;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  backdrop-filter: blur(10px);
 
   .logo {
     img {
-      height: 50px;
+      height: 48px;
       width: auto;
+      display: block;
     }
   }
 
   .nav-menu {
     display: flex;
-    gap: 2rem;
+    gap: 2.5rem;
+    align-items: center;
 
     a {
-      color: $text;
+      color: $text-secondary;
       text-decoration: none;
       font-weight: 500;
-      transition: color 0.3s ease;
+      font-size: 0.9375rem;
+      letter-spacing: -0.01em;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: -4px;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background: $primary;
+        transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
 
       &:hover {
-        color: $primary;
+        color: $text;
+        
+        &::after {
+          width: 100%;
+        }
       }
     }
   }
@@ -62,57 +90,78 @@ $border: #d1d5db;
     .user-button {
       display: flex;
       align-items: center;
-      gap: 0.8rem;
+      gap: 0.75rem;
       background: $primary;
       color: $white;
       border: none;
-      padding: 0.6rem 1.2rem;
-      border-radius: 25px;
+      padding: 0.625rem 1.25rem;
+      border-radius: 8px;
       cursor: pointer;
       font-weight: 600;
-      transition: all 0.3s ease;
+      font-size: 0.9375rem;
+      letter-spacing: -0.01em;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 1px 2px rgba(229, 9, 20, 0.1);
+      max-width: 250px;
 
       &:hover {
         background: $secondary;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(229, 9, 20, 0.3);
+        box-shadow: 0 4px 12px rgba(229, 9, 20, 0.25);
+        transform: translateY(-1px);
       }
 
-      .user-avatar {
+      &:active {
+        transform: translateY(0);
+      }
+
+      .user-avatar-small {
         background: rgba(255, 255, 255, 0.2);
         width: 32px;
         height: 32px;
-        border-radius: 50%;
+        border-radius: 6px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 1rem;
+        font-size: 0.9375rem;
+        font-weight: 600;
+        flex-shrink: 0;
       }
 
       span {
-        font-size: 0.95rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
       }
     }
 
     .dropdown-menu {
       position: absolute;
-      top: calc(100% + 0.5rem);
+      top: calc(100% + 0.75rem);
       right: 0;
-      background: $white;
-      border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-      min-width: 200px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12);
+      border: 1px solid $border;
+      min-width: 180px;
       overflow: hidden;
-      animation: slideDown 0.2s ease;
+      animation: slideDown 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 
       .dropdown-item {
         display: flex;
         align-items: center;
-        gap: 0.8rem;
-        padding: 1rem 1.5rem;
+        gap: 0.875rem;
+        padding: 0.875rem 1.25rem;
         color: $text;
         text-decoration: none;
-        transition: all 0.2s ease;
+        transition: all 0.15s ease;
+        background-color: white;
+        font-size: 0.9375rem;
+        font-weight: 500;
+        letter-spacing: -0.01em;
+        border: none;
+        width: 100%;
+        cursor: pointer;
+        text-align: left;
         border-bottom: 1px solid $gray-light;
 
         &:last-child {
@@ -125,7 +174,8 @@ $border: #d1d5db;
         }
 
         svg {
-          font-size: 1.1rem;
+          font-size: 1.125rem;
+          opacity: 0.8;
         }
       }
     }
@@ -140,7 +190,7 @@ $border: #d1d5db;
       width: 100%;
       justify-content: center;
       margin-top: 1rem;
-      gap: 1rem;
+      gap: 1.5rem;
     }
   }
 }
@@ -148,7 +198,7 @@ $border: #d1d5db;
 @keyframes slideDown {
   from {
     opacity: 0;
-    transform: translateY(-10px);
+    transform: translateY(-8px);
   }
   to {
     opacity: 1;
@@ -158,8 +208,8 @@ $border: #d1d5db;
 
 // Profile Content
 .profile-content {
-  max-width: 900px;
-  margin: 3rem auto;
+  max-width: 960px;
+  margin: 4rem auto;
   padding: 0 2rem;
 
   @media (max-width: 768px) {
@@ -170,101 +220,222 @@ $border: #d1d5db;
 
 .profile-card {
   background: $white;
-  border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  box-shadow: $shadow-lg;
   overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.06);
 }
 
 // Profile Avatar Section
 .profile-avatar-section {
   text-align: center;
-  padding: 3rem 2rem 2rem;
-  background: linear-gradient(135deg, rgba(229, 9, 20, 0.05) 0%, rgba(255, 255, 255, 0.5) 100%);
+  padding: 4rem 2rem 3rem;
+  background: linear-gradient(135deg, rgba(229, 9, 20, 0.03) 0%, rgba(255, 255, 255, 1) 100%);
+  border-bottom: 1px solid $border;
 
   .profile-avatar-large {
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    background: $primary;
+    width: 110px;
+    height: 110px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, $primary 0%, $secondary 100%);
     color: $white;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 3rem;
-    margin: 0 auto 1.5rem;
-    box-shadow: 0 4px 15px rgba(229, 9, 20, 0.3);
+    font-weight: 600;
+    margin: 0 auto 1.75rem;
+    box-shadow: 0 8px 24px rgba(229, 9, 20, 0.2);
+    letter-spacing: -0.02em;
+    position: relative;
+    overflow: hidden;
+
+    &::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(
+        45deg,
+        transparent,
+        rgba(255, 255, 255, 0.1),
+        transparent
+      );
+      transform: rotate(45deg);
+      animation: shine 3s infinite;
+    }
+  }
+
+  @keyframes shine {
+    0% {
+      transform: translateX(-100%) translateY(-100%) rotate(45deg);
+    }
+    100% {
+      transform: translateX(100%) translateY(100%) rotate(45deg);
+    }
   }
 
   h2 {
     font-size: 2rem;
     color: $text;
     margin-bottom: 0.5rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
   }
 
   .profile-subtitle {
     font-size: 1rem;
-    color: $gray-medium;
+    color: $text-secondary;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+}
+
+// Mensajes de error y éxito
+.error-message {
+  background: rgba(229, 9, 20, 0.1);
+  border-left: 4px solid $primary;
+  color: $primary;
+  padding: 1rem 1.25rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  animation: slideIn 0.3s ease;
+}
+
+.success-message {
+  background: rgba(16, 185, 129, 0.1);
+  border-left: 4px solid #10b981;
+  color: #059669;
+  padding: 1rem 1.25rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
 // Profile Form
 .profile-form {
-  padding: 2.5rem;
+  padding: 3rem;
 
   @media (max-width: 640px) {
-    padding: 1.5rem;
+    padding: 2rem 1.5rem;
   }
 }
 
 .form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1.5rem;
-  margin-bottom: 1.5rem;
+  gap: 1.75rem;
+  margin-bottom: 1.75rem;
 
   @media (max-width: 640px) {
     grid-template-columns: 1fr;
-    gap: 1rem;
+    gap: 1.25rem;
   }
 }
 
 .form-group {
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.75rem;
 
   label {
     display: block;
-    font-size: 0.95rem;
+    font-size: 0.875rem;
     font-weight: 600;
     color: $text;
-    margin-bottom: 0.6rem;
+    margin-bottom: 0.625rem;
+    letter-spacing: -0.01em;
+    text-transform: uppercase;
+    font-size: 0.8125rem;
+    color: $text-secondary;
   }
 
   input,
   select {
     width: 100%;
-    padding: 0.9rem 1rem;
-    border: 1px solid $border;
+    padding: 0.875rem 1rem;
+    border: 1.5px solid $border;
     border-radius: 8px;
-    font-size: 0.95rem;
+    font-size: 0.9375rem;
     color: $text;
     background: $white;
-    transition: all 0.3s ease;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 
     &:focus {
       outline: none;
       border-color: $primary;
-      box-shadow: 0 0 0 3px rgba(229, 9, 20, 0.1);
+      box-shadow: 0 0 0 3px rgba(229, 9, 20, 0.08);
+      background: $white;
+    }
+
+    &:hover:not(:focus) {
+      border-color: darken($border, 5%);
     }
 
     &::placeholder {
       color: $gray-medium;
+      font-weight: 400;
+    }
+  }
+
+  .password-input-wrapper {
+    position: relative;
+    width: 100%;
+
+    input {
+      padding-right: 3rem;
+    }
+
+    .password-toggle {
+      position: absolute;
+      right: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: $gray-medium;
+      cursor: pointer;
+      padding: 0.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 0.2s ease;
+
+      &:hover {
+        color: $primary;
+      }
+
+      svg {
+        width: 20px;
+        height: 20px;
+      }
     }
   }
 
   .date-inputs {
     display: grid;
     grid-template-columns: 2fr 1fr 1.2fr;
-    gap: 0.8rem;
+    gap: 0.875rem;
 
     @media (max-width: 640px) {
       grid-template-columns: 1fr;
@@ -273,21 +444,47 @@ $border: #d1d5db;
 
   .form-hint {
     display: block;
-    margin-top: 0.5rem;
-    font-size: 0.85rem;
+    margin-top: 0.625rem;
+    font-size: 0.8125rem;
     color: $gray-medium;
+    letter-spacing: -0.01em;
+    font-weight: 400;
+  }
+}
+
+.required {
+  color: $primary;
+  margin-left: 0.25rem;
+}
+
+.input-with-icon {
+  position: relative;
+  
+  .input-icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: $gray-medium;
+    font-size: 1rem;
+  }
+  
+  input {
+    padding-left: 3rem;
   }
 }
 
 .form-section {
-  margin-top: 2.5rem;
-  padding-top: 2rem;
-  border-top: 1px solid $gray-light;
+  margin-top: 3rem;
+  padding-top: 2.5rem;
+  border-top: 1px solid $border;
 
   h3 {
-    font-size: 1.3rem;
+    font-size: 1.375rem;
     color: $text;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1.75rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
   }
 }
 
@@ -295,9 +492,9 @@ $border: #d1d5db;
 .form-actions {
   display: flex;
   gap: 1rem;
-  margin-top: 2.5rem;
-  padding-top: 2rem;
-  border-top: 1px solid $gray-light;
+  margin-top: 3rem;
+  padding-top: 2.5rem;
+  border-top: 1px solid $border;
 
   @media (max-width: 640px) {
     flex-direction: column;
@@ -308,41 +505,52 @@ $border: #d1d5db;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0.6rem;
+    gap: 0.625rem;
     padding: 1rem 2rem;
     border: none;
     border-radius: 8px;
-    font-size: 1rem;
+    font-size: 0.9375rem;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    letter-spacing: -0.01em;
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    &:active {
+      transform: translateY(0) !important;
+    }
 
     svg {
-      font-size: 1.1rem;
+      font-size: 1.125rem;
     }
   }
 
   .save-button {
     background: $primary;
     color: $white;
+    box-shadow: 0 2px 8px rgba(229, 9, 20, 0.15);
 
-    &:hover {
+    &:hover:not(:disabled) {
       background: $secondary;
+      box-shadow: 0 6px 20px rgba(229, 9, 20, 0.25);
       transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(229, 9, 20, 0.3);
     }
   }
 
   .delete-button {
     background: transparent;
     color: $primary;
-    border: 2px solid $primary;
+    border: 1.5px solid $primary;
 
     &:hover {
       background: $primary;
       color: $white;
+      box-shadow: 0 4px 16px rgba(229, 9, 20, 0.2);
       transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(229, 9, 20, 0.2);
     }
   }
 }

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import "../styles/ProfileEdit.scss";
-import { FaUser, FaCog, FaSignOutAlt, FaSave, FaTrash, FaEnvelope } from "react-icons/fa";
+import { FaUser, FaCog, FaSignOutAlt, FaSave, FaTrash, FaEnvelope, FaEye, FaEyeSlash } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
@@ -21,6 +21,8 @@ const ProfileEdit = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [profileData, setProfileData] = useState<ProfileData>({
     firstName: "",
     lastName: "",
@@ -208,7 +210,13 @@ const ProfileEdit = () => {
     navigate("/");
   };
 
-  
+  const togglePassword = () => {
+    setShowPassword(!showPassword);
+  };
+
+  const toggleConfirmPassword = () => {
+    setShowConfirmPassword(!showConfirmPassword);
+  };
 
   return (
     <div className="profile-edit-container">
@@ -234,9 +242,6 @@ const ProfileEdit = () => {
           </button>
           {showDropdown && (
             <div className="dropdown-menu">
-              <a href="/#/profile" className="dropdown-item">
-                <FaCog /> Configuración de perfil
-              </a>
               <button onClick={handleLogout} className="dropdown-item">
                 <FaSignOutAlt /> Salir
               </button>
@@ -348,26 +353,44 @@ const ProfileEdit = () => {
               <h3>Cambiar la contraseña (Opcional)</h3>
               <div className="form-group">
                 <label htmlFor="newPassword">Nueva contraseña</label>
-                <input
-                  type="password"
-                  id="newPassword"
-                  name="newPassword"
-                  placeholder="Déjelo en blanco para mantener la contraseña actual"
-                  value={profileData.newPassword}
-                  onChange={handleChange}
-                />
+                <div className="password-input-wrapper">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    id="newPassword"
+                    name="newPassword"
+                    placeholder="Déjelo en blanco para mantener la contraseña actual"
+                    value={profileData.newPassword}
+                    onChange={handleChange}
+                  />
+                  <button
+                    type="button"
+                    className="password-toggle"
+                    onClick={togglePassword}
+                  >
+                    {showPassword ? <FaEyeSlash /> : <FaEye />}
+                  </button>
+                </div>
                 <small className="form-hint">Mínimo 8 caracteres</small>
               </div>
               <div className="form-group">
                 <label htmlFor="confirmPassword">Confirmar nueva contraseña</label>
-                <input
-                  type="password"
-                  id="confirmPassword"
-                  name="confirmPassword"
-                  placeholder="Vuelva a ingresar la nueva contraseña"
-                  value={profileData.confirmPassword}
-                  onChange={handleChange}
-                />
+                <div className="password-input-wrapper">
+                  <input
+                    type={showConfirmPassword ? "text" : "password"}
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    placeholder="Vuelva a ingresar la nueva contraseña"
+                    value={profileData.confirmPassword}
+                    onChange={handleChange}
+                  />
+                  <button
+                    type="button"
+                    className="password-toggle"
+                    onClick={toggleConfirmPassword}
+                  >
+                    {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -379,7 +402,7 @@ const ProfileEdit = () => {
                 onClick={handleSaveChanges}
                 disabled={isLoading}
               >
-                <FaSave /> {isLoading ? "Saving..." : "Guardar cambios"}
+                <FaSave /> {isLoading ? "Guardando..." : "Guardar cambios"}
               </button>
               <button 
                 type="button" 
