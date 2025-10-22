@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "../styles/NewPassword.scss";
 import { useParams, useNavigate } from "react-router-dom"; // Usamos useParams para obtener el token
-import { FaEye, FaEyeSlash, FaCheckCircle } from "react-icons/fa"; // Íconos para mostrar/ocultar contraseña
+import { FaEye, FaEyeSlash, FaCheckCircle } from "react-icons/fa"; // Íconos para mostrar/ocultar contraseña.
 
 const NewPassword = () => {
   const { token } = useParams();  // Obtener el token de la URL.
