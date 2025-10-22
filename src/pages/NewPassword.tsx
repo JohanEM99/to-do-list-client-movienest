@@ -5,7 +5,7 @@ import { useParams, useNavigate } from "react-router-dom"; // Usamos useParams p
 import { FaEye, FaEyeSlash, FaCheckCircle } from "react-icons/fa"; // Íconos para mostrar/ocultar contraseña
 
 const NewPassword = () => {
-  const { token } = useParams();  // Obtener el token de la URL
+  const { token } = useParams();  // Obtener el token de la URL.
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [message, setMessage] = useState("");
