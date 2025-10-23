@@ -1,4 +1,5 @@
 import "../styles/Register.scss";
+import { useState } from "react";
 import { useRegister } from "../hooks/useRegister";
 
 export default function Register() {
@@ -15,6 +16,40 @@ export default function Register() {
     success,
   } = useRegister();
 
+  const [passwordError, setPasswordError] = useState("");
+
+  const validatePassword = (password: string) => {
+    // Expresión regular para la validación de la contraseña
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+={}\[\]:;"'<>,.?/\\|-]).{8,}$/;
+
+    if (!passwordRegex.test(password)) {
+      setPasswordError(
+        "La contraseña debe tener al menos una letra mayúscula, una minúscula, un número y un símbolo especial."
+      );
+      return false;
+    }
+
+    setPasswordError(""); // Si es válida, limpiamos el mensaje de error
+    return true;
+  };
+
+  const handleFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // Validar las contraseñas antes de enviar el formulario
+    const isPasswordValid = validatePassword(formData.password);
+    const isConfirmPasswordValid = formData.password === formData.confirmPassword;
+
+    if (!isPasswordValid) return; // No enviamos si la contraseña no es válida
+    if (!isConfirmPasswordValid) {
+      setPasswordError("Las contraseñas no coinciden.");
+      return;
+    }
+
+    // Si la validación pasa, enviamos el formulario
+    handleSubmit(e);
+  };
+
   return (
     <div className="container-register">
       <div className="form-container">
@@ -22,7 +57,7 @@ export default function Register() {
         <p>Completa los campos y forma parte de nosotros.</p>
         <br />
 
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleFormSubmit}>
           <input
             type="text"
             name="username"
@@ -88,7 +123,14 @@ export default function Register() {
             </button>
           </div>
 
-          {/* Mensaje de error */}
+          {/* Mensaje de error para contraseñas */}
+          {passwordError && (
+            <div className="error-message">
+              {passwordError}
+            </div>
+          )}
+
+          {/* Mensaje de error general */}
           {error && (
             <div className="error-message">
               {error}

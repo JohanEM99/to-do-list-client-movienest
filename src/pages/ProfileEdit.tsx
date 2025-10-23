@@ -1,6 +1,14 @@
 import { useState, useEffect } from "react";
 import "../styles/ProfileEdit.scss";
-import { FaUser, FaSignOutAlt, FaSave, FaTrash, FaEnvelope, FaEye, FaEyeSlash } from "react-icons/fa";
+import {
+  FaUser,
+  FaSignOutAlt,
+  FaSave,
+  FaTrash,
+  FaEnvelope,
+  FaEye,
+  FaEyeSlash,
+} from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
@@ -35,8 +43,18 @@ const ProfileEdit = () => {
   });
 
   const months = [
-    "January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December"
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
   ];
 
   // Cargar datos del usuario al montar el componente.
@@ -54,7 +72,7 @@ const ProfileEdit = () => {
 
       const response = await axios.get(
         "https://backend-de-peliculas.onrender.com/api/v1/users/profile",
-      //"http://localhost:8080/api/v1/users/profile",
+        //"http://localhost:8080/api/v1/users/profile",
         {
           headers: {
             Authorization: `Bearer ${token}`, // Autenticación con el token
@@ -70,7 +88,7 @@ const ProfileEdit = () => {
       setProfileData({
         firstName: user.username || user.firstName || "",
         lastName: user.lastname || user.lastName || "",
-        birthMonth: birthDate ? months[birthDate.getMonth()] : "January",
+        birthMonth: birthDate ? months[birthDate.getMonth()] : "",
         birthDay: birthDate ? birthDate.getDate().toString() : "",
         birthYear: birthDate ? birthDate.getFullYear().toString() : "",
         email: user.email || "",
@@ -83,11 +101,13 @@ const ProfileEdit = () => {
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target;
-    setProfileData(prev => ({
+    setProfileData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
     setError("");
     setSuccess("");
@@ -100,13 +120,26 @@ const ProfileEdit = () => {
 
     // Validar contraseñas si se están cambiando
     if (profileData.newPassword || profileData.confirmPassword) {
+      // Verificar longitud mínima de la contraseña
       if (profileData.newPassword.length < 8) {
-        setError("La contraseña debe tener al menos 8 caracteres");
+        setError("La contraseña debe tener al menos 8 caracteres.");
         return;
       }
 
+      // Verificar que las contraseñas coincidan
       if (profileData.newPassword !== profileData.confirmPassword) {
-        setError("Las contraseñas no coinciden");
+        setError("Las contraseñas no coinciden.");
+        return;
+      }
+
+      // Verificar que la contraseña tenga al menos una letra mayúscula, una letra minúscula, un número y un símbolo especial
+      const passwordRegex =
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+={}\[\]:;"'<>,.?/\\|-]).{8,}$/;
+
+      if (!passwordRegex.test(profileData.newPassword)) {
+        setError(
+          "La contraseña debe contener al menos una letra mayúscula, una letra minúscula, un número y un símbolo especial."
+        );
         return;
       }
     }
@@ -121,7 +154,9 @@ const ProfileEdit = () => {
       }
 
       // Construir fecha de nacimiento
-      const birthdate = `${profileData.birthYear}-${String(months.indexOf(profileData.birthMonth) + 1).padStart(2, '0')}-${String(profileData.birthDay).padStart(2, '0')}`;
+      const birthdate = `${profileData.birthYear}-${String(
+        months.indexOf(profileData.birthMonth) + 1
+      ).padStart(2, "0")}-${String(profileData.birthDay).padStart(2, "0")}`;
 
       // Preparar datos para enviar
       const updateData: any = {
@@ -138,7 +173,6 @@ const ProfileEdit = () => {
 
       await axios.put(
         "https://backend-de-peliculas.onrender.com/api/v1/users/profile",
-      //"http://localhost:8080/api/v1/users/profile",
         updateData,
         {
           headers: {
@@ -151,7 +185,7 @@ const ProfileEdit = () => {
       setSuccess("¡Perfil actualizado exitosamente!");
 
       // Limpiar campos de contraseña
-      setProfileData(prev => ({
+      setProfileData((prev) => ({
         ...prev,
         newPassword: "",
         confirmPassword: "",
@@ -161,12 +195,12 @@ const ProfileEdit = () => {
       setTimeout(() => {
         fetchUserProfile();
       }, 1000);
-
     } catch (error: any) {
       console.error("Error al actualizar perfil:", error);
 
       if (axios.isAxiosError(error)) {
-        const errorMsg = error.response?.data?.message || "Error al actualizar el perfil";
+        const errorMsg =
+          error.response?.data?.message || "Error al actualizar el perfil";
         setError(errorMsg);
       } else {
         setError("Error de conexión. Intenta de nuevo.");
@@ -177,7 +211,11 @@ const ProfileEdit = () => {
   };
 
   const handleDeleteAccount = async () => {
-    if (!window.confirm("¿Estás seguro que quieres eliminar tu cuenta? Esta acción no se puede deshacer.")) {
+    if (
+      !window.confirm(
+        "¿Estás seguro que quieres eliminar tu cuenta? Esta acción no se puede deshacer."
+      )
+    ) {
       return;
     }
 
@@ -190,7 +228,7 @@ const ProfileEdit = () => {
 
       await axios.delete(
         "https://backend-de-peliculas.onrender.com/api/v1/users/profile",
-    //  "http://localhost:8080/api/v1/users/profile",
+        //  "http://localhost:8080/api/v1/users/profile",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -201,7 +239,6 @@ const ProfileEdit = () => {
       alert("Cuenta eliminada exitosamente");
       localStorage.removeItem("token");
       navigate("/");
-
     } catch (error) {
       console.error("Error al eliminar cuenta:", error);
       alert("Error al eliminar la cuenta. Intenta de nuevo.");
@@ -234,7 +271,7 @@ const ProfileEdit = () => {
           <a href="/#/about">Sobre Nosotros</a>
         </nav>
         <div className="user-menu">
-          <button 
+          <button
             className="user-button"
             onClick={() => setShowDropdown(!showDropdown)}
           >
@@ -261,26 +298,18 @@ const ProfileEdit = () => {
               <FaUser />
             </div>
             <h2>Mi Perfil</h2>
-            <p className="profile-subtitle">Administra la información de tu cuenta</p>
+            <p className="profile-subtitle">
+              Administra la información de tu cuenta
+            </p>
           </div>
 
           <div className="profile-form">
-            {error && (
-              <div className="error-message">
-                {error}
-              </div>
-            )}
-
-            {success && (
-              <div className="success-message">
-                {success}
-              </div>
-            )}
-
             {/* Formulario de datos */}
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="firstName">Nombre<span className="required">*</span></label>
+                <label htmlFor="firstName">
+                  Nombre<span className="required">*</span>
+                </label>
                 <input
                   type="text"
                   id="firstName"
@@ -290,7 +319,9 @@ const ProfileEdit = () => {
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="lastName">Apellido <span className="required">*</span></label>
+                <label htmlFor="lastName">
+                  Apellido <span className="required">*</span>
+                </label>
                 <input
                   type="text"
                   id="lastName"
@@ -303,15 +334,19 @@ const ProfileEdit = () => {
 
             {/* Fecha de nacimiento */}
             <div className="form-group">
-              <label>Fecha de nacimiento<span className="required">*</span></label>
+              <label>
+                Fecha de nacimiento<span className="required">*</span>
+              </label>
               <div className="date-inputs">
                 <select
                   name="birthMonth"
                   value={profileData.birthMonth}
                   onChange={handleChange}
                 >
-                  {months.map(month => (
-                    <option key={month} value={month}>{month}</option>
+                  {months.map((month) => (
+                    <option key={month} value={month}>
+                      {month}
+                    </option>
                   ))}
                 </select>
                 <input
@@ -333,12 +368,17 @@ const ProfileEdit = () => {
                   onChange={handleChange}
                 />
               </div>
-              <small className="form-hint">Debes tener al menos 13 años para registrarte.</small>
+              <small className="form-hint">
+                Debes tener al menos 13 años para registrarte.
+              </small>
             </div>
 
             {/* Correo electrónico */}
             <div className="form-group">
-              <label htmlFor="email">Dirección de correo electrónico<span className="required">*</span></label>
+              <label htmlFor="email">
+                Dirección de correo electrónico
+                <span className="required">*</span>
+              </label>
               <div className="input-with-icon">
                 <FaEnvelope className="input-icon" />
                 <input
@@ -376,7 +416,9 @@ const ProfileEdit = () => {
                 <small className="form-hint">Mínimo 8 caracteres</small>
               </div>
               <div className="form-group">
-                <label htmlFor="confirmPassword">Confirmar nueva contraseña</label>
+                <label htmlFor="confirmPassword">
+                  Confirmar nueva contraseña
+                </label>
                 <div className="password-input-wrapper">
                   <input
                     type={showConfirmPassword ? "text" : "password"}
@@ -395,11 +437,14 @@ const ProfileEdit = () => {
                   </button>
                 </div>
               </div>
+              {error && <div className="error-message">{error}</div>}
+
+              {success && <div className="success-message">{success}</div>}
             </div>
 
             {/* Botones */}
             <div className="form-actions">
-              <button 
+              <button
                 type="button"
                 className="save-button"
                 onClick={handleSaveChanges}
@@ -407,8 +452,8 @@ const ProfileEdit = () => {
               >
                 <FaSave /> {isLoading ? "Guardando..." : "Guardar cambios"}
               </button>
-              <button 
-                type="button" 
+              <button
+                type="button"
                 className="delete-button"
                 onClick={handleDeleteAccount}
               >

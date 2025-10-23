@@ -125,6 +125,7 @@ body {
         -webkit-text-fill-color: $text;
       }
     }
+    
 
     button[type="submit"] {
       background: $primary;
@@ -178,6 +179,13 @@ body {
   text-align: center;
   font-size: 0.9rem;
 }
+
+.error-msg {
+  color: $text;
+  font-size: 0.85rem;
+  margin-top: 0.3rem;
+}
+
 
 // Links
 p {
