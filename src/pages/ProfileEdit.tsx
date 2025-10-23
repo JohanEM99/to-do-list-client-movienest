@@ -83,7 +83,7 @@ const ProfileEdit = () => {
       const user = response.data.user;
 
       // Separar fecha de nacimiento si viene como string
-      const birthDate = user.birthdate ? new Date(user.birthdate) : null;
+      const birthDate = user.birthdate ? new Date(user.birthdate + "T12:00:00") : null;
 
       setProfileData({
         firstName: user.username || user.firstName || "",
@@ -386,7 +386,8 @@ const ProfileEdit = () => {
                   id="email"
                   name="email"
                   value={profileData.email}
-                  onChange={handleChange}
+                  readOnly
+                  style={{ backgroundColor: "#f5f5f5a2", cursor: "not-allowed" }}
                 />
               </div>
             </div>
