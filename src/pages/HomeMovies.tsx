@@ -3,6 +3,27 @@ import "../styles/HomeMovies.scss";
 import { FaStar, FaClock, FaPlay } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
+interface PexelsVideo {
+  id: number;
+  image: string;
+  duration: number;
+  user: {
+    name: string;
+  };
+  video_files: Array<{
+    id: number;
+    quality: string;
+    file_type: string;
+    width: number;
+    height: number;
+    link: string;
+  }>;
+  video_pictures: Array<{
+    id: number;
+    picture: string;
+  }>;
+}
+
 interface Movie {
   id: number;
   title: string;
@@ -12,7 +33,7 @@ interface Movie {
   rating: number;
   genre: string;
   image: string;
-  video?: string;
+  videoUrl?: string;
   featured?: boolean;
 }
 
@@ -21,6 +42,7 @@ const HomeMovies: React.FC = () => {
   const [featuredMovie, setFeaturedMovie] = useState<Movie | null>(null);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<any>(null);
+  const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -30,24 +52,47 @@ const HomeMovies: React.FC = () => {
 
   const fetchMovies = async () => {
     try {
-      // Simulación de carga de películas
-      const mockMovies: Movie[] = [
-        {
-          id: 1,
-          title: "La última batalla",
-          description: "Un thriller de acción épico sobre un sheriff que defiende su ciudad de un peligroso cártel.",
-          year: 2023,
-          duration: "125 min",
-          rating: 4.5,
-          genre: "Drama",
-          image: "https://images.pexels.com/photos/7991579/pexels-photo-7991579.jpeg?auto=compress&cs=tinysrgb&w=800",
-          featured: true,
-        },
-        // Agrega más películas si es necesario
-      ];
+      const PEXELS_API_KEY = import.meta.env.VITE_PEXELS_API_KEY || "pjVKkdHUWxAeb3NyKhEXk7j6kP1kv85b67dbekeZaWW2MYoLIuBZuCZN";
+      const url = `https://api.pexels.com/videos/search?query=cinema movie&per_page=15`;
 
-      setMovies(mockMovies);
-      setFeaturedMovie(mockMovies[0]);
+      const response = await fetch(url, {
+        headers: {
+          Authorization: PEXELS_API_KEY,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Error: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      if (data.videos && data.videos.length > 0) {
+        const transformedMovies: Movie[] = data.videos.map((video: PexelsVideo, index: number) => {
+          const hdVideo = video.video_files.find(file => file.quality === "hd") || video.video_files[0];
+          const durationMinutes = Math.floor(video.duration / 60);
+          
+          const genres = ["Acción", "Drama", "Comedia", "Terror", "Ciencia Ficción", "Aventura"];
+          const randomGenre = genres[Math.floor(Math.random() * genres.length)];
+
+          return {
+            id: video.id,
+            title: `Película ${index + 1}`,
+            description: `Video creado por ${video.user.name}. Una experiencia cinematográfica única.`,
+            year: 2024,
+            duration: `${durationMinutes} min`,
+            rating: parseFloat((4.0 + Math.random() * 1).toFixed(1)),
+            genre: randomGenre,
+            image: video.video_pictures[0]?.picture || video.image,
+            videoUrl: hdVideo?.link || "",
+            featured: index === 0
+          };
+        });
+
+        setMovies(transformedMovies);
+        setFeaturedMovie(transformedMovies[0]);
+      }
+
       setLoading(false);
     } catch (error) {
       console.error("Error al obtener películas:", error);
@@ -60,7 +105,6 @@ const HomeMovies: React.FC = () => {
     if (token) {
       try {
         const response = await fetch("https://backend-de-peliculas.onrender.com/api/v1/users/profile", {
-      //const response = await fetch("http://localhost:8080/api/v1/users/profile", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -79,10 +123,17 @@ const HomeMovies: React.FC = () => {
   };
 
   const handleLogout = () => {
-    // Eliminar el token del localStorage y redirigir a la página de login
     localStorage.removeItem("token");
     setUser(null);
     navigate("/");
+  };
+
+  const handlePlayVideo = (videoUrl: string) => {
+    setSelectedVideo(videoUrl);
+  };
+
+  const handleCloseVideo = () => {
+    setSelectedVideo(null);
   };
 
   if (loading) {
@@ -104,7 +155,6 @@ const HomeMovies: React.FC = () => {
         <div className="auth-buttons">
           {user ? (
             <>
-              {/* Mostrar el logo del perfil */}
               <a href="#/profile" className="profile-btn">
                 <img src="editar.png" alt="Profile" className="profile-icon" />
               </a>
@@ -141,7 +191,10 @@ const HomeMovies: React.FC = () => {
               <span>•</span>
               <span>{featuredMovie.duration}</span>
             </div>
-            <button className="watch-btn">
+            <button 
+              className="watch-btn"
+              onClick={() => featuredMovie.videoUrl && handlePlayVideo(featuredMovie.videoUrl)}
+            >
               <FaPlay /> Ver ahora
             </button>
           </div>
@@ -159,7 +212,10 @@ const HomeMovies: React.FC = () => {
             <div key={movie.id} className="movie-card">
               <div className="movie-image">
                 <img src={movie.image} alt={movie.title} />
-                <div className="movie-overlay">
+                <div 
+                  className="movie-overlay"
+                  onClick={() => movie.videoUrl && handlePlayVideo(movie.videoUrl)}
+                >
                   <button className="play-button">
                     <FaPlay />
                   </button>
@@ -235,6 +291,18 @@ const HomeMovies: React.FC = () => {
           </div>
         </div>
       </footer>
+
+      {/* Modal de video */}
+      {selectedVideo && (
+        <div className="video-modal" onClick={handleCloseVideo}>
+          <div className="video-modal-content" onClick={(e) => e.stopPropagation()}>
+            <button className="close-button" onClick={handleCloseVideo}>
+              ✕
+            </button>
+            <video controls autoPlay src={selectedVideo} />
+          </div>
+        </div>
+      )}
     </div>
   );
 };

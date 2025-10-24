@@ -59,6 +59,7 @@ $gray-medium: #6b7280;
   .auth-buttons {
     display: flex;
     gap: 1rem;
+    align-items: center;
 
     .login-btn {
       color: $text;
@@ -83,6 +84,46 @@ $gray-medium: #6b7280;
 
       &:hover {
         background: $secondary;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(229, 9, 20, 0.3);
+      }
+    }
+
+    .profile-btn {
+      display: flex;
+      align-items: center;
+      text-decoration: none;
+      color: $text;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+
+      .profile-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        object-fit: cover;
+      }
+
+      &:hover {
+        background: rgba(229, 9, 20, 0.1);
+      }
+    }
+
+    .logout-btn {
+      background: transparent;
+      color: $text;
+      border: 2px solid $primary;
+      padding: 0.5rem 1.5rem;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 0.95rem;
+
+      &:hover {
+        background: $primary;
+        color: $white;
         transform: translateY(-2px);
         box-shadow: 0 4px 12px rgba(229, 9, 20, 0.3);
       }

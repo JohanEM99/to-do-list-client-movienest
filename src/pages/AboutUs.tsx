@@ -1,8 +1,44 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import "../styles/AboutUs.scss";
 import { FaFilm, FaAward, FaUsers } from "react-icons/fa";
 
 const AboutUs: React.FC = () => {
+  const [user, setUser] = useState<any>(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    fetchUserProfile();
+  }, []);
+
+  const fetchUserProfile = async () => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      try {
+        const response = await fetch("https://backend-de-peliculas.onrender.com/api/v1/users/profile", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error("No se pudo obtener el perfil del usuario.");
+        }
+
+        const data = await response.json();
+        setUser(data.user);
+      } catch (error) {
+        console.error("Error al obtener el perfil de usuario:", error);
+      }
+    }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    setUser(null);
+    navigate("/");
+  };
+
   return (
     <div className="about-container">
       {/* Header Section */}
@@ -16,8 +52,23 @@ const AboutUs: React.FC = () => {
           <a href="#/about">Sobre Nosotros</a>
         </nav>
         <div className="auth-buttons">
-          <a href="/" className="login-btn">Ingreso</a>
-          <a href="#/register" className="signup-btn">Registro</a>
+          {user ? (
+            <>
+              {/* Mostrar el logo del perfil */}
+              <a href="#/profile" className="profile-btn">
+                <img src="editar.png" alt="Profile" className="profile-icon" />
+              </a>
+              <button className="logout-btn" onClick={handleLogout}>
+                Logout
+              </button>
+            </>
+          ) : (
+            <>
+              <a href="/" className="login-btn">Ingreso</a>
+              <a href="#/register" className="signup-btn">Registro</a>
+              <a href="#/profile" className="profile-btn">Mi perfil</a>
+            </>
+          )}
         </div>
       </header>
 
