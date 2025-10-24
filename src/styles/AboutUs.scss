@@ -15,9 +15,12 @@ $gray-medium: #6b7280;
 }
 
 .about-container {
-  width: 100%;
-  min-height: 100vh;
+  width: 100vw;         // Ocupa todo el ancho visible
+  height: 100vh;        // Ocupa toda la altura visible
+  overflow: hidden;     // Evita scroll si algo se sale
   background: $white;
+  display: flex;        // Centra opcionalmente el contenido si se necesita
+  flex-direction: column;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
