@@ -1,6 +1,27 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import "../styles/Movies.scss";
-import { FaStar, FaSearch, FaFilter } from "react-icons/fa";
+import { FaStar, FaSearch, FaFilter, FaPlay } from "react-icons/fa";
+
+interface PexelsVideo {
+  id: number;
+  image: string;
+  duration: number;
+  user: {
+    name: string;
+  };
+  video_files: Array<{
+    id: number;
+    quality: string;
+    file_type: string;
+    width: number;
+    height: number;
+    link: string;
+  }>;
+  video_pictures: Array<{
+    id: number;
+    picture: string;
+  }>;
+}
 
 interface Movie {
   id: number;
@@ -11,99 +32,109 @@ interface Movie {
   rating: number;
   genre: string;
   image: string;
+  videoUrl: string;
 }
 
-const Movies: React.FC = () => {
+const Movies = () => {
   const [movies, setMovies] = useState<Movie[]>([]);
   const [filteredMovies, setFilteredMovies] = useState<Movie[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedGenre, setSelectedGenre] = useState("Todos");
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
 
-  const genres = ["Todos", "Acción", "Ciencia Ficción", "Comedia", "Drama", "Horror"];
+  const genres = ["Todos", "Acción", "Drama", "Comedia", "Terror", "Ciencia Ficción"];
+
+  // Mapeo de géneros a queries de búsqueda en Pexels
+  const genreQueries: { [key: string]: string } = {
+    "Acción": "action movie",
+    "Drama": "drama film",
+    "Comedia": "comedy movie",
+    "Terror": "horror movie",
+    "Ciencia Ficción": "sci-fi movie",
+    "Todos": "cinema movie"
+  };
 
   useEffect(() => {
-    fetchMovies();
+    fetchMovies("cinema movie");
   }, []);
 
   useEffect(() => {
     filterMovies();
   }, [searchTerm, selectedGenre, movies]);
 
-  const fetchMovies = async () => {
-    // Mock data - puedes reemplazar con API de Pexels
-    const mockMovies: Movie[] = [
-      {
-        id: 1,
-        title: "La última batalla",
-        description: "Un thriller de acción épico sobre un sheriff que defiende su ciudad de un peligroso...",
-        year: 2023,
-        duration: "125 min",
-        rating: 4.5,
-        genre: "Acción",
-        image: "https://images.pexels.com/photos/7991579/pexels-photo-7991579.jpeg?auto=compress&cs=tinysrgb&w=800",
-      },
-      {
-        id: 2,
-        title: "Viaje Cósmico",
-        description: "Un relato alucinante que viaja a través del espacio y el tiempo.",
-        year: 2024,
-        duration: "140 min",
-        rating: 4.7,
-        genre: "Ciencia ficción",
-        image: "https://images.pexels.com/photos/12498606/pexels-photo-12498606.jpeg?auto=compress&cs=tinysrgb&w=800",
-      },
-      {
-        id: 3,
-        title: "¡Ríete a carcajadas!",
-        description: "Una comedia divertidísima que te hará reír de principio a fin.",
-        year: 2024,
-        duration: "98 min",
-        rating: 4.2,
-        genre: "Comedia",
-        image: "https://images.pexels.com/photos/2774556/pexels-photo-2774556.jpeg?auto=compress&cs=tinysrgb&w=800",
-      },
-      {
-        id: 4,
-        title: "Cuerdas del corazón",
-        description: "Un drama emotivo sobre el amor, la pérdida y la redención.",
-        year: 2024,
-        duration: "132 min",
-        rating: 4.6,
-        genre: "Drama",
-        image: "https://images.pexels.com/photos/3944405/pexels-photo-3944405.jpeg?auto=compress&cs=tinysrgb&w=800",
-      },
-      {
-        id: 5,
-        title: "El inquietante",
-        description: "Una película de terror aterradora que te mantendrá al borde de tu asiento.",
-        year: 2023,
-        duration: "105 min",
-        rating: 4.4,
-        genre: "Horror",
-        image: "https://images.pexels.com/photos/3945313/pexels-photo-3945313.jpeg?auto=compress&cs=tinysrgb&w=800",
-      },
-      {
-        id: 6,
-        title: "Cine Paraíso",
-        description: "Un bello homenaje a la época dorada del cine.",
-        year: 2024,
-        duration: "118 min",
-        rating: 4.8,
-        genre: "Drama",
-        image: "https://images.pexels.com/photos/7991579/pexels-photo-7991579.jpeg?auto=compress&cs=tinysrgb&w=800",
-      },
-    ];
+  const fetchMovies = async (query: string = "cinema movie") => {
+    setLoading(true);
+    setError("");
 
-    setMovies(mockMovies);
-    setFilteredMovies(mockMovies);
-    setLoading(false);
+    const PEXELS_API_KEY = import.meta.env.VITE_PEXELS_API_KEY || "pjVKkdHUWxAeb3NyKhEXk7j6kP1kv85b67dbekeZaWW2MYoLIuBZuCZN";
+    const url = `https://api.pexels.com/videos/search?query=${encodeURIComponent(query)}&per_page=15`;
+
+    try {
+      const response = await fetch(url, {
+        headers: {
+          Authorization: PEXELS_API_KEY,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      
+      if (data.videos && data.videos.length > 0) {
+        const transformedMovies: Movie[] = data.videos.map((video: PexelsVideo, index: number) => {
+          // Obtener video de calidad HD o el primero disponible
+          const hdVideo = video.video_files.find(file => file.quality === "hd") || video.video_files[0];
+          
+          // Convertir duración de segundos a minutos
+          const durationMinutes = Math.floor(video.duration / 60);
+          
+          return {
+            id: video.id,
+            title: `${query.split(' ')[0]} ${index + 1}`, // Título basado en la búsqueda
+            description: `Video creado por ${video.user.name}`,
+            year: 2024,
+            duration: `${durationMinutes} min`,
+            rating: (4.0 + Math.random() * 1).toFixed(1) as any,
+            genre: getGenreFromQuery(query),
+            image: video.video_pictures[0]?.picture || video.image,
+            videoUrl: hdVideo?.link || ""
+          };
+        });
+
+        setMovies(transformedMovies);
+        setFilteredMovies(transformedMovies);
+      } else {
+        setError("No se encontraron videos");
+        setMovies([]);
+        setFilteredMovies([]);
+      }
+    } catch (error: any) {
+      console.error("Error al cargar videos:", error);
+      setError("Error al cargar los videos. Intenta de nuevo.");
+      setMovies([]);
+      setFilteredMovies([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getGenreFromQuery = (query: string): string => {
+    for (const [genre, searchQuery] of Object.entries(genreQueries)) {
+      if (searchQuery === query) {
+        return genre;
+      }
+    }
+    return "Todos";
   };
 
   const filterMovies = () => {
     let filtered = movies;
 
-    if (selectedGenre !== "All") {
+    if (selectedGenre !== "Todos") {
       filtered = filtered.filter(movie => movie.genre === selectedGenre);
     }
 
@@ -119,10 +150,31 @@ const Movies: React.FC = () => {
 
   const handleGenreClick = (genre: string) => {
     setSelectedGenre(genre);
+    const query = genreQueries[genre] || "cinema movie";
+    fetchMovies(query);
+  };
+
+  const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (searchTerm.trim()) {
+      fetchMovies(searchTerm);
+    }
+  };
+
+  const handlePlayVideo = (videoUrl: string) => {
+    setSelectedVideo(videoUrl);
+  };
+
+  const handleCloseVideo = () => {
+    setSelectedVideo(null);
   };
 
   if (loading) {
-    return <div className="loading">Cargando películas...</div>;
+    return (
+      <div className="movies-container">
+        <div className="loading">Cargando películas...</div>
+      </div>
+    );
   }
 
   return (
@@ -132,13 +184,13 @@ const Movies: React.FC = () => {
           <img src="/logo.png" alt="MovieNest Logo" />
         </div>
         <nav className="nav-menu">
-          <a href="#/homemovies">Home</a>
-          <a href="#/movies">Películas</a>
-          <a href="#/about">Sobre Nosotros</a>
+          <a href="/#/homemovies">Home</a>
+          <a href="/#/movies">Películas</a>
+          <a href="/#/about">Sobre Nosotros</a>
         </nav>
         <div className="auth-buttons">
-          <a href="#/" className="login-btn">Ingreso</a>
-          <a href="#/register" className="signup-btn">Registro</a>
+          <a href="/#/" className="login-btn">Ingreso</a>
+          <a href="/#/register" className="signup-btn">Registro</a>
         </div>
       </header>
 
@@ -149,7 +201,7 @@ const Movies: React.FC = () => {
         </div>
 
         <div className="search-filter-section">
-          <div className="search-bar">
+          <form onSubmit={handleSearch} className="search-bar">
             <FaSearch className="search-icon" />
             <input
               type="text"
@@ -157,17 +209,21 @@ const Movies: React.FC = () => {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
-          </div>
+            <button type="submit" className="search-button" disabled={loading}>
+              {loading ? "Buscando..." : "Buscar"}
+            </button>
+          </form>
 
           <div className="filter-buttons">
             <button className="filter-toggle">
-              <FaFilter /> Genre
+              <FaFilter /> Género
             </button>
             {genres.map((genre) => (
               <button
                 key={genre}
                 className={`genre-btn ${selectedGenre === genre ? "active" : ""}`}
                 onClick={() => handleGenreClick(genre)}
+                disabled={loading}
               >
                 {genre}
               </button>
@@ -175,15 +231,29 @@ const Movies: React.FC = () => {
           </div>
         </div>
 
+        {error && (
+          <div className="error-message">
+            <p>{error}</p>
+            <button onClick={() => fetchMovies("cinema movie")}>
+              Intentar de nuevo
+            </button>
+          </div>
+        )}
+
         <div className="movies-grid">
           {filteredMovies.map((movie) => (
             <div key={movie.id} className="movie-card">
               <div className="movie-image">
                 <img src={movie.image} alt={movie.title} />
+                <div className="movie-overlay" onClick={() => handlePlayVideo(movie.videoUrl)}>
+                  <button className="play-btn">
+                    <FaPlay />
+                  </button>
+                </div>
                 <div className="movie-badges">
                   <span className="genre-badge">{movie.genre}</span>
                   <span className="rating-badge">
-                    <FaStar /> {movie.rating.toFixed(1)}
+                    <FaStar /> {movie.rating}
                   </span>
                 </div>
               </div>
@@ -199,12 +269,24 @@ const Movies: React.FC = () => {
           ))}
         </div>
 
-        {filteredMovies.length === 0 && (
+        {filteredMovies.length === 0 && !loading && !error && (
           <div className="no-results">
             <p>No se encontraron películas que coincidan con tus criterios.</p>
           </div>
         )}
       </div>
+
+      {/* Modal de video */}
+      {selectedVideo && (
+        <div className="video-modal" onClick={handleCloseVideo}>
+          <div className="video-modal-content" onClick={(e) => e.stopPropagation()}>
+            <button className="close-button" onClick={handleCloseVideo}>
+              ✕
+            </button>
+            <video controls autoPlay src={selectedVideo} />
+          </div>
+        </div>
+      )}
     </div>
   );
 };
