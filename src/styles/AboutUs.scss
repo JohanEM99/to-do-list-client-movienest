@@ -14,10 +14,18 @@ $gray-medium: #6b7280;
   box-sizing: border-box;
 }
 
-.about-container {
+body, html {
+  margin: 0;
+  padding: 0;
   width: 100%;
-  min-height: 100vh; // ✅ ahora crece dinámicamente según el contenido
-  overflow-x: hidden; // ✅ evita scroll lateral, pero permite scroll vertical
+  overflow-x: hidden;
+}
+
+.about-container {
+  width: 100vw;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
   background: $white;
   display: flex;
   flex-direction: column;
@@ -35,6 +43,7 @@ $gray-medium: #6b7280;
   position: sticky;
   top: 0;
   z-index: 1000;
+  width: 100%;
 
   .logo {
     img {
@@ -147,11 +156,98 @@ $gray-medium: #6b7280;
   }
 }
 
+// 👤 Menú de usuario
+.user-menu {
+  position: relative;
+
+  .user-button {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    background: $primary;
+    color: $white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background: $secondary;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(229, 9, 20, 0.3);
+    }
+
+    .user-avatar-small {
+      background: rgba(255, 255, 255, 0.25);
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+    }
+  }
+
+  .dropdown-menu {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    right: 0;
+    background: $white;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    min-width: 200px;
+    overflow: hidden;
+    animation: slideDown 0.2s ease;
+    z-index: 100;
+
+    .dropdown-item {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      padding: 0.85rem 1.2rem;
+      color: $text;
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: all 0.2s ease;
+      background: none;
+      border: none;
+      width: 100%;
+      text-align: left;
+      cursor: pointer;
+
+      &:hover {
+        background: $gray-light;
+        color: $primary;
+      }
+
+      svg {
+        font-size: 1rem;
+      }
+    }
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 // Hero Section
 .hero-section {
   background: linear-gradient(135deg, $gray-light 0%, $white 100%);
   padding: 4rem 4rem;
   text-align: center;
+  width: 100%;
 
   .hero-content {
     max-width: 900px;
@@ -201,6 +297,7 @@ $gray-medium: #6b7280;
 .mission-section {
   padding: 5rem 4rem;
   background: $white;
+  width: 100%;
 
   .mission-content {
     max-width: 1200px;
@@ -270,6 +367,7 @@ $gray-medium: #6b7280;
   padding: 5rem 4rem;
   background: $gray-light;
   text-align: center;
+  width: 100%;
 
   h2 {
     font-size: 2rem;
@@ -338,6 +436,7 @@ $gray-medium: #6b7280;
   padding: 5rem 4rem;
   background: linear-gradient(135deg, rgba(229, 9, 20, 0.05) 0%, rgba(255, 255, 255, 0.5) 100%);
   text-align: center;
+  width: 100%;
 
   h2 {
     font-size: 2rem;
@@ -400,6 +499,7 @@ $gray-medium: #6b7280;
   padding: 5rem 4rem;
   background: $white;
   text-align: center;
+  width: 100%;
 
   h2 {
     font-size: 2rem;
@@ -443,6 +543,7 @@ $gray-medium: #6b7280;
   background: $text;
   color: $white;
   padding: 3rem 4rem 1.5rem;
+  width: 100%;
 
   .footer-content {
     max-width: 1200px;
@@ -548,7 +649,6 @@ $gray-medium: #6b7280;
     }
   }
 }
-
 
 /* 🌍 RESPONSIVIDAD GLOBAL OPTIMIZADA */
 
@@ -687,6 +787,27 @@ $gray-medium: #6b7280;
       text-align: center;
     }
   }
+
+  .user-menu {
+    .user-button {
+      padding: 0.4rem 0.8rem;
+      font-size: 0.85rem;
+
+      .user-avatar-small {
+        width: 24px;
+        height: 24px;
+      }
+    }
+
+    .dropdown-menu {
+      min-width: 180px;
+
+      .dropdown-item {
+        padding: 0.75rem 1rem;
+        font-size: 0.85rem;
+      }
+    }
+  }
 }
 
 /* 📲 Móviles pequeños (max 480px) */
@@ -740,6 +861,3 @@ $gray-medium: #6b7280;
     }
   }
 }
-
-
-

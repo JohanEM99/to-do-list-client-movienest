@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "../styles/HomeMovies.scss";
-import { FaStar, FaClock, FaPlay } from "react-icons/fa";
+import { FaStar, FaClock, FaPlay, FaUser, FaCog, FaSignOutAlt } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
 interface PexelsVideo {
@@ -43,6 +43,7 @@ const HomeMovies: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<any>(null);
   const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
+  const [showDropdown, setShowDropdown] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -154,19 +155,31 @@ const HomeMovies: React.FC = () => {
         </nav>
         <div className="auth-buttons">
           {user ? (
-            <>
-              <a href="#/profile" className="profile-btn">
-                <img src="editar.png" alt="Profile" className="profile-icon" />
-              </a>
-              <button className="logout-btn" onClick={handleLogout}>
-                Logout
+            <div className="user-menu">
+              <button 
+                className="user-button"
+                onClick={() => setShowDropdown(!showDropdown)}
+              >
+                <div className="user-avatar-small">
+                  <FaUser />
+                </div>
+                <span>{user.name || "Usuario"}</span>
               </button>
-            </>
+              {showDropdown && (
+                <div className="dropdown-menu">
+                  <a href="#/profile" className="dropdown-item">
+                    <FaCog /> Editar Perfil
+                  </a>
+                  <button onClick={handleLogout} className="dropdown-item">
+                    <FaSignOutAlt /> Cerrar Sesión
+                  </button>
+                </div>
+              )}
+            </div>
           ) : (
             <>
               <a href="/" className="login-btn">Ingreso</a>
               <a href="#/register" className="signup-btn">Registro</a>
-              <a href="#/profile" className="profile-btn">Mi perfil</a>
             </>
           )}
         </div>

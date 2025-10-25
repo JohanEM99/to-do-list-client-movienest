@@ -15,9 +15,7 @@ import axios from "axios";
 interface ProfileData {
   firstName: string;
   lastName: string;
-  birthMonth: string;
-  birthDay: string;
-  birthYear: string;
+  age: string;
   email: string;
   newPassword: string;
   confirmPassword: string;
@@ -34,30 +32,27 @@ const ProfileEdit = () => {
   const [profileData, setProfileData] = useState<ProfileData>({
     firstName: "",
     lastName: "",
-    birthMonth: "January",
-    birthDay: "",
-    birthYear: "",
+    age: "",
     email: "",
     newPassword: "",
     confirmPassword: "",
   });
 
-  const months = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ];
+  // Función para calcular edad desde fecha de nacimiento
+  const calculateAge = (birthdate: string): string => {
+    const today = new Date();
+    const birth = new Date(birthdate);
+    let age = today.getFullYear() - birth.getFullYear();
+    const monthDiff = today.getMonth() - birth.getMonth();
+    
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+      age--;
+    }
+    
+    return age.toString();
+  };
 
-  // Cargar datos del usuario al montar el componente.
+  // Cargar datos del usuario al montar el componente
   useEffect(() => {
     fetchUserProfile();
   }, []);
@@ -66,31 +61,28 @@ const ProfileEdit = () => {
     try {
       const token = localStorage.getItem("token");
       if (!token) {
-        navigate("/"); // Redirigir al login si no hay token
+        navigate("/");
         return;
       }
 
       const response = await axios.get(
         "https://backend-de-peliculas.onrender.com/api/v1/users/profile",
-        //"http://localhost:8080/api/v1/users/profile",
         {
           headers: {
-            Authorization: `Bearer ${token}`, // Autenticación con el token
+            Authorization: `Bearer ${token}`,
           },
         }
       );
 
       const user = response.data.user;
 
-      // Separar fecha de nacimiento si viene como string
-      const birthDate = user.birthdate ? new Date(user.birthdate) : null;
+      // Calcular edad desde la fecha de nacimiento
+      const age = user.birthdate ? calculateAge(user.birthdate) : "";
 
       setProfileData({
         firstName: user.username || user.firstName || "",
         lastName: user.lastname || user.lastName || "",
-        birthMonth: birthDate ? months[birthDate.getMonth()] : "",
-        birthDay: birthDate ? birthDate.getDate().toString() : "",
-        birthYear: birthDate ? birthDate.getFullYear().toString() : "",
+        age: age,
         email: user.email || "",
         newPassword: "",
         confirmPassword: "",
@@ -120,19 +112,16 @@ const ProfileEdit = () => {
 
     // Validar contraseñas si se están cambiando
     if (profileData.newPassword || profileData.confirmPassword) {
-      // Verificar longitud mínima de la contraseña
       if (profileData.newPassword.length < 8) {
         setError("La contraseña debe tener al menos 8 caracteres.");
         return;
       }
 
-      // Verificar que las contraseñas coincidan
       if (profileData.newPassword !== profileData.confirmPassword) {
         setError("Las contraseñas no coinciden.");
         return;
       }
 
-      // Verificar que la contraseña tenga al menos una letra mayúscula, una letra minúscula, un número y un símbolo especial
       const passwordRegex =
         /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+={}\[\]:;"'<>,.?/\\|-]).{8,}$/;
 
@@ -149,20 +138,14 @@ const ProfileEdit = () => {
     try {
       const token = localStorage.getItem("token");
       if (!token) {
-        navigate("/"); // Redirigir al login si no hay token
+        navigate("/");
         return;
       }
 
-      // Construir fecha de nacimiento
-      const birthdate = `${profileData.birthYear}-${String(
-        months.indexOf(profileData.birthMonth) + 1
-      ).padStart(2, "0")}-${String(profileData.birthDay).padStart(2, "0")}`;
-
-      // Preparar datos para enviar
+      // Preparar datos para enviar (sin modificar la edad/fecha de nacimiento)
       const updateData: any = {
         username: profileData.firstName,
         lastname: profileData.lastName,
-        birthdate: birthdate,
         email: profileData.email,
       };
 
@@ -222,13 +205,12 @@ const ProfileEdit = () => {
     try {
       const token = localStorage.getItem("token");
       if (!token) {
-        navigate("/"); // Redirigir al login si no hay token
+        navigate("/");
         return;
       }
 
       await axios.delete(
         "https://backend-de-peliculas.onrender.com/api/v1/users/profile",
-        //  "http://localhost:8080/api/v1/users/profile",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -332,44 +314,21 @@ const ProfileEdit = () => {
               </div>
             </div>
 
-            {/* Fecha de nacimiento */}
+            {/* Edad */}
             <div className="form-group">
-              <label>
-                Fecha de nacimiento<span className="required">*</span>
+              <label htmlFor="age">
+                Edad
               </label>
-              <div className="date-inputs">
-                <select
-                  name="birthMonth"
-                  value={profileData.birthMonth}
-                  onChange={handleChange}
-                >
-                  {months.map((month) => (
-                    <option key={month} value={month}>
-                      {month}
-                    </option>
-                  ))}
-                </select>
-                <input
-                  type="number"
-                  name="birthDay"
-                  placeholder="Día"
-                  min="1"
-                  max="31"
-                  value={profileData.birthDay}
-                  onChange={handleChange}
-                />
-                <input
-                  type="number"
-                  name="birthYear"
-                  placeholder="Año"
-                  min="1900"
-                  max="2025"
-                  value={profileData.birthYear}
-                  onChange={handleChange}
-                />
-              </div>
+              <input
+                type="text"
+                id="age"
+                name="age"
+                value={profileData.age ? `${profileData.age} años` : "No disponible"}
+                readOnly
+                style={{ backgroundColor: "#f5f5f531", cursor: "not-allowed" }}
+              />
               <small className="form-hint">
-                Debes tener al menos 13 años para registrarte.
+                La edad se calcula automáticamente desde tu fecha de nacimiento.
               </small>
             </div>
 
