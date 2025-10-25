@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import "../styles/Movies.scss";
-import { FaStar, FaSearch, FaFilter, FaPlay } from "react-icons/fa";
+import { FaStar, FaSearch, FaFilter, FaPlay, FaHeart, FaRegHeart, FaUser, FaCog, FaSignOutAlt } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 interface PexelsVideo {
   id: number;
@@ -37,19 +37,22 @@ interface Movie {
 }
 
 const Movies = () => {
+  const navigate = useNavigate();
   const [movies, setMovies] = useState<Movie[]>([]);
   const [filteredMovies, setFilteredMovies] = useState<Movie[]>([]);
+  const [favorites, setFavorites] = useState<Movie[]>([]);
+  const [showFavorites, setShowFavorites] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedGenre, setSelectedGenre] = useState("Todos");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
-  const [user, setUser] = useState<any>(null);
-  const navigate = useNavigate();
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userName, setUserName] = useState("");
 
   const genres = ["Todos", "Acción", "Drama", "Comedia", "Terror", "Ciencia Ficción"];
 
-  // Mapeo de géneros a queries de búsqueda en Pexels
   const genreQueries: { [key: string]: string } = {
     "Acción": "action movie",
     "Drama": "drama film",
@@ -59,42 +62,28 @@ const Movies = () => {
     "Todos": "cinema movie"
   };
 
+  // Verificar si el usuario está logueado
   useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      setIsLoggedIn(true);
+      // Aquí podrías hacer una petición al backend para obtener el nombre del usuario
+      setUserName("Usuario"); // Placeholder
+    }
+  }, []);
+
+  // Cargar favoritos del localStorage al iniciar
+  useEffect(() => {
+    const savedFavorites = localStorage.getItem("movieFavorites");
+    if (savedFavorites) {
+      setFavorites(JSON.parse(savedFavorites));
+    }
     fetchMovies("cinema movie");
-    fetchUserProfile();
   }, []);
 
   useEffect(() => {
     filterMovies();
-  }, [searchTerm, selectedGenre, movies]);
-
-  const fetchUserProfile = async () => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      try {
-        const response = await fetch("https://backend-de-peliculas.onrender.com/api/v1/users/profile", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error("No se pudo obtener el perfil del usuario.");
-        }
-
-        const data = await response.json();
-        setUser(data.user);
-      } catch (error) {
-        console.error("Error al obtener el perfil de usuario:", error);
-      }
-    }
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    setUser(null);
-    navigate("/");
-  };
+  }, [searchTerm, selectedGenre, movies, showFavorites]);
 
   const fetchMovies = async (query: string = "cinema movie") => {
     setLoading(true);
@@ -118,19 +107,16 @@ const Movies = () => {
       
       if (data.videos && data.videos.length > 0) {
         const transformedMovies: Movie[] = data.videos.map((video: PexelsVideo, index: number) => {
-          // Obtener video de calidad HD o el primero disponible
           const hdVideo = video.video_files.find(file => file.quality === "hd") || video.video_files[0];
-          
-          // Convertir duración de segundos a minutos
           const durationMinutes = Math.floor(video.duration / 60);
           
           return {
             id: video.id,
-            title: `${query.split(' ')[0]} ${index + 1}`, // Título basado en la búsqueda
+            title: `${query.split(' ')[0]} ${index + 1}`,
             description: `Video creado por ${video.user.name}`,
             year: 2024,
             duration: `${durationMinutes} min`,
-            rating: (4.0 + Math.random() * 1).toFixed(1) as any,
+            rating: parseFloat((4.0 + Math.random() * 1).toFixed(1)),
             genre: getGenreFromQuery(query),
             image: video.video_pictures[0]?.picture || video.image,
             videoUrl: hdVideo?.link || ""
@@ -164,31 +150,50 @@ const Movies = () => {
   };
 
   const filterMovies = () => {
-    let filtered = movies;
+    if (showFavorites) {
+      let filtered = favorites;
 
-    if (selectedGenre !== "Todos") {
-      filtered = filtered.filter(movie => movie.genre === selectedGenre);
+      if (selectedGenre !== "Todos") {
+        filtered = filtered.filter(movie => movie.genre === selectedGenre);
+      }
+
+      if (searchTerm) {
+        filtered = filtered.filter(movie =>
+          movie.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          movie.description.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+      }
+
+      setFilteredMovies(filtered);
+    } else {
+      let filtered = movies;
+
+      if (selectedGenre !== "Todos") {
+        filtered = filtered.filter(movie => movie.genre === selectedGenre);
+      }
+
+      if (searchTerm) {
+        filtered = filtered.filter(movie =>
+          movie.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          movie.description.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+      }
+
+      setFilteredMovies(filtered);
     }
-
-    if (searchTerm) {
-      filtered = filtered.filter(movie =>
-        movie.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        movie.description.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
-
-    setFilteredMovies(filtered);
   };
 
   const handleGenreClick = (genre: string) => {
     setSelectedGenre(genre);
-    const query = genreQueries[genre] || "cinema movie";
-    fetchMovies(query);
+    if (!showFavorites) {
+      const query = genreQueries[genre] || "cinema movie";
+      fetchMovies(query);
+    }
   };
 
   const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (searchTerm.trim()) {
+    if (searchTerm.trim() && !showFavorites) {
       fetchMovies(searchTerm);
     }
   };
@@ -199,6 +204,39 @@ const Movies = () => {
 
   const handleCloseVideo = () => {
     setSelectedVideo(null);
+  };
+
+  const isFavorite = (movieId: number): boolean => {
+    return favorites.some(fav => fav.id === movieId);
+  };
+
+  const toggleFavorite = (movie: Movie) => {
+    let newFavorites: Movie[];
+    
+    if (isFavorite(movie.id)) {
+      newFavorites = favorites.filter(fav => fav.id !== movie.id);
+    } else {
+      newFavorites = [...favorites, movie];
+    }
+    
+    setFavorites(newFavorites);
+    localStorage.setItem("movieFavorites", JSON.stringify(newFavorites));
+    
+    if (showFavorites) {
+      filterMovies();
+    }
+  };
+
+  const toggleShowFavorites = () => {
+    setShowFavorites(!showFavorites);
+    setSearchTerm("");
+    setSelectedGenre("Todos");
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    setIsLoggedIn(false);
+    navigate("/");
   };
 
   if (loading) {
@@ -221,21 +259,40 @@ const Movies = () => {
           <a href="/#/about">Sobre Nosotros</a>
         </nav>
         <div className="auth-buttons">
-          {user ? (
-            <>
-              {/* Mostrar el logo del perfil */}
-              <a href="#/profile" className="profile-btn">
-                <img src="editar.png" alt="Profile" className="profile-icon" />
-              </a>
-              <button className="logout-btn" onClick={handleLogout}>
-                Logout
+          <button 
+            className={`favorites-btn ${showFavorites ? 'active' : ''}`}
+            onClick={toggleShowFavorites}
+          >
+            <FaHeart /> 
+            Favoritos ({favorites.length})
+          </button>
+          
+          {isLoggedIn ? (
+            <div className="user-menu">
+              <button 
+                className="user-button"
+                onClick={() => setShowDropdown(!showDropdown)}
+              >
+                <div className="user-avatar-small">
+                  <FaUser />
+                </div>
+                <span>{userName}</span>
               </button>
-            </>
+              {showDropdown && (
+                <div className="dropdown-menu">
+                  <a href="/#/profile" className="dropdown-item">
+                    <FaCog /> Editar Perfil
+                  </a>
+                  <button onClick={handleLogout} className="dropdown-item">
+                    <FaSignOutAlt /> Cerrar Sesión
+                  </button>
+                </div>
+              )}
+            </div>
           ) : (
             <>
-              <a href="/" className="login-btn">Ingreso</a>
-              <a href="#/register" className="signup-btn">Registro</a>
-              <a href="#/profile" className="profile-btn">Mi perfil</a>
+              <a href="/#/" className="login-btn">Ingreso</a>
+              <a href="/#/register" className="signup-btn">Registro</a>
             </>
           )}
         </div>
@@ -243,8 +300,13 @@ const Movies = () => {
 
       <div className="movies-content">
         <div className="movies-hero">
-          <h1>Buscar películas</h1>
-          <p>Explora nuestra colección de películas increíbles</p>
+          <h1>{showFavorites ? "Mis Favoritos" : "Buscar películas"}</h1>
+          <p>
+            {showFavorites 
+              ? `Tienes ${favorites.length} película${favorites.length !== 1 ? 's' : ''} en favoritos`
+              : "Explora nuestra colección de películas increíbles"
+            }
+          </p>
         </div>
 
         <div className="search-filter-section">
@@ -252,13 +314,15 @@ const Movies = () => {
             <FaSearch className="search-icon" />
             <input
               type="text"
-              placeholder="Buscar películas por título o descripción..."
+              placeholder={showFavorites ? "Buscar en favoritos..." : "Buscar películas por título o descripción..."}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
-            <button type="submit" className="search-button" disabled={loading}>
-              {loading ? "Buscando..." : "Buscar"}
-            </button>
+            {!showFavorites && (
+              <button type="submit" className="search-button" disabled={loading}>
+                {loading ? "Buscando..." : "Buscar"}
+              </button>
+            )}
           </form>
 
           <div className="filter-buttons">
@@ -297,6 +361,15 @@ const Movies = () => {
                     <FaPlay />
                   </button>
                 </div>
+                <button 
+                  className={`favorite-btn ${isFavorite(movie.id) ? 'is-favorite' : ''}`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    toggleFavorite(movie);
+                  }}
+                >
+                  {isFavorite(movie.id) ? <FaHeart /> : <FaRegHeart />}
+                </button>
                 <div className="movie-badges">
                   <span className="genre-badge">{movie.genre}</span>
                   <span className="rating-badge">
@@ -318,12 +391,16 @@ const Movies = () => {
 
         {filteredMovies.length === 0 && !loading && !error && (
           <div className="no-results">
-            <p>No se encontraron películas que coincidan con tus criterios.</p>
+            <p>
+              {showFavorites 
+                ? "No tienes películas en favoritos aún. ¡Agrega algunas!"
+                : "No se encontraron películas que coincidan con tus criterios."
+              }
+            </p>
           </div>
         )}
       </div>
 
-      {/* Modal de video */}
       {selectedVideo && (
         <div className="video-modal" onClick={handleCloseVideo}>
           <div className="video-modal-content" onClick={(e) => e.stopPropagation()}>
