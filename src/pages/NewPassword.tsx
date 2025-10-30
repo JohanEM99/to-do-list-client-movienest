@@ -4,65 +4,116 @@ import "../styles/NewPassword.scss";
 import { useParams, useNavigate } from "react-router-dom"; // Usamos useParams para obtener el token
 import { FaEye, FaEyeSlash, FaCheckCircle } from "react-icons/fa"; // Íconos para mostrar/ocultar contraseña.
 
+
+
+
+/**
+ * NewPassword component — allows users to reset their password using a token received via email.
+ * The token is obtained from the URL and verified with the backend.
+ * Users can input and confirm a new password, which is validated before submission.
+ *
+ * @component
+ * @returns {JSX.Element} The rendered password reset page.
+ */
 const NewPassword = () => {
-  const { token } = useParams();  // Obtener el token de la URL.
+  /** 
+   * Extracts the token from the URL parameters.
+   * @type {{ token?: string }}
+   */
+  const { token } = useParams();
+
+  /** @type {[string, Function]} */
   const [newPassword, setNewPassword] = useState("");
+
+  /** @type {[string, Function]} */
   const [confirmPassword, setConfirmPassword] = useState("");
+
+  /** @type {[string, Function]} */
   const [message, setMessage] = useState("");
+
+  /** @type {[boolean, Function]} */
   const [isSuccess, setIsSuccess] = useState(false);
+
+  /** @type {[boolean, Function]} */
   const [isLoading, setIsLoading] = useState(false);
 
-  const [showNewPassword, setShowNewPassword] = useState(false); // Mostrar/ocultar nueva contraseña
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false); // Mostrar/ocultar confirmación de contraseña
-  
-  const navigate = useNavigate(); // Usamos useNavigate para redirigir después
+  /** @type {[boolean, Function]} Controls visibility of the new password field. */
+  const [showNewPassword, setShowNewPassword] = useState(false);
 
-  // Si no hay token, redirigir al inicio
+  /** @type {[boolean, Function]} Controls visibility of the confirm password field. */
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const navigate = useNavigate();
+
+  /**
+   * Redirects the user to the home page if no token is present in the URL.
+   * Executed on component mount.
+   *
+   * @effect
+   */
+
   useEffect(() => {
     if (!token) {
-      navigate("/"); // Redirigir si no hay token
+      navigate("/"); // Redirect if there is no token
     }
   }, [token, navigate]);
+
+
+  /**
+   * Handles form submission and validates password fields before sending a request.
+   * It ensures passwords match, meet minimum length requirements, and are not empty.
+   * Sends the token and new password to the backend API.
+   *
+   * @async
+   * @function handleSubmit
+   * @param {React.FormEvent} e - Form submission event.
+   * @returns {Promise<void>}
+   */
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validar que las contraseñas coincidan
+   // Validate that both fields are filled
     if (!newPassword || !confirmPassword) {
       setMessage("Por favor completa todos los campos");
       setIsSuccess(false);
       return;
     }
 
+    
+    // Validate password length
     if (newPassword.length < 8) {
       setMessage("La contraseña debe tener al menos 8 caracteres");
       setIsSuccess(false);
       return;
     }
 
+
+    
+    // Validate that passwords match
     if (newPassword !== confirmPassword) {
       setMessage("Las contraseñas no coinciden");
       setIsSuccess(false);
       return;
     }
 
-    setIsLoading(true); // Activar el estado de carga
+    setIsLoading(true); /// Activate loading state
     setMessage("");
 
     try {
-      // Enviar el token y la nueva contraseña al backend para actualizarlas
+      // Send token and new password to backend for updating
       await axios.post("https://backend-de-peliculas.onrender.com/api/v1/users/reset-password", {
    // await axios.post("http://localhost:8080/api/v1/users/reset-password", {
-        token,        // El token que se obtiene de la URL
-        newPassword,  // La nueva contraseña
+        token,        // Token obtained from the URL
+        newPassword,  /// New password entered by the user
       });
 
       setMessage("Contraseña restablecida correctamente.");
-      setIsSuccess(true); // Mostrar el mensaje de éxito
+      setIsSuccess(true); /// Display success message
     } catch (error) {
       setMessage("Hubo un error al restablecer la contraseña.");
     } finally {
-      setIsLoading(false); // Desactivar el estado de carga después de la solicitud
+      setIsLoading(false); // Disable loading state after request
     }
   };
 

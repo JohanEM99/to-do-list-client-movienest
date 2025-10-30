@@ -3,13 +3,26 @@ import "../styles/HomeMovies.scss";
 import { FaStar, FaClock, FaPlay, FaUser, FaCog, FaSignOutAlt } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
+
+
+/**
+ * Interface representing a video object from the Pexels API.
+ * @interface
+ */
+
+
+
 interface PexelsVideo {
-  id: number;
-  image: string;
-  duration: number;
-  user: {
+  id: number;     /** Unique identifier of the video */
+  image: string;    /** Thumbnail image URL */
+  duration: number;    /** Video duration in seconds */
+
+  user: {      /** Information about the video creator */
     name: string;
   };
+
+ /** List of video files in various qualities */
+
   video_files: Array<{
     id: number;
     quality: string;
@@ -18,38 +31,71 @@ interface PexelsVideo {
     height: number;
     link: string;
   }>;
+
+
+    /** List of video preview pictures */
   video_pictures: Array<{
     id: number;
     picture: string;
   }>;
 }
 
+
+/**
+ * Interface representing a movie object displayed in the app.
+ * @interface
+ */
 interface Movie {
-  id: number;
-  title: string;
-  description: string;
-  year: number;
-  duration: string;
-  rating: number;
-  genre: string;
-  image: string;
-  videoUrl?: string;
-  featured?: boolean;
+  id: number;     /** Unique movie ID */
+  title: string;    /** Movie title */
+  description: string;    /** Short movie description */
+  year: number;     /** Release year */
+  duration: string;    /** Movie duration in readable format (e.g. "120 min") */
+  rating: number;    /** User rating (0-5) */
+  genre: string;    /** Movie genre */
+  image: string;    /** Movie poster or thumbnail image */
+  videoUrl?: string;    /** Optional video URL */
+  featured?: boolean;    /** Defines whether the movie is featured */
 }
 
+/**
+ * HomeMovies component — Displays featured and recommended movies, user profile options,
+ * and a movie video modal. Fetches movie data from the Pexels API.
+ *
+ * @component
+ * @returns {JSX.Element} Rendered HomeMovies component
+ */
+
+
+
 const HomeMovies: React.FC = () => {
+  /** List of movies fetched from the Pexels API */
   const [movies, setMovies] = useState<Movie[]>([]);
+  /** Movie selected as featured (displayed in hero banner) */
   const [featuredMovie, setFeaturedMovie] = useState<Movie | null>(null);
+  /** Loading state for movie fetching */
   const [loading, setLoading] = useState(true);
+  /** Authenticated user profile information */
   const [user, setUser] = useState<any>(null);
+  /** Selected video URL for modal playback */
   const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
+  /** Dropdown visibility state for user menu */
   const [showDropdown, setShowDropdown] = useState(false);
+  /** Navigation hook */
   const navigate = useNavigate();
 
+  /** Runs on component mount — loads movies and user data */
   useEffect(() => {
     fetchMovies();
     fetchUserProfile();
   }, []);
+
+  /**
+   * Fetches movie data from the Pexels API and transforms it into a local Movie format.
+   * @async
+   * @returns {Promise<void>}
+   */
+
 
   const fetchMovies = async () => {
     try {
@@ -101,6 +147,13 @@ const HomeMovies: React.FC = () => {
     }
   };
 
+  /**
+   * Fetches authenticated user profile from backend.
+   * @async
+   * @returns {Promise<void>}
+   */
+
+
   const fetchUserProfile = async () => {
     const token = localStorage.getItem("token");
     if (token) {
@@ -123,15 +176,31 @@ const HomeMovies: React.FC = () => {
     }
   };
 
+
+ /**
+   * Handles user logout by clearing authentication token and redirecting to home.
+   */
+
+
   const handleLogout = () => {
     localStorage.removeItem("token");
     setUser(null);
     navigate("/");
   };
 
+  /**
+   * Opens video modal with the selected movie trailer.
+   * @param {string} videoUrl - URL of the video to play
+   */
+
   const handlePlayVideo = (videoUrl: string) => {
     setSelectedVideo(videoUrl);
   };
+
+
+  /**
+   * Closes the open video modal.
+   */
 
   const handleCloseVideo = () => {
     setSelectedVideo(null);

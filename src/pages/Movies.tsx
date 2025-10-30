@@ -3,6 +3,10 @@ import "../styles/Movies.scss";
 import { FaStar, FaSearch, FaFilter, FaPlay, FaHeart, FaRegHeart, FaUser, FaCog, FaSignOutAlt } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
+/**
+ * Interface representing a video object returned by the Pexels API.
+ * @interface
+ */
 interface PexelsVideo {
   id: number;
   image: string;
@@ -24,6 +28,10 @@ interface PexelsVideo {
   }>;
 }
 
+/**
+ * Interface representing a Movie object in the app.
+ * @interface
+ */
 interface Movie {
   id: number;
   title: string;
@@ -36,6 +44,14 @@ interface Movie {
   videoUrl: string;
 }
 
+
+/**
+ * Movies component — displays, filters, and manages movies fetched from the Pexels API.
+ * Includes features such as favorites, search, filtering by genre, and user session handling.
+ *
+ * @component
+ * @returns {JSX.Element} The rendered Movies page
+ */
 const Movies = () => {
   const navigate = useNavigate();
   const [movies, setMovies] = useState<Movie[]>([]);
@@ -62,17 +78,22 @@ const Movies = () => {
     "Todos": "cinema movie"
   };
 
-  // Verificar si el usuario está logueado
+    /**
+   * Checks if the user is logged in by validating the existence of a token in localStorage.
+   * Sets a placeholder username if found.
+   * @function
+   */
+  // Check if the user is logged in
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
       setIsLoggedIn(true);
-      // Aquí podrías hacer una petición al backend para obtener el nombre del usuario
+      // Here you could make a request to the backend to get the user's name
       setUserName("Usuario"); // Placeholder
     }
   }, []);
 
-  // Cargar favoritos del localStorage al iniciar
+  // Load favorites from localStorage when the component mounts
   useEffect(() => {
     const savedFavorites = localStorage.getItem("movieFavorites");
     if (savedFavorites) {
@@ -81,9 +102,21 @@ const Movies = () => {
     fetchMovies("cinema movie");
   }, []);
 
+
+
+
+  // Filter movies when search term, genre, or favorite status changes
   useEffect(() => {
     filterMovies();
   }, [searchTerm, selectedGenre, movies, showFavorites]);
+
+
+  /**
+   * Fetches movies from Pexels API based on query term.
+   * @async
+   * @param {string} [query="cinema movie"] - The search query for fetching movies.
+   * @returns {Promise<void>}
+   */
 
   const fetchMovies = async (query: string = "cinema movie") => {
     setLoading(true);
@@ -140,6 +173,13 @@ const Movies = () => {
     }
   };
 
+
+  /**
+   * Determines the genre name from a given query.
+   * @param {string} query - The search query.
+   * @returns {string} The corresponding genre name.
+   */
+
   const getGenreFromQuery = (query: string): string => {
     for (const [genre, searchQuery] of Object.entries(genreQueries)) {
       if (searchQuery === query) {
@@ -148,6 +188,12 @@ const Movies = () => {
     }
     return "Todos";
   };
+
+  /**
+   * Filters movies based on genre, favorites, and search terms.
+   * @function
+   */
+
 
   const filterMovies = () => {
     if (showFavorites) {
@@ -182,6 +228,10 @@ const Movies = () => {
       setFilteredMovies(filtered);
     }
   };
+  
+
+  
+  /** Handles genre selection and fetches movies accordingly. */
 
   const handleGenreClick = (genre: string) => {
     setSelectedGenre(genre);
@@ -191,6 +241,9 @@ const Movies = () => {
     }
   };
 
+  
+  /** Handles search form submission. */
+
   const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (searchTerm.trim() && !showFavorites) {
@@ -198,18 +251,28 @@ const Movies = () => {
     }
   };
 
+  
+  /** Plays the selected movie video. */
   const handlePlayVideo = (videoUrl: string) => {
     setSelectedVideo(videoUrl);
   };
 
+
+   /** Closes the movie player modal. */ 
   const handleCloseVideo = () => {
     setSelectedVideo(null);
   };
 
+
+  
+  /** Checks if a movie is already in favorites. */
   const isFavorite = (movieId: number): boolean => {
     return favorites.some(fav => fav.id === movieId);
   };
 
+
+  
+  /** Toggles a movie as favorite or removes it. */
   const toggleFavorite = (movie: Movie) => {
     let newFavorites: Movie[];
     
@@ -227,12 +290,17 @@ const Movies = () => {
     }
   };
 
+  
+  /** Toggles between showing all movies or only favorites. */
   const toggleShowFavorites = () => {
     setShowFavorites(!showFavorites);
     setSearchTerm("");
     setSelectedGenre("Todos");
   };
 
+
+  
+  /** Logs the user out and removes authentication token. */
   const handleLogout = () => {
     localStorage.removeItem("token");
     setIsLoggedIn(false);

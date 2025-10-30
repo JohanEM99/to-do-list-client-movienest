@@ -12,6 +12,12 @@ import {
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
+
+/**
+ * Interface representing user profile data.
+ * @interface
+ */
+
 interface ProfileData {
   firstName: string;
   lastName: string;
@@ -21,6 +27,14 @@ interface ProfileData {
   confirmPassword: string;
 }
 
+
+/**
+ * ProfileEdit component — allows users to view, edit, and update their profile information.
+ * It also supports password updates, account deletion, and logout functionality.
+ *
+ * @component
+ * @returns {JSX.Element} The rendered profile editing interface.
+ */
 const ProfileEdit = () => {
   const navigate = useNavigate();
   const [showDropdown, setShowDropdown] = useState(false);
@@ -38,7 +52,12 @@ const ProfileEdit = () => {
     confirmPassword: "",
   });
 
-  // Función para calcular edad desde fecha de nacimiento
+  /**
+   * Calculates the age from a given birthdate.
+   *
+   * @param {string} birthdate - The user's birthdate.
+   * @returns {string} The calculated age as a string.
+   */
   const calculateAge = (birthdate: string): string => {
     const today = new Date();
     const birth = new Date(birthdate);
@@ -52,11 +71,25 @@ const ProfileEdit = () => {
     return age.toString();
   };
 
-  // Cargar datos del usuario al montar el componente
+
+  /**
+   * Loads user data when the component mounts.
+   *
+   * @effect
+   */
   useEffect(() => {
     fetchUserProfile();
   }, []);
 
+
+    /**
+   * Fetches the user's profile information from the backend.
+   * If the user is not logged in, they are redirected to the home page.
+   *
+   * @async
+   * @function fetchUserProfile
+   * @returns {Promise<void>}
+   */
   const fetchUserProfile = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -76,7 +109,6 @@ const ProfileEdit = () => {
 
       const user = response.data.user;
 
-      // Calcular edad desde la fecha de nacimiento
       const age = user.birthdate ? calculateAge(user.birthdate) : "";
 
       setProfileData({
@@ -93,6 +125,12 @@ const ProfileEdit = () => {
     }
   };
 
+
+    /**
+   * Handles input field changes and updates the profile data state.
+   *
+   * @param {React.ChangeEvent<HTMLInputElement | HTMLSelectElement>} e - The input change event.
+   */
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
@@ -105,12 +143,23 @@ const ProfileEdit = () => {
     setSuccess("");
   };
 
+
+    /**
+   * Validates and submits updated user information to the backend.
+   * Handles password validation and optional password changes.
+   *
+   * @async
+   * @function handleSaveChanges
+   * @param {React.FormEvent} e - The form submission event.
+   * @returns {Promise<void>}
+   */
   const handleSaveChanges = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setSuccess("");
 
-    // Validar contraseñas si se están cambiando
+
+    // Validate passwords if being changed
     if (profileData.newPassword || profileData.confirmPassword) {
       if (profileData.newPassword.length < 8) {
         setError("La contraseña debe tener al menos 8 caracteres.");
@@ -142,14 +191,14 @@ const ProfileEdit = () => {
         return;
       }
 
-      // Preparar datos para enviar (sin modificar la edad/fecha de nacimiento)
+      // Prepare data to send (age is not editable)
       const updateData: any = {
         username: profileData.firstName,
         lastname: profileData.lastName,
         email: profileData.email,
       };
 
-      // Solo incluir password si se está cambiando
+      // Include password only if changed
       if (profileData.newPassword) {
         updateData.password = profileData.newPassword;
       }
@@ -167,14 +216,14 @@ const ProfileEdit = () => {
 
       setSuccess("¡Perfil actualizado exitosamente!");
 
-      // Limpiar campos de contraseña
+      // Clear password fields
       setProfileData((prev) => ({
         ...prev,
         newPassword: "",
         confirmPassword: "",
       }));
 
-      // Recargar datos del perfil
+      // Reload profile data
       setTimeout(() => {
         fetchUserProfile();
       }, 1000);
@@ -193,6 +242,14 @@ const ProfileEdit = () => {
     }
   };
 
+
+    /**
+   * Deletes the user's account after confirmation.
+   *
+   * @async
+   * @function handleDeleteAccount
+   * @returns {Promise<void>}
+   */
   const handleDeleteAccount = async () => {
     if (
       !window.confirm(
@@ -227,15 +284,21 @@ const ProfileEdit = () => {
     }
   };
 
+
+    /**
+   * Logs the user out and removes the authentication token.
+   */
   const handleLogout = () => {
     localStorage.removeItem("token");
     navigate("/");
   };
 
+  /** Toggles visibility of the new password field. */
   const togglePassword = () => {
     setShowPassword(!showPassword);
   };
 
+  /** Toggles visibility of the confirm password field. */
   const toggleConfirmPassword = () => {
     setShowConfirmPassword(!showConfirmPassword);
   };

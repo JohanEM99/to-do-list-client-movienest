@@ -1,6 +1,22 @@
+
+
+/**
+ * @file Register.tsx
+ * @description Registration form component that allows users to create an account. 
+ * It includes password validation, visibility toggling, and form submission using a custom hook.
+ */
+
 import "../styles/Register.scss";
 import { useState } from "react";
 import { useRegister } from "../hooks/useRegister";
+
+/**
+ * Register component that handles user registration.
+ * It validates passwords, manages form inputs, and handles registration requests.
+ * 
+ * @component
+ * @returns {JSX.Element} The rendered registration form.
+ */
 
 export default function Register() {
   const {
@@ -18,8 +34,15 @@ export default function Register() {
 
   const [passwordError, setPasswordError] = useState("");
 
+
+   /**
+   * Validates the password based on specific rules (uppercase, lowercase, number, special character, and minimum length).
+   * 
+   * @param {string} password - The password entered by the user.
+   * @returns {boolean} True if the password meets all criteria, false otherwise.
+   */
   const validatePassword = (password: string) => {
-    // Expresión regular para la validación de la contraseña
+    // Regular expression for password validation
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+={}\[\]:;"'<>,.?/\\|-]).{8,}$/;
 
     if (!passwordRegex.test(password)) {
@@ -29,24 +52,31 @@ export default function Register() {
       return false;
     }
 
-    setPasswordError(""); // Si es válida, limpiamos el mensaje de error
+    setPasswordError(""); // If valid, clear the error message
     return true;
   };
 
+
+    /**
+   * Handles form submission by validating the password and confirmation fields.
+   * If validation passes, it calls the handleSubmit function from the custom hook.
+   * 
+   * @param {React.FormEvent} e - The form submission event.
+   */
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validar las contraseñas antes de enviar el formulario
+    // Validate passwords before submitting the form
     const isPasswordValid = validatePassword(formData.password);
     const isConfirmPasswordValid = formData.password === formData.confirmPassword;
 
-    if (!isPasswordValid) return; // No enviamos si la contraseña no es válida
+    if (!isPasswordValid) return; /// Do not submit if password is invalid
     if (!isConfirmPasswordValid) {
       setPasswordError("Las contraseñas no coinciden.");
       return;
     }
 
-    // Si la validación pasa, enviamos el formulario
+    // If validation passes, submit the form
     handleSubmit(e);
   };
 

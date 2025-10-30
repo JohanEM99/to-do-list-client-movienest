@@ -1,16 +1,73 @@
+/**
+ * @file AboutUs.tsx
+ * @description React component that renders the "About Us" page for MovieNest.
+ * Includes sections for mission, features, statistics, and contact information.
+ * Also manages user authentication state and dropdown menu.
+ */
+
+
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/AboutUs.scss";
 import { FaFilm, FaAward, FaUsers, FaUser, FaCog, FaSignOutAlt } from "react-icons/fa";
 
+/**
+ * Main component for the "About MovieNest" page.
+ * Displays platform information, mission, features, and user interaction options.
+ * 
+ * @component
+ * @returns {JSX.Element} The rendered AboutUs page.
+ */
+
+
+
 const AboutUs: React.FC = () => {
+
+  /**
+   * Stores the authenticated user's data.
+   * @type {object | null}
+   */
+
+
   const [user, setUser] = useState<any>(null);
+
+
+  /**
+   * Controls the visibility of the user dropdown menu.
+   * @type {boolean}
+   */
+
+
   const [showDropdown, setShowDropdown] = useState(false);
+
+  /**
+   * Navigation hook used to redirect between routes.
+   */
+
+
+
   const navigate = useNavigate();
+
+  /**
+   * Fetches the user profile when the component is mounted.
+   * Runs only once on initial render.
+   */
+
+
 
   useEffect(() => {
     fetchUserProfile();
   }, []);
+
+
+    /**
+   * Fetches the authenticated user's profile from the backend API.
+   * If a valid token is found in localStorage, it sends a request to retrieve user details.
+   * 
+   * @async
+   * @function
+   * @returns {Promise<void>}
+   */
 
   const fetchUserProfile = async () => {
     const token = localStorage.getItem("token");
@@ -33,6 +90,14 @@ const AboutUs: React.FC = () => {
       }
     }
   };
+
+  /**
+   * Logs the user out by removing their token and redirecting to the homepage.
+   * 
+   * @function
+   * @returns {void}
+   */
+
 
   const handleLogout = () => {
     localStorage.removeItem("token");

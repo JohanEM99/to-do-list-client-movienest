@@ -1,41 +1,80 @@
 import React, { useState } from "react";
 import "../styles/login.scss";
 
-import { FaEye, FaEyeSlash } from "react-icons/fa"; // íconos de Font Awesome (vía react-icons)
+import { FaEye, FaEyeSlash } from "react-icons/fa"; // Font Awesome icons (via react-icons)
 import { useNavigate } from "react-router-dom";  // Importa useNavigate
 
+/**
+ * Home component — Handles user login functionality including form validation, 
+ * password visibility toggle, API request for authentication, and navigation after login.
+ *
+ * @component
+ * @returns {JSX.Element} The rendered login page
+ */
+
+
 const Home: React.FC = () => {
+  /** State to control password visibility */
   const [showPassword, setShowPassword] = useState(false);
+  /** State for displaying login feedback messages */
   const [loginMsg, setLoginMsg] = useState("");
+  /** State holding form data for email and password fields */
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
-  const [errorMsg, setErrorMsg] = useState(""); // Mensaje de error
+
+  /** State for displaying error messages */
+  const [errorMsg, setErrorMsg] = useState("");
+  /** React Router hook for navigation */
   const navigate = useNavigate();
+
+  /**
+   * Toggles the visibility of the password input field.
+   * @function
+   */
 
   const togglePassword = () => {
     setShowPassword(!showPassword);
   };
+
+
+  /**
+   * Handles input changes for the login form fields.
+   * @function
+   * @param {React.ChangeEvent<HTMLInputElement>} e - The input change event
+   */
+
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  /**
+   * Handles login form submission.
+   * Performs input validation, sends a POST request to the backend for authentication,
+   * stores the JWT token on success, and redirects the user to the HomeMovies page.
+   *
+   * @async
+   * @function
+   * @param {React.FormEvent} e - The form submission event
+   * @returns {Promise<void>}
+   */
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Limpiar mensajes de error previos
+    // Clear previous error messages
     setErrorMsg("");
 
-    // Validación de campos vacíos
+    // Validate empty fields
     if (!formData.email || !formData.password) {
       setErrorMsg("❌ El correo y la contraseña son obligatorios");
       return;
     }
 
-    // Validación del formato del email
+    // Validate email format
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     if (!emailRegex.test(formData.email)) {
       setErrorMsg("❌ El formato del correo electrónico no es válido");
@@ -45,7 +84,7 @@ const Home: React.FC = () => {
     setLoginMsg("Iniciando sesión...");
 
     try {
-      // Enviar la solicitud de login al backend
+      // Send login request to backend
       const response = await fetch("https://backend-de-peliculas.onrender.com/api/auth/login", {
         method: "POST",
         headers: {
@@ -58,10 +97,10 @@ const Home: React.FC = () => {
 
       if (response.ok) {
         setLoginMsg("Inicio de sesión exitoso ✅");
-        localStorage.setItem("token", data.token); // Almacenar el token
-        navigate("/homemovies");  // Redirigir al Home Movies (ajustar la ruta según tu configuración)
+        localStorage.setItem("token", data.token); /// Store token in localStorage
+        navigate("/homemovies");  // Redirect to Home Movies page
       } else {
-        setErrorMsg(data.message); // Mostrar el mensaje de error del backend
+        setErrorMsg(data.message); // Show backend error message
       }
     } catch (error) {
       setErrorMsg("❌ Error al intentar iniciar sesión");
