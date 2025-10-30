@@ -99,19 +99,44 @@ const Movies = () => {
     }
   }, []);
 
-  // Load favorites from localStorage when the component mounts
+  // Load favorites from backend when the component mounts
   useEffect(() => {
-    const savedFavorites = localStorage.getItem("movieFavorites");
-    if (savedFavorites) {
-      setFavorites(JSON.parse(savedFavorites));
-    }
     fetchMovies("cinema movie");
-  }, []);
+    if (isLoggedIn) {
+      fetchFavorites();
+    }
+  }, [isLoggedIn]);
 
   // Filter movies when search term, genre, or favorite status changes
   useEffect(() => {
     filterMovies();
   }, [searchTerm, selectedGenre, movies, showFavorites]);
+
+  /**
+   * Fetches user's favorites from the backend.
+   * @async
+   * @returns {Promise<void>}
+   */
+  const fetchFavorites = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    try {
+      const response = await fetch("https://backend-de-peliculas.onrender.com/api/v1/favorites", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        // El backend devuelve un array de favoritos
+        setFavorites(data || []);
+      }
+    } catch (error) {
+      console.error("Error al cargar favoritos:", error);
+    }
+  };
 
   /**
    * Fetches movies from Pexels API based on query term.
@@ -261,20 +286,56 @@ const Movies = () => {
   };
 
   /** Toggles a movie as favorite or removes it. */
-  const toggleFavorite = (movie: Movie) => {
-    let newFavorites: Movie[];
-    
-    if (isFavorite(movie.id)) {
-      newFavorites = favorites.filter(fav => fav.id !== movie.id);
-    } else {
-      newFavorites = [...favorites, movie];
+  const toggleFavorite = async (movie: Movie) => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      alert("Debes iniciar sesión para agregar favoritos");
+      return;
     }
-    
-    setFavorites(newFavorites);
-    localStorage.setItem("movieFavorites", JSON.stringify(newFavorites));
-    
-    if (showFavorites) {
-      filterMovies();
+
+    const isCurrentlyFavorite = isFavorite(movie.id);
+
+    try {
+      if (isCurrentlyFavorite) {
+        // Remove from favorites
+        const response = await fetch(`https://backend-de-peliculas.onrender.com/api/v1/favorites/${movie.id}`, {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (response.ok) {
+          const newFavorites = favorites.filter(fav => fav.id !== movie.id);
+          setFavorites(newFavorites);
+        } else {
+          throw new Error("Error al eliminar de favoritos");
+        }
+      } else {
+        // Add to favorites
+        const response = await fetch("https://backend-de-peliculas.onrender.com/api/v1/favorites", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(movie),
+        });
+
+        if (response.ok) {
+          const newFavorites = [...favorites, movie];
+          setFavorites(newFavorites);
+        } else {
+          throw new Error("Error al agregar a favoritos");
+        }
+      }
+
+      if (showFavorites) {
+        filterMovies();
+      }
+    } catch (error) {
+      console.error("Error al actualizar favoritos:", error);
+      alert("Hubo un error al actualizar favoritos. Intenta de nuevo.");
     }
   };
 
@@ -297,7 +358,7 @@ const Movies = () => {
   // ============================================
   
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
+    const handleKeyDown = async (e: KeyboardEvent) => {
       // Ignore if typing in input fields (except Escape)
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
         if (e.key === 'Escape') {
@@ -365,7 +426,7 @@ const Movies = () => {
       if (e.key.toLowerCase() === 'f' && !showShortcuts && !selectedVideo) {
         if (filteredMovies[focusedMovieIndex]) {
           e.preventDefault();
-          toggleFavorite(filteredMovies[focusedMovieIndex]);
+          await toggleFavorite(filteredMovies[focusedMovieIndex]);
         }
       }
 
@@ -548,9 +609,9 @@ const Movies = () => {
                 </div>
                 <button 
                   className={`favorite-btn ${isFavorite(movie.id) ? 'is-favorite' : ''}`}
-                  onClick={(e) => {
+                  onClick={async (e) => {
                     e.stopPropagation();
-                    toggleFavorite(movie);
+                    await toggleFavorite(movie);
                   }}
                   aria-label={isFavorite(movie.id) ? 'Quitar de favoritos' : 'Agregar a favoritos'}
                   title={`${isFavorite(movie.id) ? 'Quitar de' : 'Agregar a'} favoritos (F)`}
