@@ -6,6 +6,7 @@ $text: #333333;
 $white: #ffffff;
 $gray-light: #f3f4f6;
 $gray-medium: #6b7280;
+$gray-dark: #1f2937;
 $border: #e5e7eb;
 
 * {
@@ -39,9 +40,17 @@ body, html {
   z-index: 1000;
   width: 100%;
 
-  .logo img {
-    height: 45px;
-    transition: height 0.3s ease;
+  .logo {
+    display: flex;
+    align-items: center;
+    font-weight: bold;
+    font-size: 1.5rem;
+    color: $primary;
+
+    img {
+      height: 45px;
+      transition: height 0.3s ease;
+    }
   }
 
   .nav-menu {
@@ -55,8 +64,16 @@ body, html {
       transition: color 0.3s;
       white-space: nowrap;
 
-      &:hover {
+      &:hover,
+      &:focus {
         color: $primary;
+        outline: none;
+      }
+
+      &:focus-visible {
+        outline: 2px solid $primary;
+        outline-offset: 4px;
+        border-radius: 4px;
       }
     }
   }
@@ -76,8 +93,15 @@ body, html {
       padding: 0.5rem 1.5rem;
       transition: color 0.3s;
 
-      &:hover {
+      &:hover,
+      &:focus {
         color: $primary;
+      }
+
+      &:focus-visible {
+        outline: 2px solid $primary;
+        outline-offset: 2px;
+        border-radius: 8px;
       }
     }
 
@@ -93,6 +117,40 @@ body, html {
         background: $secondary;
         transform: translateY(-2px);
         box-shadow: 0 4px 12px rgba(229, 9, 20, 0.3);
+      }
+
+      &:focus-visible {
+        outline: 2px solid $text;
+        outline-offset: 2px;
+      }
+    }
+
+    // Keyboard shortcuts button
+    .shortcuts-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      color: $gray-medium;
+      border: none;
+      padding: 0.5rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+
+      &:hover {
+        color: $primary;
+        background: $gray-light;
+      }
+
+      &:focus-visible {
+        outline: 2px solid $primary;
+        outline-offset: 2px;
+      }
+
+      svg {
+        width: 1.25rem;
+        height: 1.25rem;
       }
     }
 
@@ -115,6 +173,11 @@ body, html {
         border-color: $primary;
         color: $primary;
         transform: translateY(-2px);
+      }
+
+      &:focus-visible {
+        outline: 2px solid $primary;
+        outline-offset: 2px;
       }
 
       &.active {
@@ -161,8 +224,12 @@ body, html {
     flex-wrap: wrap;
     gap: 1rem;
 
-    .logo img {
-      height: 40px;
+    .logo {
+      font-size: 1.3rem;
+
+      img {
+        height: 40px;
+      }
     }
 
     .nav-menu {
@@ -186,7 +253,7 @@ body, html {
         font-size: 0.8rem;
         
         span {
-          display: none; // Ocultar texto "Favoritos"
+          display: none;
         }
       }
     }
@@ -196,8 +263,12 @@ body, html {
   @media (max-width: 480px) {
     padding: 0.8rem 1rem;
 
-    .logo img {
-      height: 35px;
+    .logo {
+      font-size: 1.2rem;
+
+      img {
+        height: 35px;
+      }
     }
 
     .nav-menu {
@@ -285,7 +356,7 @@ body, html {
   }
 }
 
-// 🔍 Buscador con fondo blanco
+// 🔍 Buscador con filtros
 .search-filter-section {
   background-color: $gray-light;
   padding: 3rem 2rem;
@@ -294,6 +365,8 @@ body, html {
   flex-direction: column;
   align-items: center;
   gap: 1.5rem;
+  border-radius: 12px;
+  margin-bottom: 2rem;
 
   .search-bar {
     position: relative;
@@ -321,11 +394,17 @@ body, html {
       padding: 1rem 1rem 1rem 3rem;
       color: $text;
       min-width: 0;
+      transition: all 0.3s ease;
 
       &:focus {
         outline: none;
         border-color: $primary;
         box-shadow: 0 0 0 3px rgba(229, 9, 20, 0.1);
+      }
+
+      &:focus-visible {
+        outline: 2px solid $primary;
+        outline-offset: 2px;
       }
 
       &::placeholder {
@@ -347,6 +426,11 @@ body, html {
       &:hover {
         background: $secondary;
         transform: translateY(-1px);
+      }
+
+      &:focus-visible {
+        outline: 2px solid $text;
+        outline-offset: 2px;
       }
 
       &:disabled {
@@ -378,6 +462,11 @@ body, html {
       &:hover {
         border-color: $primary;
         color: $primary;
+      }
+
+      &:focus-visible {
+        outline: 2px solid $primary;
+        outline-offset: 2px;
       }
 
       &.active {
@@ -495,7 +584,7 @@ body, html {
   }
 }
 
-// 🎞️ Tarjeta de película
+// 🎞️ Tarjeta de película con indicador de foco
 .movie-card {
   background: $white;
   border-radius: 12px;
@@ -503,10 +592,25 @@ body, html {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   transition: all 0.3s ease;
   cursor: pointer;
+  position: relative;
+
+  // Indicador de foco para accesibilidad
+  &:focus,
+  &:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 4px $primary;
+    transform: translateY(-6px);
+  }
 
   &:hover {
     transform: translateY(-6px);
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  }
+
+  // Ring indicator cuando está enfocado con teclado
+  &.focused {
+    box-shadow: 0 0 0 4px $primary;
+    transform: translateY(-6px);
   }
 
   .movie-image {
@@ -551,6 +655,11 @@ body, html {
         &:hover {
           background: $secondary;
           transform: scale(1.1);
+        }
+
+        &:focus-visible {
+          outline: 2px solid $white;
+          outline-offset: 4px;
         }
       }
     }
@@ -727,6 +836,11 @@ body, html {
     &:hover {
       background: $secondary;
     }
+
+    &:focus-visible {
+      outline: 2px solid $text;
+      outline-offset: 2px;
+    }
   }
 
   @media (max-width: 480px) {
@@ -776,6 +890,11 @@ body, html {
       object-fit: contain;
       background: black;
       border-radius: 10px;
+
+      &:focus-visible {
+        outline: 2px solid $primary;
+        outline-offset: 4px;
+      }
     }
   }
 
@@ -801,6 +920,11 @@ body, html {
     &:hover {
       background: $secondary;
       transform: scale(1.08);
+    }
+
+    &:focus-visible {
+      outline: 2px solid $white;
+      outline-offset: 4px;
     }
   }
 
@@ -844,6 +968,11 @@ body, html {
       background: $secondary;
       transform: translateY(-1px);
       box-shadow: 0 4px 12px rgba(229, 9, 20, 0.3);
+    }
+
+    &:focus-visible {
+      outline: 2px solid $text;
+      outline-offset: 2px;
     }
 
     .user-avatar-small {
@@ -897,6 +1026,11 @@ body, html {
         color: $primary;
       }
 
+      &:focus-visible {
+        outline: 2px solid $primary;
+        outline-offset: -2px;
+      }
+
       svg {
         font-size: 1rem;
       }
@@ -932,7 +1066,7 @@ body, html {
       max-width: 120px;
 
       span {
-        display: none; // Ocultar nombre en móviles muy pequeños
+        display: none;
       }
     }
 
@@ -998,6 +1132,11 @@ body, html {
     }
   }
 
+  &:focus-visible {
+    outline: 2px solid $primary;
+    outline-offset: 4px;
+  }
+
   &.is-favorite {
     background: rgba(229, 9, 20, 0.1);
     border: 2px solid $primary;
@@ -1053,5 +1192,407 @@ body, html {
 
   @media (max-width: 480px) {
     font-size: 1rem;
+  }
+}
+
+// ⌨️ Modal de atajos de teclado
+.shortcuts-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  backdrop-filter: blur(4px);
+
+  .shortcuts-content {
+    background: linear-gradient(135deg, $gray-dark 0%, #111827 100%);
+    border-radius: 1rem;
+    max-width: 42rem;
+    width: 100%;
+    padding: 2rem;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    max-height: 90vh;
+    overflow-y: auto;
+
+    // Custom scrollbar
+    &::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 4px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 4px;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.3);
+      }
+    }
+
+    .shortcuts-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+      .header-left {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+
+        .icon-wrapper {
+          width: 2.5rem;
+          height: 2.5rem;
+          background: $primary;
+          border-radius: 0.5rem;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+
+          svg {
+            width: 1.5rem;
+            height: 1.5rem;
+            color: $white;
+          }
+        }
+
+        h2 {
+          font-size: 1.5rem;
+          font-weight: bold;
+          color: $white;
+          margin: 0;
+        }
+      }
+
+      .close-btn {
+        background: transparent;
+        border: none;
+        color: rgba(255, 255, 255, 0.6);
+        cursor: pointer;
+        padding: 0.5rem;
+        border-radius: 0.5rem;
+        transition: all 0.3s ease;
+
+        &:hover {
+          color: $white;
+          background: rgba(255, 255, 255, 0.1);
+        }
+
+        &:focus-visible {
+          outline: 2px solid $primary;
+          outline-offset: 2px;
+        }
+
+        svg {
+          width: 1.5rem;
+          height: 1.5rem;
+        }
+      }
+    }
+
+    .shortcuts-sections {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+
+      .shortcuts-section {
+        .section-title {
+          color: $primary;
+          font-weight: 600;
+          font-size: 0.95rem;
+          margin-bottom: 0.75rem;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+
+          &.yellow {
+            color: #fbbf24;
+          }
+
+          &.blue {
+            color: #60a5fa;
+          }
+        }
+
+        .shortcuts-list {
+          display: flex;
+          flex-direction: column;
+          gap: 0.5rem;
+
+          .shortcut-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 0.5rem;
+            transition: all 0.2s ease;
+
+            &:hover {
+              background: rgba(255, 255, 255, 0.08);
+            }
+
+            .shortcut-description {
+              color: rgba(255, 255, 255, 0.9);
+              font-size: 0.9rem;
+            }
+
+            .shortcut-keys {
+              display: flex;
+              align-items: center;
+              gap: 0.5rem;
+
+              .shortcut-note {
+                font-size: 0.75rem;
+                color: rgba(255, 255, 255, 0.5);
+                font-style: italic;
+              }
+
+              .keys-wrapper {
+                display: flex;
+                align-items: center;
+                gap: 0.25rem;
+
+                kbd {
+                  background: rgba(255, 255, 255, 0.15);
+                  color: $white;
+                  padding: 0.25rem 0.5rem;
+                  border-radius: 0.25rem;
+                  font-size: 0.85rem;
+                  font-family: 'Monaco', 'Courier New', monospace;
+                  min-width: 2rem;
+                  text-align: center;
+                  border: 1px solid rgba(255, 255, 255, 0.1);
+                }
+
+                .plus {
+                  color: rgba(255, 255, 255, 0.5);
+                  font-size: 0.75rem;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    .shortcuts-footer {
+      margin-top: 1.5rem;
+      padding-top: 1rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      font-size: 0.85rem;
+      color: rgba(255, 255, 255, 0.6);
+      line-height: 1.5;
+
+      kbd {
+        background: rgba(255, 255, 255, 0.15);
+        color: $white;
+        padding: 0.125rem 0.375rem;
+        border-radius: 0.25rem;
+        font-size: 0.8rem;
+        font-family: 'Monaco', 'Courier New', monospace;
+      }
+    }
+
+    .shortcuts-close-btn {
+      width: 100%;
+      margin-top: 1.5rem;
+      background: $primary;
+      color: $white;
+      border: none;
+      padding: 0.75rem;
+      border-radius: 0.5rem;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+
+      &:hover {
+        background: $secondary;
+      }
+
+      &:focus-visible {
+        outline: 2px solid $white;
+        outline-offset: 2px;
+      }
+    }
+  }
+
+  // 📱 Tablet (max 768px)
+  @media (max-width: 768px) {
+    .shortcuts-content {
+      padding: 1.5rem;
+
+      .shortcuts-header {
+        .header-left {
+          h2 {
+            font-size: 1.25rem;
+          }
+
+          .icon-wrapper {
+            width: 2rem;
+            height: 2rem;
+
+            svg {
+              width: 1.25rem;
+              height: 1.25rem;
+            }
+          }
+        }
+      }
+
+      .shortcuts-sections {
+        gap: 1.25rem;
+
+        .shortcuts-section {
+          .section-title {
+            font-size: 0.9rem;
+          }
+
+          .shortcuts-list {
+            .shortcut-item {
+              padding: 0.65rem;
+
+              .shortcut-description {
+                font-size: 0.85rem;
+              }
+
+              .shortcut-keys {
+                .keys-wrapper {
+                  kbd {
+                    font-size: 0.8rem;
+                    padding: 0.2rem 0.4rem;
+                    min-width: 1.75rem;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // 📱 Mobile (max 480px)
+  @media (max-width: 480px) {
+    padding: 0.5rem;
+
+    .shortcuts-content {
+      padding: 1.25rem;
+      max-height: 95vh;
+
+      .shortcuts-header {
+        margin-bottom: 1rem;
+
+        .header-left {
+          gap: 0.5rem;
+
+          h2 {
+            font-size: 1.1rem;
+          }
+
+          .icon-wrapper {
+            width: 1.75rem;
+            height: 1.75rem;
+
+            svg {
+              width: 1rem;
+              height: 1rem;
+            }
+          }
+        }
+
+        .close-btn {
+          svg {
+            width: 1.25rem;
+            height: 1.25rem;
+          }
+        }
+      }
+
+      .shortcuts-sections {
+        gap: 1rem;
+
+        .shortcuts-section {
+          .section-title {
+            font-size: 0.85rem;
+            margin-bottom: 0.5rem;
+          }
+
+          .shortcuts-list {
+            gap: 0.4rem;
+
+            .shortcut-item {
+              padding: 0.6rem;
+              flex-direction: column;
+              align-items: flex-start;
+              gap: 0.5rem;
+
+              .shortcut-description {
+                font-size: 0.8rem;
+              }
+
+              .shortcut-keys {
+                align-self: flex-end;
+
+                .keys-wrapper {
+                  kbd {
+                    font-size: 0.75rem;
+                    padding: 0.15rem 0.35rem;
+                    min-width: 1.5rem;
+                  }
+                }
+
+                .shortcut-note {
+                  font-size: 0.7rem;
+                }
+              }
+            }
+          }
+        }
+      }
+
+      .shortcuts-footer {
+        font-size: 0.75rem;
+        margin-top: 1rem;
+        padding-top: 0.75rem;
+
+        kbd {
+          font-size: 0.7rem;
+          padding: 0.1rem 0.3rem;
+        }
+      }
+
+      .shortcuts-close-btn {
+        padding: 0.65rem;
+        font-size: 0.9rem;
+      }
+    }
+  }
+}
+
+// 🎯 Accesibilidad: Focus visible mejorado
+*:focus-visible {
+  outline: 2px solid $primary;
+  outline-offset: 2px;
+}
+
+// 🎯 Reducir movimiento para usuarios con preferencias de accesibilidad
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }

@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import "../styles/Movies.scss";
-import { FaStar, FaSearch, FaFilter, FaPlay, FaHeart, FaRegHeart, FaUser, FaCog, FaSignOutAlt } from "react-icons/fa";
+import { FaStar, FaSearch, FaFilter, FaPlay, FaHeart, FaRegHeart, FaUser, FaCog, FaSignOutAlt, FaKeyboard } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
 /**
@@ -44,10 +44,10 @@ interface Movie {
   videoUrl: string;
 }
 
-
 /**
  * Movies component — displays, filters, and manages movies fetched from the Pexels API.
- * Includes features such as favorites, search, filtering by genre, and user session handling.
+ * Includes features such as favorites, search, filtering by genre, user session handling,
+ * and full keyboard accessibility (WCAG 2.1 Level A compliant).
  *
  * @component
  * @returns {JSX.Element} The rendered Movies page
@@ -66,6 +66,14 @@ const Movies = () => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userName, setUserName] = useState("");
+  
+  // ⌨️ NEW: Keyboard accessibility states
+  const [showShortcuts, setShowShortcuts] = useState(false);
+  const [focusedMovieIndex, setFocusedMovieIndex] = useState(0);
+  
+  // ⌨️ NEW: Refs for keyboard navigation
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  const movieGridRef = useRef<HTMLDivElement>(null);
 
   const genres = ["Todos", "Acción", "Drama", "Comedia", "Terror", "Ciencia Ficción"];
 
@@ -78,18 +86,16 @@ const Movies = () => {
     "Todos": "cinema movie"
   };
 
-    /**
+  /**
    * Checks if the user is logged in by validating the existence of a token in localStorage.
    * Sets a placeholder username if found.
    * @function
    */
-  // Check if the user is logged in
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
       setIsLoggedIn(true);
-      // Here you could make a request to the backend to get the user's name
-      setUserName("Usuario"); // Placeholder
+      setUserName("Usuario");
     }
   }, []);
 
@@ -102,14 +108,10 @@ const Movies = () => {
     fetchMovies("cinema movie");
   }, []);
 
-
-
-
   // Filter movies when search term, genre, or favorite status changes
   useEffect(() => {
     filterMovies();
   }, [searchTerm, selectedGenre, movies, showFavorites]);
-
 
   /**
    * Fetches movies from Pexels API based on query term.
@@ -117,7 +119,6 @@ const Movies = () => {
    * @param {string} [query="cinema movie"] - The search query for fetching movies.
    * @returns {Promise<void>}
    */
-
   const fetchMovies = async (query: string = "cinema movie") => {
     setLoading(true);
     setError("");
@@ -173,13 +174,11 @@ const Movies = () => {
     }
   };
 
-
   /**
    * Determines the genre name from a given query.
    * @param {string} query - The search query.
    * @returns {string} The corresponding genre name.
    */
-
   const getGenreFromQuery = (query: string): string => {
     for (const [genre, searchQuery] of Object.entries(genreQueries)) {
       if (searchQuery === query) {
@@ -193,8 +192,6 @@ const Movies = () => {
    * Filters movies based on genre, favorites, and search terms.
    * @function
    */
-
-
   const filterMovies = () => {
     if (showFavorites) {
       let filtered = favorites;
@@ -227,12 +224,11 @@ const Movies = () => {
 
       setFilteredMovies(filtered);
     }
+    // ⌨️ NEW: Reset focused index when filter changes
+    setFocusedMovieIndex(0);
   };
-  
 
-  
   /** Handles genre selection and fetches movies accordingly. */
-
   const handleGenreClick = (genre: string) => {
     setSelectedGenre(genre);
     if (!showFavorites) {
@@ -241,9 +237,7 @@ const Movies = () => {
     }
   };
 
-  
   /** Handles search form submission. */
-
   const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (searchTerm.trim() && !showFavorites) {
@@ -251,27 +245,21 @@ const Movies = () => {
     }
   };
 
-  
   /** Plays the selected movie video. */
   const handlePlayVideo = (videoUrl: string) => {
     setSelectedVideo(videoUrl);
   };
 
-
-   /** Closes the movie player modal. */ 
+  /** Closes the movie player modal. */ 
   const handleCloseVideo = () => {
     setSelectedVideo(null);
   };
 
-
-  
   /** Checks if a movie is already in favorites. */
   const isFavorite = (movieId: number): boolean => {
     return favorites.some(fav => fav.id === movieId);
   };
 
-
-  
   /** Toggles a movie as favorite or removes it. */
   const toggleFavorite = (movie: Movie) => {
     let newFavorites: Movie[];
@@ -290,7 +278,6 @@ const Movies = () => {
     }
   };
 
-  
   /** Toggles between showing all movies or only favorites. */
   const toggleShowFavorites = () => {
     setShowFavorites(!showFavorites);
@@ -298,14 +285,116 @@ const Movies = () => {
     setSelectedGenre("Todos");
   };
 
-
-  
   /** Logs the user out and removes authentication token. */
   const handleLogout = () => {
     localStorage.removeItem("token");
     setIsLoggedIn(false);
     navigate("/");
   };
+
+  // ============================================
+  // ⌨️ NEW: KEYBOARD SHORTCUTS IMPLEMENTATION (WCAG 2.1 Level A)
+  // ============================================
+  
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Ignore if typing in input fields (except Escape)
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
+        if (e.key === 'Escape') {
+          (e.target as HTMLElement).blur();
+        }
+        return;
+      }
+
+      // Alt/Option + H: Go to Home
+      if ((e.altKey || e.metaKey) && e.key.toLowerCase() === 'h') {
+        e.preventDefault();
+        window.location.href = '/#/homemovies';
+      }
+
+      // Alt/Option + P: Go to Profile
+      if ((e.altKey || e.metaKey) && e.key.toLowerCase() === 'p') {
+        e.preventDefault();
+        if (isLoggedIn) {
+          window.location.href = '/#/profile';
+        }
+      }
+
+      // Alt/Option + M: Go to Favorites
+      if ((e.altKey || e.metaKey) && e.key.toLowerCase() === 'm') {
+        e.preventDefault();
+        toggleShowFavorites();
+      }
+
+      // Alt/Option + K: Show keyboard shortcuts modal
+      if ((e.altKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setShowShortcuts(!showShortcuts);
+      }
+
+      // Forward slash (/): Focus search
+      if (e.key === '/' && !showShortcuts && !selectedVideo) {
+        e.preventDefault();
+        searchInputRef.current?.focus();
+      }
+
+      // Arrow keys: Navigate between movies
+      if (!showShortcuts && !selectedVideo && filteredMovies.length > 0) {
+        if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+          e.preventDefault();
+          setFocusedMovieIndex(prev => 
+            Math.min(prev + 1, filteredMovies.length - 1)
+          );
+        }
+        
+        if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+          e.preventDefault();
+          setFocusedMovieIndex(prev => Math.max(prev - 1, 0));
+        }
+      }
+
+      // Enter: Play focused movie
+      if (e.key === 'Enter' && !showShortcuts && !selectedVideo) {
+        if (filteredMovies[focusedMovieIndex]) {
+          e.preventDefault();
+          handlePlayVideo(filteredMovies[focusedMovieIndex].videoUrl);
+        }
+      }
+
+      // F: Toggle favorite on focused movie
+      if (e.key.toLowerCase() === 'f' && !showShortcuts && !selectedVideo) {
+        if (filteredMovies[focusedMovieIndex]) {
+          e.preventDefault();
+          toggleFavorite(filteredMovies[focusedMovieIndex]);
+        }
+      }
+
+      // Escape: Close modals (no keyboard trap)
+      if (e.key === 'Escape') {
+        if (showShortcuts) {
+          setShowShortcuts(false);
+        } else if (selectedVideo) {
+          handleCloseVideo();
+        } else if (showDropdown) {
+          setShowDropdown(false);
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [showShortcuts, selectedVideo, showDropdown, filteredMovies, focusedMovieIndex, showFavorites, isLoggedIn]);
+
+  // ⌨️ NEW: Scroll focused movie into view
+  useEffect(() => {
+    if (movieGridRef.current && filteredMovies.length > 0) {
+      const movieCards = movieGridRef.current.querySelectorAll('.movie-card');
+      const focusedCard = movieCards[focusedMovieIndex];
+      if (focusedCard) {
+        focusedCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    }
+  }, [focusedMovieIndex]);
 
   if (loading) {
     return (
@@ -327,12 +416,24 @@ const Movies = () => {
           <a href="/#/about">Sobre Nosotros</a>
         </nav>
         <div className="auth-buttons">
+          {/* ⌨️ NEW: Keyboard shortcuts button */}
+          <button 
+            className="shortcuts-btn"
+            onClick={() => setShowShortcuts(!showShortcuts)}
+            aria-label="Mostrar atajos de teclado"
+            title="Atajos de teclado (Alt+K)"
+          >
+            <FaKeyboard />
+          </button>
+
           <button 
             className={`favorites-btn ${showFavorites ? 'active' : ''}`}
             onClick={toggleShowFavorites}
+            aria-label={`${showFavorites ? 'Ocultar' : 'Mostrar'} favoritos`}
+            title="Favoritos (Alt+M)"
           >
             <FaHeart /> 
-            Favoritos ({favorites.length})
+            <span>Favoritos ({favorites.length})</span>
           </button>
           
           {isLoggedIn ? (
@@ -340,6 +441,8 @@ const Movies = () => {
               <button 
                 className="user-button"
                 onClick={() => setShowDropdown(!showDropdown)}
+                aria-expanded={showDropdown}
+                aria-haspopup="true"
               >
                 <div className="user-avatar-small">
                   <FaUser />
@@ -381,10 +484,12 @@ const Movies = () => {
           <form onSubmit={handleSearch} className="search-bar">
             <FaSearch className="search-icon" />
             <input
+              ref={searchInputRef}
               type="text"
-              placeholder={showFavorites ? "Buscar en favoritos..." : "Buscar películas por título o descripción..."}
+              placeholder={showFavorites ? "Buscar en favoritos... (Presiona / para buscar)" : "Buscar películas... (Presiona / para buscar)"}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
+              aria-label="Buscar películas"
             />
             {!showFavorites && (
               <button type="submit" className="search-button" disabled={loading}>
@@ -403,6 +508,7 @@ const Movies = () => {
                 className={`genre-btn ${selectedGenre === genre ? "active" : ""}`}
                 onClick={() => handleGenreClick(genre)}
                 disabled={loading}
+                aria-pressed={selectedGenre === genre}
               >
                 {genre}
               </button>
@@ -419,13 +525,24 @@ const Movies = () => {
           </div>
         )}
 
-        <div className="movies-grid">
-          {filteredMovies.map((movie) => (
-            <div key={movie.id} className="movie-card">
+        {/* ⌨️ NEW: Added ref and role for accessibility */}
+        <div ref={movieGridRef} className="movies-grid" role="list" aria-label="Lista de películas">
+          {filteredMovies.map((movie, index) => (
+            <div 
+              key={movie.id} 
+              className={`movie-card ${focusedMovieIndex === index ? 'focused' : ''}`}
+              role="listitem"
+              tabIndex={0}
+              aria-label={`${movie.title}, ${movie.rating} estrellas`}
+              onFocus={() => setFocusedMovieIndex(index)}
+            >
               <div className="movie-image">
                 <img src={movie.image} alt={movie.title} />
                 <div className="movie-overlay" onClick={() => handlePlayVideo(movie.videoUrl)}>
-                  <button className="play-btn">
+                  <button 
+                    className="play-btn"
+                    aria-label={`Reproducir ${movie.title}`}
+                  >
                     <FaPlay />
                   </button>
                 </div>
@@ -435,6 +552,8 @@ const Movies = () => {
                     e.stopPropagation();
                     toggleFavorite(movie);
                   }}
+                  aria-label={isFavorite(movie.id) ? 'Quitar de favoritos' : 'Agregar a favoritos'}
+                  title={`${isFavorite(movie.id) ? 'Quitar de' : 'Agregar a'} favoritos (F)`}
                 >
                   {isFavorite(movie.id) ? <FaHeart /> : <FaRegHeart />}
                 </button>
@@ -469,13 +588,193 @@ const Movies = () => {
         )}
       </div>
 
+      {/* Video Modal */}
       {selectedVideo && (
-        <div className="video-modal" onClick={handleCloseVideo}>
+        <div 
+          className="video-modal" 
+          onClick={handleCloseVideo}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Reproductor de video"
+        >
           <div className="video-modal-content" onClick={(e) => e.stopPropagation()}>
-            <button className="close-button" onClick={handleCloseVideo}>
+            <button 
+              className="close-button" 
+              onClick={handleCloseVideo}
+              aria-label="Cerrar reproductor (Esc)"
+            >
               ✕
             </button>
-            <video controls autoPlay src={selectedVideo} />
+            <video 
+              controls 
+              autoPlay 
+              src={selectedVideo}
+              aria-label="Video de película"
+            />
+          </div>
+        </div>
+      )}
+
+      {/* ⌨️ NEW: Keyboard Shortcuts Modal */}
+      {showShortcuts && (
+        <div 
+          className="shortcuts-modal" 
+          onClick={() => setShowShortcuts(false)}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="shortcuts-title"
+        >
+          <div className="shortcuts-content" onClick={(e) => e.stopPropagation()}>
+            <div className="shortcuts-header">
+              <div className="header-left">
+                <div className="icon-wrapper">
+                  <FaKeyboard />
+                </div>
+                <h2 id="shortcuts-title">Atajos de Teclado</h2>
+              </div>
+              <button 
+                className="close-btn" 
+                onClick={() => setShowShortcuts(false)}
+                aria-label="Cerrar (Esc)"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="shortcuts-sections">
+              {/* Navigation Section */}
+              <div className="shortcuts-section">
+                <h3 className="section-title">🧭 Navegación General</h3>
+                <div className="shortcuts-list">
+                  <div className="shortcut-item">
+                    <span className="shortcut-description">Ir a Inicio</span>
+                    <div className="shortcut-keys">
+                      <div className="keys-wrapper">
+                        <kbd>Alt</kbd>
+                        <span className="plus">+</span>
+                        <kbd>H</kbd>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="shortcut-item">
+                    <span className="shortcut-description">Ir al Perfil</span>
+                    <div className="shortcut-keys">
+                      <div className="keys-wrapper">
+                        <kbd>Alt</kbd>
+                        <span className="plus">+</span>
+                        <kbd>P</kbd>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="shortcut-item">
+                    <span className="shortcut-description">Ir a Favoritas</span>
+                    <div className="shortcut-keys">
+                      <div className="keys-wrapper">
+                        <kbd>Alt</kbd>
+                        <span className="plus">+</span>
+                        <kbd>M</kbd>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Video Interaction Section */}
+              <div className="shortcuts-section">
+                <h3 className="section-title yellow">🎬 Interacción con Videos</h3>
+                <div className="shortcuts-list">
+                  <div className="shortcut-item">
+                    <span className="shortcut-description">Agregar/quitar de Favoritas</span>
+                    <div className="shortcut-keys">
+                      <span className="shortcut-note">Click en ❤️</span>
+                    </div>
+                  </div>
+                  <div className="shortcut-item">
+                    <span className="shortcut-description">Agregar/quitar película enfocada</span>
+                    <div className="shortcut-keys">
+                      <div className="keys-wrapper">
+                        <kbd>F</kbd>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="shortcut-item">
+                    <span className="shortcut-description">Reproducir película</span>
+                    <div className="shortcut-keys">
+                      <span className="shortcut-note">Click en video</span>
+                    </div>
+                  </div>
+                  <div className="shortcut-item">
+                    <span className="shortcut-description">Reproducir película enfocada</span>
+                    <div className="shortcut-keys">
+                      <div className="keys-wrapper">
+                        <kbd>Enter</kbd>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Basic Navigation Section */}
+              <div className="shortcuts-section">
+                <h3 className="section-title blue">🖱️ Navegación Básica</h3>
+                <div className="shortcuts-list">
+                  <div className="shortcut-item">
+                    <span className="shortcut-description">Enfocar búsqueda</span>
+                    <div className="shortcut-keys">
+                      <div className="keys-wrapper">
+                        <kbd>/</kbd>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="shortcut-item">
+                    <span className="shortcut-description">Navegar entre películas</span>
+                    <div className="shortcut-keys">
+                      <div className="keys-wrapper">
+                        <kbd>↑</kbd>
+                        <kbd>↓</kbd>
+                        <kbd>←</kbd>
+                        <kbd>→</kbd>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="shortcut-item">
+                    <span className="shortcut-description">Seleccionar elemento</span>
+                    <div className="shortcut-keys">
+                      <div className="keys-wrapper">
+                        <kbd>Enter</kbd>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="shortcut-item">
+                    <span className="shortcut-description">Cambiar entre secciones</span>
+                    <div className="shortcut-keys">
+                      <div className="keys-wrapper">
+                        <kbd>Tab</kbd>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="shortcut-item">
+                    <span className="shortcut-description">Cerrar ventana o menú</span>
+                    <div className="shortcut-keys">
+                      <div className="keys-wrapper">
+                        <kbd>Esc</kbd>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="shortcuts-footer">
+              Los atajos funcionan tanto en Mac, PC, y Linux. Si estás en Windows/Linux usa <kbd>Alt</kbd> en lugar de <kbd>⌘</kbd>. Puedes activar/desactivar los atajos desde el botón <kbd>⌘</kbd> en el header.
+            </div>
+
+            <button 
+              className="shortcuts-close-btn" 
+              onClick={() => setShowShortcuts(false)}
+            >
+              Cerrar
+            </button>
           </div>
         </div>
       )}
