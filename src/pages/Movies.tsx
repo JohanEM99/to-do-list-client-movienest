@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import "../styles/Movies.scss";
-import { FaStar, FaSearch, FaFilter, FaPlay, FaHeart, FaRegHeart, FaUser, FaCog, FaSignOutAlt, FaKeyboard } from "react-icons/fa";
+import { FaStar, FaSearch, FaFilter, FaPlay, FaHeart, FaRegHeart, FaUser, FaCog, FaSignOutAlt, FaKeyboard, FaTimes, FaArrowLeft } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
 /**
@@ -45,9 +45,23 @@ interface Movie {
 }
 
 /**
+ * Interface representing a user review
+ * @interface
+ */
+interface Review {
+  id: string;
+  movieId: number;
+  userId: string;
+  userName: string;
+  rating: number;
+  comment: string;
+  date: string;
+}
+
+/**
  * Movies component — displays, filters, and manages movies fetched from the Pexels API.
  * Includes features such as favorites, search, filtering by genre, user session handling,
- * and full keyboard accessibility (WCAG 2.1 Level A compliant).
+ * reviews and ratings system, and full keyboard accessibility (WCAG 2.1 Level A compliant).
  *
  * @component
  * @returns {JSX.Element} The rendered Movies page
@@ -67,11 +81,20 @@ const Movies = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userName, setUserName] = useState("");
   
-  // ⌨️ NEW: Keyboard accessibility states
+  // ⭐ NEW: Review and rating states
+  const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
+  const [showMovieDetail, setShowMovieDetail] = useState(false);
+  const [userRating, setUserRating] = useState(0);
+  const [hoverRating, setHoverRating] = useState(0);
+  const [reviewText, setReviewText] = useState("");
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [movieReviews, setMovieReviews] = useState<Review[]>([]);
+  
+  // ⌨️ Keyboard accessibility states
   const [showShortcuts, setShowShortcuts] = useState(false);
   const [focusedMovieIndex, setFocusedMovieIndex] = useState(0);
   
-  // ⌨️ NEW: Refs for keyboard navigation
+  // ⌨️ Refs for keyboard navigation
   const searchInputRef = useRef<HTMLInputElement>(null);
   const movieGridRef = useRef<HTMLDivElement>(null);
 
@@ -96,6 +119,11 @@ const Movies = () => {
     if (token) {
       setIsLoggedIn(true);
       setUserName("Usuario");
+    }
+    // Load reviews from localStorage
+    const savedReviews = localStorage.getItem("movieReviews");
+    if (savedReviews) {
+      setReviews(JSON.parse(savedReviews));
     }
   }, []);
 
@@ -130,7 +158,6 @@ const Movies = () => {
 
       if (response.ok) {
         const data = await response.json();
-        // El backend devuelve un array de favoritos
         setFavorites(data || []);
       }
     } catch (error) {
@@ -249,7 +276,6 @@ const Movies = () => {
 
       setFilteredMovies(filtered);
     }
-    // ⌨️ NEW: Reset focused index when filter changes
     setFocusedMovieIndex(0);
   };
 
@@ -280,6 +306,83 @@ const Movies = () => {
     setSelectedVideo(null);
   };
 
+  // ⭐ NEW: Opens movie detail page for reviews
+  const handleOpenMovieDetail = (movie: Movie) => {
+    setSelectedMovie(movie);
+    setShowMovieDetail(true);
+    
+    // Load reviews for this movie
+    const movieReviewsFiltered = reviews.filter(r => r.movieId === movie.id);
+    setMovieReviews(movieReviewsFiltered);
+    
+    // Load user's existing review if any
+    const userReview = movieReviewsFiltered.find(r => r.userName === userName);
+    if (userReview) {
+      setUserRating(userReview.rating);
+      setReviewText(userReview.comment);
+    } else {
+      setUserRating(0);
+      setReviewText("");
+    }
+  };
+
+  // ⭐ NEW: Closes movie detail page
+  const handleCloseMovieDetail = () => {
+    setShowMovieDetail(false);
+    setSelectedMovie(null);
+    setUserRating(0);
+    setHoverRating(0);
+    setReviewText("");
+  };
+
+  // ⭐ NEW: Submit review
+  const handleSubmitReview = () => {
+    if (!isLoggedIn) {
+      alert("Debes iniciar sesión para dejar una reseña");
+      return;
+    }
+
+    if (userRating === 0) {
+      alert("Por favor selecciona una puntuación");
+      return;
+    }
+
+    if (!selectedMovie) return;
+
+    const newReview: Review = {
+      id: `${selectedMovie.id}-${userName}-${Date.now()}`,
+      movieId: selectedMovie.id,
+      userId: userName,
+      userName: userName,
+      rating: userRating,
+      comment: reviewText,
+      date: new Date().toLocaleDateString('es-ES')
+    };
+
+    // Remove previous review from same user for this movie
+    const updatedReviews = reviews.filter(
+      r => !(r.movieId === selectedMovie.id && r.userName === userName)
+    );
+    
+    const allReviews = [...updatedReviews, newReview];
+    setReviews(allReviews);
+    localStorage.setItem("movieReviews", JSON.stringify(allReviews));
+    
+    // Update movie reviews display
+    setMovieReviews(allReviews.filter(r => r.movieId === selectedMovie.id));
+    
+    alert("¡Reseña enviada con éxito!");
+  };
+
+  // ⭐ NEW: Calculate average rating for a movie
+  const getAverageRating = (movieId: number): number => {
+    const movieReviewsFiltered = reviews.filter(r => r.movieId === movieId);
+    if (movieReviewsFiltered.length === 0) return 0;
+    
+    const sum = movieReviewsFiltered.reduce((acc, r) => acc + r.rating, 0);
+    return parseFloat((sum / movieReviewsFiltered.length).toFixed(1));
+  };
+
   /** Checks if a movie is already in favorites. */
   const isFavorite = (movieId: number): boolean => {
     return favorites.some(fav => fav.id === movieId);
@@ -297,7 +400,6 @@ const Movies = () => {
 
     try {
       if (isCurrentlyFavorite) {
-        // Remove from favorites
         const response = await fetch(`https://backend-de-peliculas.onrender.com/api/v1/favorites/${movie.id}`, {
           method: "DELETE",
           headers: {
@@ -312,7 +414,6 @@ const Movies = () => {
           throw new Error("Error al eliminar de favoritos");
         }
       } else {
-        // Add to favorites
         const response = await fetch("https://backend-de-peliculas.onrender.com/api/v1/favorites", {
           method: "POST",
           headers: {
@@ -354,7 +455,7 @@ const Movies = () => {
   };
 
   // ============================================
-  // ⌨️ NEW: KEYBOARD SHORTCUTS IMPLEMENTATION (WCAG 2.1 Level A)
+  // ⌨️ KEYBOARD SHORTCUTS IMPLEMENTATION (WCAG 2.1 Level A)
   // ============================================
   
   useEffect(() => {
@@ -394,13 +495,13 @@ const Movies = () => {
       }
 
       // Forward slash (/): Focus search
-      if (e.key === '/' && !showShortcuts && !selectedVideo) {
+      if (e.key === '/' && !showShortcuts && !selectedVideo && !showMovieDetail) {
         e.preventDefault();
         searchInputRef.current?.focus();
       }
 
       // Arrow keys: Navigate between movies
-      if (!showShortcuts && !selectedVideo && filteredMovies.length > 0) {
+      if (!showShortcuts && !selectedVideo && !showMovieDetail && filteredMovies.length > 0) {
         if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
           e.preventDefault();
           setFocusedMovieIndex(prev => 
@@ -414,16 +515,16 @@ const Movies = () => {
         }
       }
 
-      // Enter: Play focused movie
-      if (e.key === 'Enter' && !showShortcuts && !selectedVideo) {
+      // Enter: Open movie detail
+      if (e.key === 'Enter' && !showShortcuts && !selectedVideo && !showMovieDetail) {
         if (filteredMovies[focusedMovieIndex]) {
           e.preventDefault();
-          handlePlayVideo(filteredMovies[focusedMovieIndex].videoUrl);
+          handleOpenMovieDetail(filteredMovies[focusedMovieIndex]);
         }
       }
 
       // F: Toggle favorite on focused movie
-      if (e.key.toLowerCase() === 'f' && !showShortcuts && !selectedVideo) {
+      if (e.key.toLowerCase() === 'f' && !showShortcuts && !selectedVideo && !showMovieDetail) {
         if (filteredMovies[focusedMovieIndex]) {
           e.preventDefault();
           await toggleFavorite(filteredMovies[focusedMovieIndex]);
@@ -436,6 +537,8 @@ const Movies = () => {
           setShowShortcuts(false);
         } else if (selectedVideo) {
           handleCloseVideo();
+        } else if (showMovieDetail) {
+          handleCloseMovieDetail();
         } else if (showDropdown) {
           setShowDropdown(false);
         }
@@ -444,9 +547,9 @@ const Movies = () => {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [showShortcuts, selectedVideo, showDropdown, filteredMovies, focusedMovieIndex, showFavorites, isLoggedIn]);
+  }, [showShortcuts, selectedVideo, showMovieDetail, showDropdown, filteredMovies, focusedMovieIndex, showFavorites, isLoggedIn]);
 
-  // ⌨️ NEW: Scroll focused movie into view
+  // ⌨️ Scroll focused movie into view
   useEffect(() => {
     if (movieGridRef.current && filteredMovies.length > 0) {
       const movieCards = movieGridRef.current.querySelectorAll('.movie-card');
@@ -477,7 +580,6 @@ const Movies = () => {
           <a href="/#/about">Sobre Nosotros</a>
         </nav>
         <div className="auth-buttons">
-          {/* ⌨️ NEW: Keyboard shortcuts button */}
           <button 
             className="shortcuts-btn"
             onClick={() => setShowShortcuts(!showShortcuts)}
@@ -586,55 +688,61 @@ const Movies = () => {
           </div>
         )}
 
-        {/* ⌨️ NEW: Added ref and role for accessibility */}
         <div ref={movieGridRef} className="movies-grid" role="list" aria-label="Lista de películas">
-          {filteredMovies.map((movie, index) => (
-            <div 
-              key={movie.id} 
-              className={`movie-card ${focusedMovieIndex === index ? 'focused' : ''}`}
-              role="listitem"
-              tabIndex={0}
-              aria-label={`${movie.title}, ${movie.rating} estrellas`}
-              onFocus={() => setFocusedMovieIndex(index)}
-            >
-              <div className="movie-image">
-                <img src={movie.image} alt={movie.title} />
-                <div className="movie-overlay" onClick={() => handlePlayVideo(movie.videoUrl)}>
+          {filteredMovies.map((movie, index) => {
+            const avgRating = getAverageRating(movie.id);
+            const reviewCount = reviews.filter(r => r.movieId === movie.id).length;
+            
+            return (
+              <div 
+                key={movie.id} 
+                className={`movie-card ${focusedMovieIndex === index ? 'focused' : ''}`}
+                role="listitem"
+                tabIndex={0}
+                aria-label={`${movie.title}, ${avgRating > 0 ? avgRating : movie.rating} estrellas`}
+                onFocus={() => setFocusedMovieIndex(index)}
+                onClick={() => handleOpenMovieDetail(movie)}
+              >
+                <div className="movie-image">
+                  <img src={movie.image} alt={movie.title} />
+                  <div className="movie-overlay">
+                    <button 
+                      className="play-button"
+                      aria-label={`Ver detalles de ${movie.title}`}
+                    >
+                      <FaPlay />
+                    </button>
+                  </div>
                   <button 
-                    className="play-btn"
-                    aria-label={`Reproducir ${movie.title}`}
+                    className={`favorite-btn ${isFavorite(movie.id) ? 'is-favorite' : ''}`}
+                    onClick={async (e) => {
+                      e.stopPropagation();
+                      await toggleFavorite(movie);
+                    }}
+                    aria-label={isFavorite(movie.id) ? 'Quitar de favoritos' : 'Agregar a favoritos'}
+                    title={`${isFavorite(movie.id) ? 'Quitar de' : 'Agregar a'} favoritos (F)`}
                   >
-                    <FaPlay />
+                    {isFavorite(movie.id) ? <FaHeart /> : <FaRegHeart />}
                   </button>
+                  <div className="movie-badges">
+                    <span className="genre-badge">{movie.genre}</span>
+                    <span className="rating-badge">
+                      <FaStar /> {avgRating > 0 ? avgRating : movie.rating}
+                      {reviewCount > 0 && <span className="review-count"> ({reviewCount})</span>}
+                    </span>
+                  </div>
                 </div>
-                <button 
-                  className={`favorite-btn ${isFavorite(movie.id) ? 'is-favorite' : ''}`}
-                  onClick={async (e) => {
-                    e.stopPropagation();
-                    await toggleFavorite(movie);
-                  }}
-                  aria-label={isFavorite(movie.id) ? 'Quitar de favoritos' : 'Agregar a favoritos'}
-                  title={`${isFavorite(movie.id) ? 'Quitar de' : 'Agregar a'} favoritos (F)`}
-                >
-                  {isFavorite(movie.id) ? <FaHeart /> : <FaRegHeart />}
-                </button>
-                <div className="movie-badges">
-                  <span className="genre-badge">{movie.genre}</span>
-                  <span className="rating-badge">
-                    <FaStar /> {movie.rating}
-                  </span>
+                <div className="movie-info">
+                  <h3>{movie.title}</h3>
+                  <p className="movie-description">{movie.description}</p>
+                  <div className="movie-meta">
+                    <span>{movie.year}</span>
+                    <span>{movie.duration}</span>
+                  </div>
                 </div>
               </div>
-              <div className="movie-info">
-                <h3>{movie.title}</h3>
-                <p className="movie-description">{movie.description}</p>
-                <div className="movie-meta">
-                  <span>{movie.year}</span>
-                  <span>{movie.duration}</span>
-                </div>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         {filteredMovies.length === 0 && !loading && !error && (
@@ -648,6 +756,160 @@ const Movies = () => {
           </div>
         )}
       </div>
+
+      {/* ⭐ NEW: Movie Detail Page with Reviews */}
+      {showMovieDetail && selectedMovie && (
+        <div className="movie-detail-page">
+          <div className="movie-detail-header">
+            <button 
+              className="back-button" 
+              onClick={handleCloseMovieDetail}
+              aria-label="Volver a películas"
+            >
+              <FaArrowLeft /> Volver
+            </button>
+          </div>
+
+          <div className="movie-detail-content">
+            <div className="movie-detail-hero">
+              <div className="movie-detail-poster">
+                <img src={selectedMovie.image} alt={selectedMovie.title} />
+                <button 
+                  className="play-trailer-btn"
+                  onClick={() => handlePlayVideo(selectedMovie.videoUrl)}
+                >
+                  <FaPlay /> Ver Pelicula
+                </button>
+              </div>
+              
+              <div className="movie-detail-info">
+                <h1>{selectedMovie.title}</h1>
+                <div className="movie-detail-meta">
+                  <span className="genre-tag">{selectedMovie.genre}</span>
+                  <span>{selectedMovie.year}</span>
+                  <span>{selectedMovie.duration}</span>
+                </div>
+                <div className="movie-rating-summary">
+                  <div className="stars-display">
+                    {[1, 2, 3, 4, 5].map(star => (
+                      <FaStar 
+                        key={star}
+                        className={star <= (getAverageRating(selectedMovie.id) || selectedMovie.rating) ? 'star-filled' : 'star-empty'}
+                      />
+                    ))}
+                  </div>
+                  <span className="rating-number">
+                    {getAverageRating(selectedMovie.id) > 0 
+                      ? getAverageRating(selectedMovie.id) 
+                      : selectedMovie.rating} / 5
+                  </span>
+                  <span className="review-count-text">
+                    ({movieReviews.length} reseña{movieReviews.length !== 1 ? 's' : ''})
+                  </span>
+                </div>
+                <p className="movie-description-full">{selectedMovie.description}</p>
+                
+                <button 
+                  className={`favorite-detail-btn ${isFavorite(selectedMovie.id) ? 'is-favorite' : ''}`}
+                  onClick={async () => await toggleFavorite(selectedMovie)}
+                >
+                  {isFavorite(selectedMovie.id) ? <FaHeart /> : <FaRegHeart />}
+                  {isFavorite(selectedMovie.id) ? 'En Favoritos' : 'Agregar a Favoritos'}
+                </button>
+              </div>
+            </div>
+
+            {/* Review Section */}
+            <div className="reviews-section">
+              <h2>Reseñas y Puntuaciones</h2>
+              
+              {/* Add Review Form */}
+              {isLoggedIn ? (
+                <div className="add-review-form">
+                  <h3>Deja tu reseña</h3>
+                  <div className="rating-input">
+                    <label>Tu puntuación:</label>
+                    <div className="stars-input">
+                      {[1, 2, 3, 4, 5].map(star => (
+                        <FaStar
+                          key={star}
+                          className={star <= (hoverRating || userRating) ? 'star-hover' : 'star-empty'}
+                          onMouseEnter={() => setHoverRating(star)}
+                          onMouseLeave={() => setHoverRating(0)}
+                          onClick={() => setUserRating(star)}
+                        />
+                      ))}
+                    </div>
+                    {userRating > 0 && (
+                      <span className="rating-text">{userRating} de 5 estrellas</span>
+                    )}
+                  </div>
+                  
+                  <div className="comment-input">
+                    <label htmlFor="review-text">Tu comentario (opcional):</label>
+                    <textarea
+                      id="review-text"
+                      value={reviewText}
+                      onChange={(e) => setReviewText(e.target.value)}
+                      placeholder="Cuéntanos qué te pareció esta película..."
+                      rows={4}
+                      maxLength={500}
+                    />
+                    <span className="char-count">{reviewText.length}/500</span>
+                  </div>
+                  
+                  <button 
+                    className="submit-review-btn"
+                    onClick={handleSubmitReview}
+                    disabled={userRating === 0}
+                  >
+                    Enviar Reseña
+                  </button>
+                </div>
+              ) : (
+                <div className="login-prompt">
+                  <p>Debes <a href="/#/">iniciar sesión</a> para dejar una reseña</p>
+                </div>
+              )}
+
+              {/* Reviews List */}
+              <div className="reviews-list">
+                <h3>Todas las reseñas ({movieReviews.length})</h3>
+                {movieReviews.length === 0 ? (
+                  <p className="no-reviews">Aún no hay reseñas. ¡Sé el primero en dejar una!</p>
+                ) : (
+                  movieReviews.map(review => (
+                    <div key={review.id} className="review-item">
+                      <div className="review-header">
+                        <div className="review-user">
+                          <div className="user-avatar">
+                            <FaUser />
+                          </div>
+                          <div className="user-info">
+                            <span className="user-name">{review.userName}</span>
+                            <span className="review-date">{review.date}</span>
+                          </div>
+                        </div>
+                        <div className="review-rating">
+                          {[1, 2, 3, 4, 5].map(star => (
+                            <FaStar
+                              key={star}
+                              className={star <= review.rating ? 'star-filled' : 'star-empty'}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                      {review.comment && (
+                        <p className="review-comment">{review.comment}</p>
+                      )}
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Video Modal */}
       {selectedVideo && (
@@ -676,7 +938,7 @@ const Movies = () => {
         </div>
       )}
 
-      {/* ⌨️ NEW: Keyboard Shortcuts Modal */}
+      {/* ⌨️ Keyboard Shortcuts Modal */}
       {showShortcuts && (
         <div 
           className="shortcuts-modal" 
@@ -759,13 +1021,13 @@ const Movies = () => {
                     </div>
                   </div>
                   <div className="shortcut-item">
-                    <span className="shortcut-description">Reproducir película</span>
+                    <span className="shortcut-description">Ver detalles de película</span>
                     <div className="shortcut-keys">
-                      <span className="shortcut-note">Click en video</span>
+                      <span className="shortcut-note">Click en tarjeta</span>
                     </div>
                   </div>
                   <div className="shortcut-item">
-                    <span className="shortcut-description">Reproducir película enfocada</span>
+                    <span className="shortcut-description">Ver detalles (enfocada)</span>
                     <div className="shortcut-keys">
                       <div className="keys-wrapper">
                         <kbd>Enter</kbd>

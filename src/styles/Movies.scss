@@ -15,7 +15,8 @@ $border: #e5e7eb;
   box-sizing: border-box;
 }
 
-body, html {
+body,
+html {
   overflow-x: hidden;
   width: 100%;
 }
@@ -24,7 +25,8 @@ body, html {
   width: 100%;
   min-height: 100vh;
   background: $background;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
 }
 
 // 🧭 Header - Responsive optimizado
@@ -83,7 +85,8 @@ body, html {
     gap: 1rem;
     align-items: center;
 
-    .login-btn, .signup-btn {
+    .login-btn,
+    .signup-btn {
       text-decoration: none;
       white-space: nowrap;
     }
@@ -184,7 +187,7 @@ body, html {
         background: $primary;
         color: $white;
         border-color: $primary;
-        
+
         svg {
           animation: heartBeat 0.3s ease;
         }
@@ -251,7 +254,7 @@ body, html {
       .favorites-btn {
         padding: 0.4rem 0.8rem;
         font-size: 0.8rem;
-        
+
         span {
           display: none;
         }
@@ -645,12 +648,18 @@ body, html {
         width: 60px;
         height: 60px;
         border-radius: 50%;
-        font-size: 1.5rem;
+        font-size: 0.01rem;
         display: flex;
         align-items: center;
         justify-content: center;
         cursor: pointer;
         transition: all 0.3s ease;
+
+        svg {
+          width: 36px;
+          height: 36px;
+          margin-left: 3px;
+        }
 
         &:hover {
           background: $secondary;
@@ -1125,7 +1134,7 @@ body, html {
     background: $white;
     transform: scale(1.15);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    
+
     svg {
       color: $primary;
       transform: scale(1.1);
@@ -1140,7 +1149,7 @@ body, html {
   &.is-favorite {
     background: rgba(229, 9, 20, 0.1);
     border: 2px solid $primary;
-    
+
     svg {
       color: $primary;
       animation: heartBeat 0.3s ease;
@@ -1173,7 +1182,8 @@ body, html {
 }
 
 @keyframes heartBeat {
-  0%, 100% {
+  0%,
+  100% {
     transform: scale(1);
   }
   50% {
@@ -1368,7 +1378,7 @@ body, html {
                   padding: 0.25rem 0.5rem;
                   border-radius: 0.25rem;
                   font-size: 0.85rem;
-                  font-family: 'Monaco', 'Courier New', monospace;
+                  font-family: "Monaco", "Courier New", monospace;
                   min-width: 2rem;
                   text-align: center;
                   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -1399,7 +1409,7 @@ body, html {
         padding: 0.125rem 0.375rem;
         border-radius: 0.25rem;
         font-size: 0.8rem;
-        font-family: 'Monaco', 'Courier New', monospace;
+        font-family: "Monaco", "Courier New", monospace;
       }
     }
 
@@ -1578,6 +1588,519 @@ body, html {
       }
     }
   }
+}
+
+// ⭐ Movie Detail Page with Reviews
+.movie-detail-page {
+  position: fixed;
+  inset: 0;
+  background: $background;
+  z-index: 9999;
+  overflow-y: auto;
+  animation: slideIn 0.3s ease;
+
+  .movie-detail-header {
+    position: sticky;
+    top: 0;
+    background: $white;
+    padding: 1rem 2rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    z-index: 100;
+
+    .back-button {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: transparent;
+      border: none;
+      color: $text;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+
+      &:hover {
+        background: $gray-light;
+        color: $primary;
+      }
+
+      &:focus-visible {
+        outline: 2px solid $primary;
+        outline-offset: 2px;
+      }
+    }
+  }
+
+  .movie-detail-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+
+    .movie-detail-hero {
+      display: grid;
+      grid-template-columns: 400px 1fr;
+      gap: 3rem;
+      margin-bottom: 3rem;
+
+      .movie-detail-poster {
+        position: relative;
+
+        img {
+          width: 100%;
+          border-radius: 12px;
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        }
+
+        .play-trailer-btn {
+          width: 100%;
+          margin-top: 1rem;
+          background: $primary;
+          color: $white;
+          border: none;
+          padding: 1rem;
+          border-radius: 8px;
+          font-size: 1rem;
+          font-weight: 600;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 0.5rem;
+          transition: all 0.3s ease;
+
+          &:hover {
+            background: $secondary;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(229, 9, 20, 0.3);
+          }
+
+          &:focus-visible {
+            outline: 2px solid $text;
+            outline-offset: 2px;
+          }
+        }
+      }
+
+      .movie-detail-info {
+        h1 {
+          font-size: 2.5rem;
+          margin-bottom: 1rem;
+          color: $text;
+        }
+
+        .movie-detail-meta {
+          display: flex;
+          gap: 1rem;
+          margin-bottom: 1.5rem;
+          flex-wrap: wrap;
+
+          span {
+            color: $gray-medium;
+            font-size: 1rem;
+          }
+
+          .genre-tag {
+            background: $primary;
+            color: $white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 6px;
+            font-weight: 600;
+          }
+        }
+
+        .movie-rating-summary {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+          margin-bottom: 1.5rem;
+          flex-wrap: wrap;
+
+          .stars-display {
+            display: flex;
+            gap: 0.3rem;
+
+            .star-filled {
+              color: #fbbf24;
+              font-size: 1.5rem;
+            }
+
+            .star-empty {
+              color: $gray-medium;
+              font-size: 1.5rem;
+            }
+          }
+
+          .rating-number {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: $text;
+          }
+
+          .review-count-text {
+            color: $gray-medium;
+          }
+        }
+
+        .movie-description-full {
+          font-size: 1.1rem;
+          line-height: 1.8;
+          color: $text;
+          margin-bottom: 2rem;
+        }
+
+        .favorite-detail-btn {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          background: transparent;
+          border: 2px solid $primary;
+          color: $primary;
+          padding: 0.8rem 1.5rem;
+          border-radius: 8px;
+          font-size: 1rem;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.3s ease;
+
+          &:hover {
+            background: $primary;
+            color: $white;
+            transform: translateY(-2px);
+          }
+
+          &:focus-visible {
+            outline: 2px solid $text;
+            outline-offset: 2px;
+          }
+
+          &.is-favorite {
+            background: $primary;
+            color: $white;
+          }
+
+          svg {
+            font-size: 1.2rem;
+          }
+        }
+      }
+
+      @media (max-width: 1024px) {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+
+        .movie-detail-poster {
+          max-width: 400px;
+          margin: 0 auto;
+        }
+      }
+    }
+
+    .reviews-section {
+      background: $gray-light;
+      padding: 2rem;
+      border-radius: 12px;
+
+      h2 {
+        font-size: 2rem;
+        margin-bottom: 2rem;
+        color: $text;
+      }
+
+      .add-review-form {
+        background: $white;
+        padding: 2rem;
+        border-radius: 12px;
+        margin-bottom: 2rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+        h3 {
+          font-size: 1.3rem;
+          margin-bottom: 1.5rem;
+          color: $text;
+        }
+
+        .rating-input {
+          margin-bottom: 1.5rem;
+
+          label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: $text;
+          }
+
+          .stars-input {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+
+            svg {
+              font-size: 2rem;
+              cursor: pointer;
+              transition: all 0.2s ease;
+
+              &.star-hover {
+                color: #fbbf24;
+                transform: scale(1.1);
+              }
+
+              &.star-empty {
+                color: $gray-medium;
+              }
+
+              &:hover {
+                transform: scale(1.15);
+              }
+            }
+          }
+
+          .rating-text {
+            color: $gray-medium;
+            font-size: 0.9rem;
+          }
+        }
+
+        .comment-input {
+          margin-bottom: 1.5rem;
+
+          label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: $text;
+          }
+
+          textarea {
+            width: 100%;
+            padding: 1rem;
+            border: 1px solid $border;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 100px;
+            transition: border-color 0.3s ease;
+
+            &:focus {
+              outline: none;
+              border-color: $primary;
+              box-shadow: 0 0 0 3px rgba(229, 9, 20, 0.1);
+            }
+
+            &::placeholder {
+              color: $gray-medium;
+            }
+          }
+
+          .char-count {
+            display: block;
+            text-align: right;
+            margin-top: 0.5rem;
+            font-size: 0.85rem;
+            color: $gray-medium;
+          }
+        }
+
+        .submit-review-btn {
+          width: 100%;
+          background: $primary;
+          color: $white;
+          border: none;
+          padding: 1rem;
+          border-radius: 8px;
+          font-size: 1rem;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.3s ease;
+
+          &:hover:not(:disabled) {
+            background: $secondary;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(229, 9, 20, 0.3);
+          }
+
+          &:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+          }
+
+          &:focus-visible {
+            outline: 2px solid $text;
+            outline-offset: 2px;
+          }
+        }
+      }
+
+      .login-prompt {
+        background: $white;
+        padding: 2rem;
+        border-radius: 12px;
+        text-align: center;
+        margin-bottom: 2rem;
+
+        p {
+          font-size: 1.1rem;
+          color: $text;
+
+          a {
+            color: $primary;
+            font-weight: 600;
+            text-decoration: none;
+
+            &:hover {
+              text-decoration: underline;
+            }
+          }
+        }
+      }
+
+      .reviews-list {
+        h3 {
+          font-size: 1.5rem;
+          margin-bottom: 1.5rem;
+          color: $text;
+        }
+
+        .no-reviews {
+          text-align: center;
+          padding: 2rem;
+          color: $gray-medium;
+          font-size: 1.1rem;
+        }
+
+        .review-item {
+          background: $white;
+          padding: 1.5rem;
+          border-radius: 12px;
+          margin-bottom: 1rem;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+          .review-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+
+            .review-user {
+              display: flex;
+              align-items: center;
+              gap: 1rem;
+
+              .user-avatar {
+                width: 48px;
+                height: 48px;
+                background: $gray-light;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: $gray-medium;
+
+                svg {
+                  font-size: 1.5rem;
+                }
+              }
+
+              .user-info {
+                display: flex;
+                flex-direction: column;
+                gap: 0.25rem;
+
+                .user-name {
+                  font-weight: 600;
+                  color: $text;
+                  font-size: 1rem;
+                }
+
+                .review-date {
+                  font-size: 0.85rem;
+                  color: $gray-medium;
+                }
+              }
+            }
+
+            .review-rating {
+              display: flex;
+              gap: 0.25rem;
+
+              .star-filled {
+                color: #fbbf24;
+                font-size: 1.2rem;
+              }
+
+              .star-empty {
+                color: $gray-medium;
+                font-size: 1.2rem;
+              }
+            }
+          }
+
+          .review-comment {
+            color: $text;
+            line-height: 1.6;
+            font-size: 1rem;
+          }
+        }
+      }
+    }
+
+    @media (max-width: 768px) {
+      padding: 1.5rem;
+
+      .reviews-section {
+        padding: 1.5rem;
+
+        h2 {
+          font-size: 1.5rem;
+        }
+
+        .add-review-form,
+        .login-prompt {
+          padding: 1.5rem;
+        }
+
+        .reviews-list {
+          .review-item {
+            padding: 1rem;
+
+            .review-header {
+              .review-user {
+                .user-avatar {
+                  width: 40px;
+                  height: 40px;
+
+                  svg {
+                    font-size: 1.2rem;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Review count badge in movie card
+.review-count {
+  font-size: 0.75rem;
+  opacity: 0.9;
 }
 
 // 🎯 Accesibilidad: Focus visible mejorado

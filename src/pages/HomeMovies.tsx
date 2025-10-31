@@ -324,12 +324,14 @@ const HomeMovies: React.FC = () => {
         </div>
       </section>
 
-      {/* Call to Action */}
-      <section className="cta-section">
-        <h2>¿Listo para mirar?</h2>
-        <p>Crea una cuenta para comenzar a transmitir miles de películas y programas de TV al instante.</p>
-        <a href="/#/register" className="cta-button">Empezar</a>
-      </section>
+      {/* Call to Action - Solo visible cuando NO está logueado */}
+      {!user && (
+        <section className="cta-section">
+          <h2>¿Listo para mirar?</h2>
+          <p>Crea una cuenta para comenzar a transmitir miles de películas y programas de TV al instante.</p>
+          <a href="/#/register" className="cta-button">Empezar</a>
+        </section>
+      )}
 
       {/* Footer */}
       <footer className="movies-footer">
