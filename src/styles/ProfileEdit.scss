@@ -1,3 +1,5 @@
+@use "sass:color";
+
 // Paleta de colores
 $primary: #e50914;
 $secondary: #b20710;
@@ -385,7 +387,7 @@ $shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.08);
     }
 
     &:hover:not(:focus) {
-      border-color: darken($border, 5%);
+      border-color: color.adjust($border, $lightness: -5%);
     }
 
     &::placeholder {
