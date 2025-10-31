@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import "../styles/Movies.scss";
-import { FaStar, FaSearch, FaFilter, FaPlay, FaHeart, FaRegHeart, FaUser, FaCog, FaSignOutAlt, FaKeyboard, FaTimes, FaArrowLeft } from "react-icons/fa";
+import { FaStar, FaSearch, FaFilter, FaPlay, FaHeart, FaRegHeart, FaUser, FaCog, FaSignOutAlt, FaKeyboard, FaTimes, FaArrowLeft, FaEdit, FaTrash } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
 /**
@@ -56,6 +56,18 @@ interface Review {
   rating: number;
   comment: string;
   date: string;
+  hasRating: boolean; // Indicates if this review includes a rating
+}
+
+/**
+ * Interface representing a user's rating for a movie (only one per movie)
+ * @interface
+ */
+interface UserMovieRating {
+  movieId: number;
+  userId: string;
+  rating: number;
+  date: string;
 }
 
 /**
@@ -89,6 +101,9 @@ const Movies = () => {
   const [reviewText, setReviewText] = useState("");
   const [reviews, setReviews] = useState<Review[]>([]);
   const [movieReviews, setMovieReviews] = useState<Review[]>([]);
+  const [editingReviewId, setEditingReviewId] = useState<string | null>(null);
+  const [userMovieRatings, setUserMovieRatings] = useState<UserMovieRating[]>([]);
+  const [hasRatedThisMovie, setHasRatedThisMovie] = useState(false);
   
   // ⌨️ Keyboard accessibility states
   const [showShortcuts, setShowShortcuts] = useState(false);
@@ -110,22 +125,61 @@ const Movies = () => {
   };
 
   /**
-   * Checks if the user is logged in by validating the existence of a token in localStorage.
-   * Sets a placeholder username if found.
+   * Checks if the user is logged in and fetches user profile from backend.
    * @function
    */
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
       setIsLoggedIn(true);
-      setUserName("Usuario");
+      // Fetch username ONLY from backend
+      fetchUserProfile();
     }
     // Load reviews from localStorage
     const savedReviews = localStorage.getItem("movieReviews");
     if (savedReviews) {
       setReviews(JSON.parse(savedReviews));
     }
+    // Load user ratings from localStorage
+    const savedRatings = localStorage.getItem("userMovieRatings");
+    if (savedRatings) {
+      setUserMovieRatings(JSON.parse(savedRatings));
+    }
   }, []);
+
+  /**
+   * Fetches the user's profile information from the backend to get username.
+   * @async
+   */
+  const fetchUserProfile = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
+      const response = await fetch(
+        "https://backend-de-peliculas.onrender.com/api/v1/users/profile",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        const user = data.user;
+        // Set username from backend profile ONLY
+        const username = user.username || user.firstName || user.email || "Usuario";
+        setUserName(username);
+      } else {
+        console.error("Error en la respuesta del backend:", response.status);
+        setUserName("Usuario");
+      }
+    } catch (error) {
+      console.error("Error al cargar perfil de usuario:", error);
+      setUserName("Usuario");
+    }
+  };
 
   // Load favorites from backend when the component mounts
   useEffect(() => {
@@ -134,6 +188,13 @@ const Movies = () => {
       fetchFavorites();
     }
   }, [isLoggedIn]);
+
+  // Wait for userName to be loaded before showing content
+  useEffect(() => {
+    if (isLoggedIn && !userName) {
+      fetchUserProfile();
+    }
+  }, [isLoggedIn, userName]);
 
   // Filter movies when search term, genre, or favorite status changes
   useEffect(() => {
@@ -310,20 +371,27 @@ const Movies = () => {
   const handleOpenMovieDetail = (movie: Movie) => {
     setSelectedMovie(movie);
     setShowMovieDetail(true);
+    setEditingReviewId(null);
     
     // Load reviews for this movie
     const movieReviewsFiltered = reviews.filter(r => r.movieId === movie.id);
     setMovieReviews(movieReviewsFiltered);
     
-    // Load user's existing review if any
-    const userReview = movieReviewsFiltered.find(r => r.userName === userName);
-    if (userReview) {
-      setUserRating(userReview.rating);
-      setReviewText(userReview.comment);
+    // Check if user has already rated this movie
+    const existingRating = userMovieRatings.find(
+      r => r.movieId === movie.id && r.userId === userName
+    );
+    
+    if (existingRating) {
+      setUserRating(existingRating.rating);
+      setHasRatedThisMovie(true);
     } else {
       setUserRating(0);
-      setReviewText("");
+      setHasRatedThisMovie(false);
     }
+    
+    // Reset review text
+    setReviewText("");
   };
 
   // ⭐ NEW: Closes movie detail page
@@ -333,54 +401,152 @@ const Movies = () => {
     setUserRating(0);
     setHoverRating(0);
     setReviewText("");
+    setEditingReviewId(null);
+    setHasRatedThisMovie(false);
   };
 
-  // ⭐ NEW: Submit review
+  // ⭐ NEW: Submit review (allows multiple reviews per user, but only ONE rating per movie)
   const handleSubmitReview = () => {
     if (!isLoggedIn) {
       alert("Debes iniciar sesión para dejar una reseña");
       return;
     }
 
-    if (userRating === 0) {
-      alert("Por favor selecciona una puntuación");
+    if (!userName || userName === "Usuario") {
+      alert("Cargando información del usuario, por favor espera un momento...");
+      fetchUserProfile();
       return;
     }
 
     if (!selectedMovie) return;
 
+    // Si ya calificaste, solo necesitas comentario
+    // Si NO has calificado, necesitas comentario O calificación
+    if (hasRatedThisMovie) {
+      if (!reviewText.trim()) {
+        alert("Por favor escribe un comentario");
+        return;
+      }
+    } else {
+      if (!reviewText.trim() && userRating === 0) {
+        alert("Por favor escribe un comentario o selecciona una calificación");
+        return;
+      }
+    }
+
+    if (editingReviewId) {
+      // Editing existing review (only comment, rating cannot be changed)
+      const updatedReviews = reviews.map(r => 
+        r.id === editingReviewId 
+          ? { ...r, comment: reviewText, date: new Date().toLocaleDateString('es-ES') }
+          : r
+      );
+      setReviews(updatedReviews);
+      localStorage.setItem("movieReviews", JSON.stringify(updatedReviews));
+      setMovieReviews(updatedReviews.filter(r => r.movieId === selectedMovie.id));
+      
+      // Reset form after editing
+      setReviewText("");
+      setEditingReviewId(null);
+      
+      alert("¡Comentario actualizado con éxito!");
+      return;
+    }
+
+    // Check if this is a new rating submission
+    const isSubmittingNewRating = userRating > 0 && !hasRatedThisMovie;
+
+    // Save rating if it's the first time
+    if (isSubmittingNewRating) {
+      const newRating: UserMovieRating = {
+        movieId: selectedMovie.id,
+        userId: userName,
+        rating: userRating,
+        date: new Date().toLocaleDateString('es-ES')
+      };
+
+      const updatedRatings = [...userMovieRatings, newRating];
+      setUserMovieRatings(updatedRatings);
+      localStorage.setItem("userMovieRatings", JSON.stringify(updatedRatings));
+      setHasRatedThisMovie(true);
+    }
+
+    // Create new review/comment
     const newReview: Review = {
       id: `${selectedMovie.id}-${userName}-${Date.now()}`,
       movieId: selectedMovie.id,
       userId: userName,
       userName: userName,
-      rating: userRating,
+      rating: isSubmittingNewRating ? userRating : 0, // Only include rating if it's new
       comment: reviewText,
-      date: new Date().toLocaleDateString('es-ES')
+      date: new Date().toLocaleDateString('es-ES'),
+      hasRating: isSubmittingNewRating // Only true for the first review with rating
     };
 
-    // Remove previous review from same user for this movie
-    const updatedReviews = reviews.filter(
-      r => !(r.movieId === selectedMovie.id && r.userName === userName)
-    );
-    
-    const allReviews = [...updatedReviews, newReview];
+    console.log("Creando nueva reseña:", newReview); // Debug
+
+    const allReviews = [...reviews, newReview];
     setReviews(allReviews);
     localStorage.setItem("movieReviews", JSON.stringify(allReviews));
-    
-    // Update movie reviews display
     setMovieReviews(allReviews.filter(r => r.movieId === selectedMovie.id));
     
-    alert("¡Reseña enviada con éxito!");
+    // Reset only the comment field
+    setReviewText("");
+    
+    if (isSubmittingNewRating) {
+      alert("¡Calificación y comentario enviados con éxito!");
+    } else {
+      alert("¡Comentario enviado con éxito!");
+    }
   };
 
-  // ⭐ NEW: Calculate average rating for a movie
-  const getAverageRating = (movieId: number): number => {
-    const movieReviewsFiltered = reviews.filter(r => r.movieId === movieId);
-    if (movieReviewsFiltered.length === 0) return 0;
+  // ⭐ NEW: Edit review
+  const handleEditReview = (review: Review) => {
+    setUserRating(review.rating);
+    setReviewText(review.comment);
+    setEditingReviewId(review.id);
+    // Scroll to form
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // ⭐ NEW: Delete review
+  const handleDeleteReview = (reviewId: string) => {
+    if (!window.confirm("¿Estás seguro de que deseas eliminar esta reseña?")) {
+      return;
+    }
+
+    const updatedReviews = reviews.filter(r => r.id !== reviewId);
+    setReviews(updatedReviews);
+    localStorage.setItem("movieReviews", JSON.stringify(updatedReviews));
     
-    const sum = movieReviewsFiltered.reduce((acc, r) => acc + r.rating, 0);
-    return parseFloat((sum / movieReviewsFiltered.length).toFixed(1));
+    if (selectedMovie) {
+      setMovieReviews(updatedReviews.filter(r => r.movieId === selectedMovie.id));
+    }
+
+    // Reset form if deleting current editing review
+    if (editingReviewId === reviewId) {
+      setUserRating(0);
+      setReviewText("");
+      setEditingReviewId(null);
+    }
+
+    alert("Reseña eliminada correctamente");
+  };
+
+  // ⭐ NEW: Cancel edit
+  const handleCancelEdit = () => {
+    setUserRating(0);
+    setReviewText("");
+    setEditingReviewId(null);
+  };
+
+  // ⭐ NEW: Calculate average rating for a movie (based on UserMovieRatings, not reviews)
+  const getAverageRating = (movieId: number): number => {
+    const movieRatings = userMovieRatings.filter(r => r.movieId === movieId);
+    if (movieRatings.length === 0) return 0;
+    
+    const sum = movieRatings.reduce((acc, r) => acc + r.rating, 0);
+    return parseFloat((sum / movieRatings.length).toFixed(1));
   };
 
   /** Checks if a movie is already in favorites. */
@@ -826,27 +992,62 @@ const Movies = () => {
               {/* Add Review Form */}
               {isLoggedIn ? (
                 <div className="add-review-form">
-                  <h3>Deja tu reseña</h3>
+                  <div className="review-form-user-info">
+                    <div className="user-avatar">
+                      <FaUser />
+                    </div>
+                    <div>
+                      <h3>{editingReviewId ? 'Editar reseña' : 'Agregar nueva reseña'}</h3>
+                      <p className="review-form-info">
+                        {editingReviewId 
+                          ? 'Editando comentario (la calificación no se puede cambiar)' 
+                          : `Escribiendo como: ${userName || 'Cargando...'}`}
+                      </p>
+                    </div>
+                  </div>
+                  
+                  {/* Rating Section */}
                   <div className="rating-input">
                     <label>Tu puntuación:</label>
-                    <div className="stars-input">
-                      {[1, 2, 3, 4, 5].map(star => (
-                        <FaStar
-                          key={star}
-                          className={star <= (hoverRating || userRating) ? 'star-hover' : 'star-empty'}
-                          onMouseEnter={() => setHoverRating(star)}
-                          onMouseLeave={() => setHoverRating(0)}
-                          onClick={() => setUserRating(star)}
-                        />
-                      ))}
-                    </div>
-                    {userRating > 0 && (
-                      <span className="rating-text">{userRating} de 5 estrellas</span>
+                    {hasRatedThisMovie ? (
+                      <div className="rating-locked">
+                        <div className="stars-display">
+                          {[1, 2, 3, 4, 5].map(star => (
+                            <FaStar
+                              key={star}
+                              className={star <= userRating ? 'star-filled' : 'star-empty'}
+                            />
+                          ))}
+                        </div>
+                        <span className="rating-locked-text">
+                          Ya has calificado esta película con {userRating} estrella{userRating !== 1 ? 's' : ''}. 
+                          Puedes agregar comentarios adicionales sin calificación.
+                        </span>
+                      </div>
+                    ) : (
+                      <>
+                        <div className="stars-input">
+                          {[1, 2, 3, 4, 5].map(star => (
+                            <FaStar
+                              key={star}
+                              className={star <= (hoverRating || userRating) ? 'star-hover' : 'star-empty'}
+                              onMouseEnter={() => setHoverRating(star)}
+                              onMouseLeave={() => setHoverRating(0)}
+                              onClick={() => setUserRating(star)}
+                            />
+                          ))}
+                        </div>
+                        {userRating > 0 ? (
+                          <span className="rating-text">{userRating} de 5 estrellas</span>
+                        ) : (
+                          <span className="rating-text-hint">Calificación opcional - Solo puedes calificar una vez</span>
+                        )}
+                      </>
                     )}
                   </div>
                   
                   <div className="comment-input">
-                    <label htmlFor="review-text">Tu comentario (opcional):</label>
+                    <label htmlFor="review-text">Tu comentario{hasRatedThisMovie ? '' : ' (opcional)'}:</label>
                     <textarea
                       id="review-text"
                       value={reviewText}
@@ -858,13 +1059,27 @@ const Movies = () => {
                     <span className="char-count">{reviewText.length}/500</span>
                   </div>
                   
-                  <button 
-                    className="submit-review-btn"
-                    onClick={handleSubmitReview}
-                    disabled={userRating === 0}
-                  >
-                    Enviar Reseña
-                  </button>
+                  <div className="review-form-buttons">
+                    <button 
+                      className="submit-review-btn"
+                      onClick={handleSubmitReview}
+                      disabled={
+                        !userName || 
+                        userName === "Usuario" || 
+                        (hasRatedThisMovie ? !reviewText.trim() : (!reviewText.trim() && userRating === 0))
+                      }
+                    >
+                      {editingReviewId ? 'Actualizar Reseña' : 'Enviar Reseña'}
+                    </button>
+                    {editingReviewId && (
+                      <button 
+                        className="cancel-edit-btn"
+                        onClick={handleCancelEdit}
+                      >
+                        Cancelar
+                      </button>
+                    )}
+                  </div>
                 </div>
               ) : (
                 <div className="login-prompt">
@@ -890,13 +1105,39 @@ const Movies = () => {
                             <span className="review-date">{review.date}</span>
                           </div>
                         </div>
-                        <div className="review-rating">
-                          {[1, 2, 3, 4, 5].map(star => (
-                            <FaStar
-                              key={star}
-                              className={star <= review.rating ? 'star-filled' : 'star-empty'}
-                            />
-                          ))}
+                        <div className="review-rating-actions">
+                          {/* Only show stars if this review includes a rating */}
+                          {review.hasRating && review.rating > 0 && (
+                            <div className="review-rating">
+                              {[1, 2, 3, 4, 5].map(star => (
+                                <FaStar
+                                  key={star}
+                                  className={star <= review.rating ? 'star-filled' : 'star-empty'}
+                                />
+                              ))}
+                            </div>
+                          )}
+                          {/* Show edit/delete buttons only for user's own reviews */}
+                          {isLoggedIn && review.userName === userName && (
+                            <div className="review-actions">
+                              <button 
+                                className="edit-review-btn"
+                                onClick={() => handleEditReview(review)}
+                                title="Editar reseña"
+                                aria-label="Editar reseña"
+                              >
+                                <FaEdit />
+                              </button>
+                              <button 
+                                className="delete-review-btn"
+                                onClick={() => handleDeleteReview(review.id)}
+                                title="Eliminar reseña"
+                                aria-label="Eliminar reseña"
+                              >
+                                <FaTrash />
+                              </button>
+                            </div>
+                          )}
                         </div>
                       </div>
                       {review.comment && (

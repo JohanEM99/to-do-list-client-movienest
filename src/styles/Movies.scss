@@ -1876,6 +1876,8 @@ html {
             width: 100%;
             padding: 1rem;
             border: 1px solid $border;
+            background-color: white;
+            color: $text;
             border-radius: 8px;
             font-size: 1rem;
             font-family: inherit;
@@ -2101,6 +2103,123 @@ html {
 .review-count {
   font-size: 0.75rem;
   opacity: 0.9;
+}
+
+// Estilos para los botones de editar/eliminar reseñas
+.review-rating-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.review-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-left: 1rem;
+}
+
+.edit-review-btn,
+.delete-review-btn {
+  padding: 0.5rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+}
+
+.edit-review-btn {
+  background: #3498db;
+  color: white;
+  
+  &:hover {
+    background: #2980b9;
+    transform: translateY(-2px);
+  }
+}
+
+.delete-review-btn {
+  background: #e74c3c;
+  color: white;
+  
+  &:hover {
+    background: #c0392b;
+    transform: translateY(-2px);
+  }
+}
+
+.review-form-buttons {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.cancel-edit-btn {
+  padding: 0.75rem 1.5rem;
+  background: #95a5a6;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    background: #7f8c8d;
+  }
+}
+
+.review-form-info {
+  font-size: 0.9rem;
+  color: #7f8c8d;
+  margin-bottom: 1rem;
+  font-style: italic;
+}
+
+.rating-locked {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1rem;
+  background: rgba(52, 152, 219, 0.1);
+  border-radius: 8px;
+  border-left: 3px solid #3498db;
+
+  .stars-display {
+    display: flex;
+    gap: 0.3rem;
+    
+    .star-filled {
+      color: #f39c12;
+      font-size: 1.5rem;
+    }
+    
+    .star-empty {
+      color: #34495e;
+      font-size: 1.5rem;
+    }
+  }
+
+  .rating-locked-text {
+    color: #3498db;
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+}
+
+.rating-text-hint {
+  color: #95a5a6;
+  font-size: 0.85rem;
+  font-style: italic;
+}
+
+// Actualiza el review-count en el badge
+.review-count-text {
+  font-size: 0.9rem;
+  color: #bdc3c7;
 }
 
 // 🎯 Accesibilidad: Focus visible mejorado
