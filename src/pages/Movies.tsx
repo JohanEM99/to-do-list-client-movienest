@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import "../styles/Movies.scss";
-import { FaStar, FaSearch, FaFilter, FaPlay, FaHeart, FaRegHeart, FaUser, FaCog, FaSignOutAlt, FaKeyboard, FaTimes, FaArrowLeft } from "react-icons/fa";
+import { FaStar, FaSearch, FaFilter, FaPlay, FaHeart, FaRegHeart, FaUser, FaCog, FaSignOutAlt, FaKeyboard, FaArrowLeft } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
 /**
