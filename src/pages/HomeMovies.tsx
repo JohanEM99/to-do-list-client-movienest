@@ -1,28 +1,19 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "../styles/HomeMovies.scss";
-import { FaStar, FaClock, FaPlay, FaUser, FaCog, FaSignOutAlt } from "react-icons/fa";
+import { FaStar, FaClock, FaPlay, FaUser, FaCog, FaSignOutAlt, FaKeyboard } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-
-
 
 /**
  * Interface representing a video object from the Pexels API.
  * @interface
  */
-
-
-
 interface PexelsVideo {
-  id: number;     /** Unique identifier of the video */
-  image: string;    /** Thumbnail image URL */
-  duration: number;    /** Video duration in seconds */
-
-  user: {      /** Information about the video creator */
+  id: number;
+  image: string;
+  duration: number;
+  user: {
     name: string;
   };
-
- /** List of video files in various qualities */
-
   video_files: Array<{
     id: number;
     quality: string;
@@ -31,72 +22,166 @@ interface PexelsVideo {
     height: number;
     link: string;
   }>;
-
-
-    /** List of video preview pictures */
   video_pictures: Array<{
     id: number;
     picture: string;
   }>;
 }
 
-
 /**
  * Interface representing a movie object displayed in the app.
  * @interface
  */
 interface Movie {
-  id: number;     /** Unique movie ID */
-  title: string;    /** Movie title */
-  description: string;    /** Short movie description */
-  year: number;     /** Release year */
-  duration: string;    /** Movie duration in readable format (e.g. "120 min") */
-  rating: number;    /** User rating (0-5) */
-  genre: string;    /** Movie genre */
-  image: string;    /** Movie poster or thumbnail image */
-  videoUrl?: string;    /** Optional video URL */
-  featured?: boolean;    /** Defines whether the movie is featured */
+  id: number;
+  title: string;
+  description: string;
+  year: number;
+  duration: string;
+  rating: number;
+  genre: string;
+  image: string;
+  videoUrl?: string;
+  featured?: boolean;
 }
 
 /**
  * HomeMovies component — Displays featured and recommended movies, user profile options,
  * and a movie video modal. Fetches movie data from the Pexels API.
+ * 
+ * Cumple con WCAG 2.2 Nivel AA - Criterio 1.4.13 (Contenido en hover o foco)
  *
  * @component
  * @returns {JSX.Element} Rendered HomeMovies component
  */
-
-
-
 const HomeMovies: React.FC = () => {
-  /** List of movies fetched from the Pexels API */
   const [movies, setMovies] = useState<Movie[]>([]);
-  /** Movie selected as featured (displayed in hero banner) */
   const [featuredMovie, setFeaturedMovie] = useState<Movie | null>(null);
-  /** Loading state for movie fetching */
   const [loading, setLoading] = useState(true);
-  /** Authenticated user profile information */
   const [user, setUser] = useState<any>(null);
-  /** Selected video URL for modal playback */
   const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
-  /** Dropdown visibility state for user menu */
   const [showDropdown, setShowDropdown] = useState(false);
-  /** Navigation hook */
+  const [showShortcuts, setShowShortcuts] = useState(false);
+  
+  // Estados para WCAG 2.2 - Criterio 1.4.13: Hoverable
+  const [isHoveringMenu, setIsHoveringMenu] = useState(false);
+  const [isHoveringDropdown, setIsHoveringDropdown] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  
   const navigate = useNavigate();
 
-  /** Runs on component mount — loads movies and user data */
   useEffect(() => {
     fetchMovies();
     fetchUserProfile();
   }, []);
 
   /**
+   * WCAG 2.2 - Criterio 1.4.13: Hoverable y Persistente
+   * Control de visibilidad del dropdown basado en hover
+   */
+  useEffect(() => {
+    if (isHoveringMenu || isHoveringDropdown) {
+      setShowDropdown(true);
+    } else {
+      // Pequeño delay para permitir transición suave
+      const timer = setTimeout(() => {
+        setShowDropdown(false);
+      }, 150);
+      return () => clearTimeout(timer);
+    }
+  }, [isHoveringMenu, isHoveringDropdown]);
+
+  /**
+   * WCAG 2.2 - Criterio 1.4.13: Desestimable
+   * Cierre del dropdown al hacer click fuera
+   */
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowDropdown(false);
+        setIsHoveringMenu(false);
+        setIsHoveringDropdown(false);
+      }
+    };
+
+    if (showDropdown) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showDropdown]);
+
+  /**
+   * Keyboard shortcuts y manejo de Escape
+   * WCAG 2.2 - Criterio 1.4.13: Desestimable (Escape cierra contenido adicional)
+   */
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Si estamos en un input o textarea, solo permitir ESC
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
+        if (e.key === 'Escape') {
+          (e.target as HTMLElement).blur();
+        }
+        return;
+      }
+
+      // Alt+H: Quedarse en Home (o refrescar)
+      if ((e.altKey || e.metaKey) && e.key.toLowerCase() === 'h') {
+        e.preventDefault();
+        window.location.href = '/#/homemovies';
+      }
+
+      // Alt+P: Ir al Perfil (solo si está logueado)
+      if ((e.altKey || e.metaKey) && e.key.toLowerCase() === 'p') {
+        e.preventDefault();
+        if (user) {
+          window.location.href = '/#/profile';
+        }
+      }
+
+      // Alt+M: Ir a Películas
+      if ((e.altKey || e.metaKey) && e.key.toLowerCase() === 'm') {
+        e.preventDefault();
+        window.location.href = '/#/movies';
+      }
+
+      // Alt+A: Ir a Sobre Nosotros
+      if ((e.altKey || e.metaKey) && e.key.toLowerCase() === 'a') {
+        e.preventDefault();
+        window.location.href = '/#/about';
+      }
+
+      // Alt+K: Mostrar/ocultar atajos de teclado
+      if ((e.altKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setShowShortcuts(!showShortcuts);
+      }
+
+      // ESC: Cerrar modal de video, atajos o dropdown (WCAG 2.2 - Desestimable)
+      if (e.key === 'Escape') {
+        if (showShortcuts) {
+          setShowShortcuts(false);
+        } else if (selectedVideo) {
+          handleCloseVideo();
+        } else if (showDropdown) {
+          setShowDropdown(false);
+          setIsHoveringMenu(false);
+          setIsHoveringDropdown(false);
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [showShortcuts, selectedVideo, showDropdown, user]);
+
+  /**
    * Fetches movie data from the Pexels API and transforms it into a local Movie format.
    * @async
    * @returns {Promise<void>}
    */
-
-
   const fetchMovies = async () => {
     try {
       const PEXELS_API_KEY = import.meta.env.VITE_PEXELS_API_KEY || "pjVKkdHUWxAeb3NyKhEXk7j6kP1kv85b67dbekeZaWW2MYoLIuBZuCZN";
@@ -152,8 +237,6 @@ const HomeMovies: React.FC = () => {
    * @async
    * @returns {Promise<void>}
    */
-
-
   const fetchUserProfile = async () => {
     const token = localStorage.getItem("token");
     if (token) {
@@ -176,12 +259,9 @@ const HomeMovies: React.FC = () => {
     }
   };
 
-
- /**
+  /**
    * Handles user logout by clearing authentication token and redirecting to home.
    */
-
-
   const handleLogout = () => {
     localStorage.removeItem("token");
     setUser(null);
@@ -192,16 +272,13 @@ const HomeMovies: React.FC = () => {
    * Opens video modal with the selected movie trailer.
    * @param {string} videoUrl - URL of the video to play
    */
-
   const handlePlayVideo = (videoUrl: string) => {
     setSelectedVideo(videoUrl);
   };
 
-
   /**
    * Closes the open video modal.
    */
-
   const handleCloseVideo = () => {
     setSelectedVideo(null);
   };
@@ -223,11 +300,29 @@ const HomeMovies: React.FC = () => {
           <a href="#/about">Sobre Nosotros</a>
         </nav>
         <div className="auth-buttons">
+          <button 
+            className="shortcuts-btn"
+            onClick={() => setShowShortcuts(!showShortcuts)}
+            aria-label="Mostrar atajos de teclado"
+            title="Atajos de teclado (Alt+K)"
+          >
+            <FaKeyboard />
+          </button>
+
           {user ? (
-            <div className="user-menu">
+            <div 
+              className="user-menu"
+              ref={dropdownRef}
+              onMouseEnter={() => setIsHoveringMenu(true)}
+              onMouseLeave={() => setIsHoveringMenu(false)}
+            >
               <button 
                 className="user-button"
                 onClick={() => setShowDropdown(!showDropdown)}
+                aria-expanded={showDropdown}
+                aria-haspopup="true"
+                aria-label="Menú de usuario"
+                title="Abrir menú de usuario"
               >
                 <div className="user-avatar-small">
                   <FaUser />
@@ -235,11 +330,27 @@ const HomeMovies: React.FC = () => {
                 <span>{user.name || "Usuario"}</span>
               </button>
               {showDropdown && (
-                <div className="dropdown-menu">
-                  <a href="#/profile" className="dropdown-item">
+                <div 
+                  className="dropdown-menu"
+                  role="menu"
+                  aria-label="Opciones de usuario"
+                  onMouseEnter={() => setIsHoveringDropdown(true)}
+                  onMouseLeave={() => setIsHoveringDropdown(false)}
+                >
+                  <a 
+                    href="#/profile" 
+                    className="dropdown-item"
+                    role="menuitem"
+                    tabIndex={0}
+                  >
                     <FaCog /> Editar Perfil
                   </a>
-                  <button onClick={handleLogout} className="dropdown-item">
+                  <button 
+                    onClick={handleLogout} 
+                    className="dropdown-item"
+                    role="menuitem"
+                    tabIndex={0}
+                  >
                     <FaSignOutAlt /> Cerrar Sesión
                   </button>
                 </div>
@@ -276,6 +387,7 @@ const HomeMovies: React.FC = () => {
             <button 
               className="watch-btn"
               onClick={() => featuredMovie.videoUrl && handlePlayVideo(featuredMovie.videoUrl)}
+              aria-label={`Ver trailer de ${featuredMovie.title}`}
             >
               <FaPlay /> Ver ahora
             </button>
@@ -291,14 +403,18 @@ const HomeMovies: React.FC = () => {
         </div>
         <div className="movies-grid">
           {movies.slice(0, 6).map((movie) => (
-            <div key={movie.id} className="movie-card">
+            <div key={movie.id} className="movie-card" tabIndex={0}>
               <div className="movie-image">
                 <img src={movie.image} alt={movie.title} />
                 <div 
                   className="movie-overlay"
                   onClick={() => movie.videoUrl && handlePlayVideo(movie.videoUrl)}
                 >
-                  <button className="play-button">
+                  <button 
+                    className="play-button"
+                    aria-label={`Reproducir ${movie.title}`}
+                    title="Reproducir video"
+                  >
                     <FaPlay />
                   </button>
                 </div>
@@ -376,14 +492,155 @@ const HomeMovies: React.FC = () => {
         </div>
       </footer>
 
-      {/* Modal de video */}
+      {/* Modal de video - WCAG 2.2 AA: Criterio 1.4.13 */}
       {selectedVideo && (
-        <div className="video-modal" onClick={handleCloseVideo}>
-          <div className="video-modal-content" onClick={(e) => e.stopPropagation()}>
-            <button className="close-button" onClick={handleCloseVideo}>
+        <div 
+          className="video-modal" 
+          onClick={handleCloseVideo}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="video-title"
+        >
+          <div 
+            className="video-modal-content" 
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button 
+              className="close-button" 
+              onClick={handleCloseVideo}
+              aria-label="Cerrar video"
+              title="Cerrar (o presiona Escape)"
+            >
               ✕
             </button>
-            <video controls autoPlay src={selectedVideo} />
+            <h2 id="video-title" className="sr-only">Reproductor de video</h2>
+            <video 
+              controls 
+              autoPlay 
+              src={selectedVideo}
+              aria-label="Video de película"
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Keyboard Shortcuts Modal - WCAG 2.2 AA Compatible */}
+      {showShortcuts && (
+        <div 
+          className="shortcuts-modal" 
+          onClick={() => setShowShortcuts(false)}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="shortcuts-title"
+        >
+          <div className="shortcuts-content" onClick={(e) => e.stopPropagation()}>
+            <div className="shortcuts-header">
+              <div className="header-left">
+                <div className="icon-wrapper">
+                  <FaKeyboard />
+                </div>
+                <h2 id="shortcuts-title">Atajos de Teclado</h2>
+              </div>
+              <button 
+                className="close-btn" 
+                onClick={() => setShowShortcuts(false)}
+                aria-label="Cerrar"
+                title="Cerrar (o presiona Escape)"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="shortcuts-sections">
+              <div className="shortcuts-section">
+                <h3 className="section-title">🧭 Navegación General</h3>
+                <div className="shortcuts-list">
+                  <div className="shortcut-item">
+                    <span className="shortcut-description">Ir a Inicio</span>
+                    <div className="shortcut-keys">
+                      <div className="keys-wrapper">
+                        <kbd>Alt</kbd>
+                        <span className="plus">+</span>
+                        <kbd>H</kbd>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="shortcut-item">
+                    <span className="shortcut-description">Ir al Perfil</span>
+                    <div className="shortcut-keys">
+                      <div className="keys-wrapper">
+                        <kbd>Alt</kbd>
+                        <span className="plus">+</span>
+                        <kbd>P</kbd>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="shortcut-item">
+                    <span className="shortcut-description">Ir a Películas</span>
+                    <div className="shortcut-keys">
+                      <div className="keys-wrapper">
+                        <kbd>Alt</kbd>
+                        <span className="plus">+</span>
+                        <kbd>M</kbd>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="shortcut-item">
+                    <span className="shortcut-description">Ir a Sobre Nosotros</span>
+                    <div className="shortcut-keys">
+                      <div className="keys-wrapper">
+                        <kbd>Alt</kbd>
+                        <span className="plus">+</span>
+                        <kbd>A</kbd>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="shortcut-item">
+                    <span className="shortcut-description">Mostrar atajos</span>
+                    <div className="shortcut-keys">
+                      <div className="keys-wrapper">
+                        <kbd>Alt</kbd>
+                        <span className="plus">+</span>
+                        <kbd>K</kbd>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="shortcuts-section">
+                <h3 className="section-title blue">🖱️ Navegación Básica</h3>
+                <div className="shortcuts-list">
+                  <div className="shortcut-item">
+                    <span className="shortcut-description">Cerrar ventana o menú</span>
+                    <div className="shortcut-keys">
+                      <div className="keys-wrapper">
+                        <kbd>Esc</kbd>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="shortcut-item">
+                    <span className="shortcut-description">Cambiar entre secciones</span>
+                    <div className="shortcut-keys">
+                      <div className="keys-wrapper">
+                        <kbd>Tab</kbd>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="shortcuts-footer">
+              Los atajos funcionan tanto en Mac, PC, y Linux. Si estás en Windows/Linux usa <kbd>Alt</kbd> en lugar de <kbd>⌘</kbd>. Puedes activar/desactivar los atajos desde el botón <FaKeyboard /> en el header.
+            </div>
+
+            <button 
+              className="shortcuts-close-btn" 
+              onClick={() => setShowShortcuts(false)}
+            >
+              Cerrar
+            </button>
           </div>
         </div>
       )}

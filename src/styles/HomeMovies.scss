@@ -888,3 +888,137 @@ $border: #e2e8f0;
     }
   }
 }
+
+// ==========================================
+// WCAG 2.2 Nivel AA - Accesibilidad
+// ==========================================
+
+// Clase para lectores de pantalla (screen reader only)
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+// Mejoras de accesibilidad para el menú de usuario
+.user-menu {
+  position: relative;
+
+  .dropdown-menu {
+    // WCAG 2.2 - Hoverable: Permite que el cursor se mueva sobre el dropdown
+    pointer-events: auto;
+    
+    .dropdown-item {
+      // Indicadores de foco para navegación por teclado
+      &:focus {
+        outline: 2px solid $primary;
+        outline-offset: -2px;
+        background: rgba(229, 9, 20, 0.1);
+      }
+
+      &:focus-visible {
+        outline: 2px solid $primary;
+        outline-offset: -2px;
+      }
+    }
+  }
+}
+
+// Mejoras para el botón de atajos de teclado
+.shortcuts-btn {
+  background: transparent;
+  border: none;
+  color: $text;
+  font-size: 1.25rem;
+  padding: 0.5rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: rgba(229, 9, 20, 0.1);
+    color: $primary;
+  }
+
+  &:focus-visible {
+    outline: 3px solid $primary;
+    outline-offset: 2px;
+  }
+}
+
+// Mejoras de accesibilidad para modales (video y shortcuts)
+.video-modal,
+.shortcuts-modal {
+  .close-button,
+  .close-btn {
+    &:focus {
+      outline: 3px solid $white;
+      outline-offset: 2px;
+    }
+
+    &:focus-visible {
+      outline: 3px solid $white;
+      outline-offset: 2px;
+    }
+  }
+
+  video {
+    &:focus {
+      outline: 3px solid $primary;
+      outline-offset: 4px;
+    }
+  }
+}
+
+// Indicadores de foco mejorados para navegación por teclado
+.nav-menu a,
+.auth-buttons .login-btn,
+.auth-buttons .signup-btn,
+.watch-btn,
+.play-button,
+.cta-button,
+.shortcuts-close-btn {
+  &:focus-visible {
+    outline: 3px solid $primary;
+    outline-offset: 4px;
+  }
+}
+
+// Asegura que los elementos interactivos tengan indicadores claros
+.movie-card {
+  &:focus-within {
+    outline: 3px solid $primary;
+    outline-offset: 4px;
+    
+    .movie-overlay {
+      opacity: 1;
+    }
+  }
+
+  .play-button {
+    &:focus-visible {
+      outline: 3px solid $white;
+      outline-offset: 4px;
+      transform: scale(1.15);
+    }
+  }
+}
+
+// Mejoras para los elementos del modal de shortcuts
+.shortcuts-content {
+  .shortcuts-close-btn {
+    &:focus-visible {
+      outline: 3px solid $primary;
+      outline-offset: 4px;
+    }
+  }
+}
