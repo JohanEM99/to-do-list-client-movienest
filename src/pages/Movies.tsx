@@ -103,7 +103,7 @@ const Movies = () => {
   const [userRating, setUserRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
   const [reviewText, setReviewText] = useState("");
-  const [reviews, setReviews] = useState<Review[]>([]);
+  const [reviews] = useState<Review[]>([]);
   const [movieReviews, setMovieReviews] = useState<Review[]>([]);
   const [editingReviewId, setEditingReviewId] = useState<string | null>(null);
   const [userMovieRatings, setUserMovieRatings] = useState<UserMovieRating[]>([]);
