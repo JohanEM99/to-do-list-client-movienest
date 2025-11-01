@@ -390,7 +390,7 @@ const Movies = () => {
   const fetchAverageRating = async (pexelsId: number): Promise<number> => {
     try {
       const response = await fetch(
-        `https://backend-de-peliculas.onrender.com/api/v1/average/${pexelsId}`
+        `https://backend-de-peliculas.onrender.com/api/v1/reviews/average/${pexelsId}`
       );
 
       if (response.ok) {
@@ -444,18 +444,20 @@ const Movies = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filteredMovies]);
 
-  const handleOpenMovieDetail = (movie: Movie) => {
+  const handleOpenMovieDetail = async (movie: Movie) => {
     setSelectedMovie(movie);
     setShowMovieDetail(true);
     setEditingReviewId(null);
-    
-    const movieReviewsFiltered = reviews.filter(r => r.movieId === movie.id);
-    setMovieReviews(movieReviewsFiltered);
-    
+  
+    // ✅ Cargar reseñas y promedio desde backend
+    await fetchMovieReviews(movie.id); // 👈 Carga las reseñas desde el backend
+    const newAvg = await fetchAverageRating(movie.id);
+    setMovieAverageRatings(prev => ({ ...prev, [movie.id]: newAvg }));
+
     const existingRating = userMovieRatings.find(
-      r => r.movieId === movie.id && r.userId === userName
-    );
-    
+    r => r.movieId === movie.id && r.userId === userName
+  );
+  
     if (existingRating) {
       setUserRating(existingRating.rating);
       setHasRatedThisMovie(true);
@@ -463,9 +465,10 @@ const Movies = () => {
       setUserRating(0);
       setHasRatedThisMovie(false);
     }
-    
+
     setReviewText("");
-  };
+};
+
 
   const handleCloseMovieDetail = () => {
     setShowMovieDetail(false);
@@ -512,19 +515,21 @@ const Movies = () => {
     try {
       if (editingReviewId) {
         // 🔄 NUEVO: Actualizar review en el backend (PUT)
-        const response = await fetch(
-          `https://backend-de-peliculas.onrender.com/api/v1/reviews/${selectedMovie.id}`,
-          {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({
-              comment: reviewText,
-            }),
-          }
-        );
+       const response = await fetch(
+              `https://backend-de-peliculas.onrender.com/api/v1/reviews/${selectedMovie.id}`,
+              {
+                method: "PUT",
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({
+                  comment: reviewText,
+                  rating: userRating,
+                }),
+              }
+            );
+
 
         if (!response.ok) {
           throw new Error("Error al actualizar la reseña");
@@ -545,10 +550,11 @@ const Movies = () => {
 
       const reviewData = {
         pexelsId: selectedMovie.id,
+        userName,
         rating: isSubmittingNewRating ? userRating : 0,
         comment: reviewText,
-        hasRating: isSubmittingNewRating,
       };
+
 
       const response = await fetch(
         "https://backend-de-peliculas.onrender.com/api/v1/reviews",
