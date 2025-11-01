@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "../styles/HomeMovies.scss";
 import { FaStar, FaClock, FaPlay, FaUser, FaCog, FaSignOutAlt, FaKeyboard } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
@@ -48,6 +48,8 @@ interface Movie {
 /**
  * HomeMovies component — Displays featured and recommended movies, user profile options,
  * and a movie video modal. Fetches movie data from the Pexels API.
+ * 
+ * Cumple con WCAG 2.2 Nivel AA - Criterio 1.4.13 (Contenido en hover o foco)
  *
  * @component
  * @returns {JSX.Element} Rendered HomeMovies component
@@ -60,12 +62,120 @@ const HomeMovies: React.FC = () => {
   const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
   const [showDropdown, setShowDropdown] = useState(false);
   const [showShortcuts, setShowShortcuts] = useState(false);
+  
+  // Estados para WCAG 2.2 - Criterio 1.4.13: Hoverable
+  const [isHoveringMenu, setIsHoveringMenu] = useState(false);
+  const [isHoveringDropdown, setIsHoveringDropdown] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  
   const navigate = useNavigate();
 
   useEffect(() => {
     fetchMovies();
     fetchUserProfile();
   }, []);
+
+  /**
+   * WCAG 2.2 - Criterio 1.4.13: Hoverable y Persistente
+   * Control de visibilidad del dropdown basado en hover
+   */
+  useEffect(() => {
+    if (isHoveringMenu || isHoveringDropdown) {
+      setShowDropdown(true);
+    } else {
+      // Pequeño delay para permitir transición suave
+      const timer = setTimeout(() => {
+        setShowDropdown(false);
+      }, 150);
+      return () => clearTimeout(timer);
+    }
+  }, [isHoveringMenu, isHoveringDropdown]);
+
+  /**
+   * WCAG 2.2 - Criterio 1.4.13: Desestimable
+   * Cierre del dropdown al hacer click fuera
+   */
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowDropdown(false);
+        setIsHoveringMenu(false);
+        setIsHoveringDropdown(false);
+      }
+    };
+
+    if (showDropdown) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showDropdown]);
+
+  /**
+   * Keyboard shortcuts y manejo de Escape
+   * WCAG 2.2 - Criterio 1.4.13: Desestimable (Escape cierra contenido adicional)
+   */
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Si estamos en un input o textarea, solo permitir ESC
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
+        if (e.key === 'Escape') {
+          (e.target as HTMLElement).blur();
+        }
+        return;
+      }
+
+      // Alt+H: Quedarse en Home (o refrescar)
+      if ((e.altKey || e.metaKey) && e.key.toLowerCase() === 'h') {
+        e.preventDefault();
+        window.location.href = '/#/homemovies';
+      }
+
+      // Alt+P: Ir al Perfil (solo si está logueado)
+      if ((e.altKey || e.metaKey) && e.key.toLowerCase() === 'p') {
+        e.preventDefault();
+        if (user) {
+          window.location.href = '/#/profile';
+        }
+      }
+
+      // Alt+M: Ir a Películas
+      if ((e.altKey || e.metaKey) && e.key.toLowerCase() === 'm') {
+        e.preventDefault();
+        window.location.href = '/#/movies';
+      }
+
+      // Alt+A: Ir a Sobre Nosotros
+      if ((e.altKey || e.metaKey) && e.key.toLowerCase() === 'a') {
+        e.preventDefault();
+        window.location.href = '/#/about';
+      }
+
+      // Alt+K: Mostrar/ocultar atajos de teclado
+      if ((e.altKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setShowShortcuts(!showShortcuts);
+      }
+
+      // ESC: Cerrar modal de video, atajos o dropdown (WCAG 2.2 - Desestimable)
+      if (e.key === 'Escape') {
+        if (showShortcuts) {
+          setShowShortcuts(false);
+        } else if (selectedVideo) {
+          handleCloseVideo();
+        } else if (showDropdown) {
+          setShowDropdown(false);
+          setIsHoveringMenu(false);
+          setIsHoveringDropdown(false);
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [showShortcuts, selectedVideo, showDropdown, user]);
 
   /**
    * Fetches movie data from the Pexels API and transforms it into a local Movie format.
@@ -173,65 +283,6 @@ const HomeMovies: React.FC = () => {
     setSelectedVideo(null);
   };
 
-  // Keyboard shortcuts
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      // Si estamos en un input o textarea, solo permitir ESC
-      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
-        if (e.key === 'Escape') {
-          (e.target as HTMLElement).blur();
-        }
-        return;
-      }
-
-      // Alt+H: Quedarse en Home (o refrescar)
-      if ((e.altKey || e.metaKey) && e.key.toLowerCase() === 'h') {
-        e.preventDefault();
-        window.location.href = '/#/homemovies';
-      }
-
-      // Alt+P: Ir al Perfil (solo si está logueado)
-      if ((e.altKey || e.metaKey) && e.key.toLowerCase() === 'p') {
-        e.preventDefault();
-        if (user) {
-          window.location.href = '/#/profile';
-        }
-      }
-
-      // Alt+M: Ir a Películas
-      if ((e.altKey || e.metaKey) && e.key.toLowerCase() === 'm') {
-        e.preventDefault();
-        window.location.href = '/#/movies';
-      }
-
-      // Alt+A: Ir a Sobre Nosotros
-      if ((e.altKey || e.metaKey) && e.key.toLowerCase() === 'a') {
-        e.preventDefault();
-        window.location.href = '/#/about';
-      }
-
-      // Alt+K: Mostrar/ocultar atajos de teclado
-      if ((e.altKey || e.metaKey) && e.key.toLowerCase() === 'k') {
-        e.preventDefault();
-        setShowShortcuts(!showShortcuts);
-      }
-
-      // ESC: Cerrar modal de video, atajos o dropdown
-      if (e.key === 'Escape') {
-        if (showShortcuts) {
-          setShowShortcuts(false);
-        } else if (selectedVideo) {
-          handleCloseVideo();
-        } else if (showDropdown) {
-          setShowDropdown(false);
-        }
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [showShortcuts, selectedVideo, showDropdown, user]);
-
   if (loading) {
     return <div className="loading">Cargando películas...</div>;
   }
@@ -259,10 +310,19 @@ const HomeMovies: React.FC = () => {
           </button>
 
           {user ? (
-            <div className="user-menu">
+            <div 
+              className="user-menu"
+              ref={dropdownRef}
+              onMouseEnter={() => setIsHoveringMenu(true)}
+              onMouseLeave={() => setIsHoveringMenu(false)}
+            >
               <button 
                 className="user-button"
                 onClick={() => setShowDropdown(!showDropdown)}
+                aria-expanded={showDropdown}
+                aria-haspopup="true"
+                aria-label="Menú de usuario"
+                title="Abrir menú de usuario"
               >
                 <div className="user-avatar-small">
                   <FaUser />
@@ -270,11 +330,27 @@ const HomeMovies: React.FC = () => {
                 <span>{user.name || "Usuario"}</span>
               </button>
               {showDropdown && (
-                <div className="dropdown-menu">
-                  <a href="#/profile" className="dropdown-item">
+                <div 
+                  className="dropdown-menu"
+                  role="menu"
+                  aria-label="Opciones de usuario"
+                  onMouseEnter={() => setIsHoveringDropdown(true)}
+                  onMouseLeave={() => setIsHoveringDropdown(false)}
+                >
+                  <a 
+                    href="#/profile" 
+                    className="dropdown-item"
+                    role="menuitem"
+                    tabIndex={0}
+                  >
                     <FaCog /> Editar Perfil
                   </a>
-                  <button onClick={handleLogout} className="dropdown-item">
+                  <button 
+                    onClick={handleLogout} 
+                    className="dropdown-item"
+                    role="menuitem"
+                    tabIndex={0}
+                  >
                     <FaSignOutAlt /> Cerrar Sesión
                   </button>
                 </div>
@@ -311,6 +387,7 @@ const HomeMovies: React.FC = () => {
             <button 
               className="watch-btn"
               onClick={() => featuredMovie.videoUrl && handlePlayVideo(featuredMovie.videoUrl)}
+              aria-label={`Ver trailer de ${featuredMovie.title}`}
             >
               <FaPlay /> Ver ahora
             </button>
@@ -326,14 +403,18 @@ const HomeMovies: React.FC = () => {
         </div>
         <div className="movies-grid">
           {movies.slice(0, 6).map((movie) => (
-            <div key={movie.id} className="movie-card">
+            <div key={movie.id} className="movie-card" tabIndex={0}>
               <div className="movie-image">
                 <img src={movie.image} alt={movie.title} />
                 <div 
                   className="movie-overlay"
                   onClick={() => movie.videoUrl && handlePlayVideo(movie.videoUrl)}
                 >
-                  <button className="play-button">
+                  <button 
+                    className="play-button"
+                    aria-label={`Reproducir ${movie.title}`}
+                    title="Reproducir video"
+                  >
                     <FaPlay />
                   </button>
                 </div>
@@ -411,19 +492,39 @@ const HomeMovies: React.FC = () => {
         </div>
       </footer>
 
-      {/* Modal de video */}
+      {/* Modal de video - WCAG 2.2 AA: Criterio 1.4.13 */}
       {selectedVideo && (
-        <div className="video-modal" onClick={handleCloseVideo}>
-          <div className="video-modal-content" onClick={(e) => e.stopPropagation()}>
-            <button className="close-button" onClick={handleCloseVideo}>
+        <div 
+          className="video-modal" 
+          onClick={handleCloseVideo}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="video-title"
+        >
+          <div 
+            className="video-modal-content" 
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button 
+              className="close-button" 
+              onClick={handleCloseVideo}
+              aria-label="Cerrar video"
+              title="Cerrar (o presiona Escape)"
+            >
               ✕
             </button>
-            <video controls autoPlay src={selectedVideo} />
+            <h2 id="video-title" className="sr-only">Reproductor de video</h2>
+            <video 
+              controls 
+              autoPlay 
+              src={selectedVideo}
+              aria-label="Video de película"
+            />
           </div>
         </div>
       )}
 
-      {/* Keyboard Shortcuts Modal */}
+      {/* Keyboard Shortcuts Modal - WCAG 2.2 AA Compatible */}
       {showShortcuts && (
         <div 
           className="shortcuts-modal" 
@@ -443,7 +544,8 @@ const HomeMovies: React.FC = () => {
               <button 
                 className="close-btn" 
                 onClick={() => setShowShortcuts(false)}
-                aria-label="Cerrar (Esc)"
+                aria-label="Cerrar"
+                title="Cerrar (o presiona Escape)"
               >
                 ✕
               </button>
