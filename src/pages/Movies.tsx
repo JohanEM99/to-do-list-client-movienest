@@ -407,6 +407,43 @@ const Movies = () => {
     }
   };
 
+  // Carga ratings en lote con límite de concurrencia para evitar peticiones masivas
+  const loadAverageRatings = async (ids: number[]) => {
+    if (!ids || ids.length === 0) return;
+
+    const concurrency = 3; // número de peticiones simultáneas permitidas
+    let index = 0;
+
+    const worker = async () => {
+      while (index < ids.length) {
+        const id = ids[index++];
+        try {
+          const rating = await fetchAverageRating(id);
+          setMovieAverageRatings(prev => ({ ...prev, [id]: rating }));
+        } catch (err) {
+          console.error(`Error al cargar promedio para ${id}:`, err);
+        }
+      }
+    };
+
+    // lanzar N workers en paralelo (pool)
+    const workers = Array.from({ length: Math.min(concurrency, ids.length) }, () => worker());
+    await Promise.all(workers);
+  };
+
+  // useEffect para cargar ratings faltantes cuando cambian las películas filtradas
+  useEffect(() => {
+    const idsToLoad = filteredMovies
+      .map(m => m.id)
+      .filter(id => movieAverageRatings[id] === undefined || movieAverageRatings[id] === 0);
+
+    if (idsToLoad.length > 0) {
+      // no bloquear el render: lanzar en background
+      loadAverageRatings(idsToLoad).catch(err => console.error('Error cargando ratings en lote:', err));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filteredMovies]);
+
   const handleOpenMovieDetail = (movie: Movie) => {
     setSelectedMovie(movie);
     setShowMovieDetail(true);
@@ -925,12 +962,7 @@ const Movies = () => {
             const avgRating = getAverageRating(movie.id);
             const reviewCount = movieReviews.filter(r => r.movieId === movie.id).length;
             
-            // 🆕 NUEVO: Cargar rating si no existe en cache (async pero no bloqueante)
-            if (!movieAverageRatings[movie.id]) {
-              fetchAverageRating(movie.id).then(rating => {
-                setMovieAverageRatings(prev => ({...prev, [movie.id]: rating}));
-              });
-            }
+            // ratings se cargan desde useEffect en lote para evitar muchas peticiones simultáneas
             
             return (
               <div 
