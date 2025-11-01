@@ -29,7 +29,7 @@ interface PexelsVideo {
 }
 
 /**
- * Interface representing a Movie object in the app.
+ * Interface representing a Movie object in the app with subtitles support.
  * @interface
  */
 interface Movie {
@@ -42,6 +42,12 @@ interface Movie {
   genre: string;
   image: string;
   videoUrl: string;
+  // 🎬 Campo para subtítulos
+  subtitles?: Array<{
+    language: string;
+    label: string;
+    url: string;
+  }>;
 }
 
 /**
@@ -56,11 +62,11 @@ interface Review {
   rating: number;
   comment: string;
   date: string;
-  hasRating: boolean; // Indicates if this review includes a rating
+  hasRating: boolean;
 }
 
 /**
- * Interface representing a user's rating for a movie (only one per movie)
+ * Interface representing a user's rating for a movie
  * @interface
  */
 interface UserMovieRating {
@@ -71,10 +77,7 @@ interface UserMovieRating {
 }
 
 /**
- * Movies component — displays, filters, and manages movies fetched from the Pexels API.
- * Includes features such as favorites, search, filtering by genre, user session handling,
- * reviews and ratings system, and full keyboard accessibility (WCAG 2.1 Level A compliant).
- *
+ * Movies component with subtitles support, reviews, ratings and keyboard accessibility.
  * @component
  * @returns {JSX.Element} The rendered Movies page
  */
@@ -89,11 +92,12 @@ const Movies = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
+  const [selectedVideoSubtitles, setSelectedVideoSubtitles] = useState<Movie['subtitles']>(); // 🎬 NUEVO
   const [showDropdown, setShowDropdown] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userName, setUserName] = useState("");
   
-  // ⭐ NEW: Review and rating states
+  // Review and rating states
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
   const [showMovieDetail, setShowMovieDetail] = useState(false);
   const [userRating, setUserRating] = useState(0);
@@ -104,12 +108,13 @@ const Movies = () => {
   const [editingReviewId, setEditingReviewId] = useState<string | null>(null);
   const [userMovieRatings, setUserMovieRatings] = useState<UserMovieRating[]>([]);
   const [hasRatedThisMovie, setHasRatedThisMovie] = useState(false);
+  const [movieAverageRatings, setMovieAverageRatings] = useState<{[key: number]: number}>({}); // 🆕 Cache de ratings
   
-  // ⌨️ Keyboard accessibility states
+  // Keyboard accessibility states
   const [showShortcuts, setShowShortcuts] = useState(false);
   const [focusedMovieIndex, setFocusedMovieIndex] = useState(0);
   
-  // ⌨️ Refs for keyboard navigation
+  // Refs for keyboard navigation
   const searchInputRef = useRef<HTMLInputElement>(null);
   const movieGridRef = useRef<HTMLDivElement>(null);
 
@@ -124,33 +129,24 @@ const Movies = () => {
     "Todos": "cinema movie"
   };
 
-  /**
-   * Checks if the user is logged in and fetches user profile from backend.
-   * @function
-   */
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
       setIsLoggedIn(true);
-      // Fetch username ONLY from backend
       fetchUserProfile();
     }
-    // Load reviews from localStorage
-    const savedReviews = localStorage.getItem("movieReviews");
-    if (savedReviews) {
-      setReviews(JSON.parse(savedReviews));
-    }
-    // Load user ratings from localStorage
+    // ⚠️ ELIMINADO: Ya no cargamos reviews desde localStorage
+    // const savedReviews = localStorage.getItem("movieReviews");
+    // if (savedReviews) {
+    //   setReviews(JSON.parse(savedReviews));
+    // }
+    
     const savedRatings = localStorage.getItem("userMovieRatings");
     if (savedRatings) {
       setUserMovieRatings(JSON.parse(savedRatings));
     }
   }, []);
 
-  /**
-   * Fetches the user's profile information from the backend to get username.
-   * @async
-   */
   const fetchUserProfile = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -168,7 +164,6 @@ const Movies = () => {
       if (response.ok) {
         const data = await response.json();
         const user = data.user;
-        // Set username from backend profile ONLY
         const username = user.username || user.firstName || user.email || "Usuario";
         setUserName(username);
       } else {
@@ -181,7 +176,6 @@ const Movies = () => {
     }
   };
 
-  // Load favorites from backend when the component mounts
   useEffect(() => {
     fetchMovies("cinema movie");
     if (isLoggedIn) {
@@ -189,23 +183,16 @@ const Movies = () => {
     }
   }, [isLoggedIn]);
 
-  // Wait for userName to be loaded before showing content
   useEffect(() => {
     if (isLoggedIn && !userName) {
       fetchUserProfile();
     }
   }, [isLoggedIn, userName]);
 
-  // Filter movies when search term, genre, or favorite status changes
   useEffect(() => {
     filterMovies();
   }, [searchTerm, selectedGenre, movies, showFavorites]);
 
-  /**
-   * Fetches user's favorites from the backend.
-   * @async
-   * @returns {Promise<void>}
-   */
   const fetchFavorites = async () => {
     const token = localStorage.getItem("token");
     if (!token) return;
@@ -226,12 +213,6 @@ const Movies = () => {
     }
   };
 
-  /**
-   * Fetches movies from Pexels API based on query term.
-   * @async
-   * @param {string} [query="cinema movie"] - The search query for fetching movies.
-   * @returns {Promise<void>}
-   */
   const fetchMovies = async (query: string = "cinema movie") => {
     setLoading(true);
     setError("");
@@ -257,6 +238,22 @@ const Movies = () => {
           const hdVideo = video.video_files.find(file => file.quality === "hd") || video.video_files[0];
           const durationMinutes = Math.floor(video.duration / 60);
           
+          // 🎬 Agregar subtítulos solo al primer video como ejemplo
+          const subtitles = index === 0 ? [
+            {
+              language: "es",
+              label: "Español",
+              // ⚠️ IMPORTANTE: Reemplaza esta URL con la URL de tu archivo .vtt en Cloudinary
+              url: "https://res.cloudinary.com/dvqhhcmrs/raw/upload/v1761885200/subtitles/dialog-es.vtt"
+            }
+            // Puedes agregar más idiomas:
+            // {
+            //   language: "en",
+            //   label: "English",
+            //   url: "https://res.cloudinary.com/dvqhhcmrs/raw/upload/v1761885200/subtitles/dialog-en.vtt"
+            // }
+          ] : undefined;
+          
           return {
             id: video.id,
             title: `${query.split(' ')[0]} ${index + 1}`,
@@ -266,7 +263,8 @@ const Movies = () => {
             rating: parseFloat((4.0 + Math.random() * 1).toFixed(1)),
             genre: getGenreFromQuery(query),
             image: video.video_pictures[0]?.picture || video.image,
-            videoUrl: hdVideo?.link || ""
+            videoUrl: hdVideo?.link || "",
+            subtitles: subtitles // 🎬 Agregar subtítulos
           };
         });
 
@@ -287,11 +285,6 @@ const Movies = () => {
     }
   };
 
-  /**
-   * Determines the genre name from a given query.
-   * @param {string} query - The search query.
-   * @returns {string} The corresponding genre name.
-   */
   const getGenreFromQuery = (query: string): string => {
     for (const [genre, searchQuery] of Object.entries(genreQueries)) {
       if (searchQuery === query) {
@@ -301,10 +294,6 @@ const Movies = () => {
     return "Todos";
   };
 
-  /**
-   * Filters movies based on genre, favorites, and search terms.
-   * @function
-   */
   const filterMovies = () => {
     if (showFavorites) {
       let filtered = favorites;
@@ -340,7 +329,6 @@ const Movies = () => {
     setFocusedMovieIndex(0);
   };
 
-  /** Handles genre selection and fetches movies accordingly. */
   const handleGenreClick = (genre: string) => {
     setSelectedGenre(genre);
     if (!showFavorites) {
@@ -349,7 +337,6 @@ const Movies = () => {
     }
   };
 
-  /** Handles search form submission. */
   const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (searchTerm.trim() && !showFavorites) {
@@ -357,27 +344,77 @@ const Movies = () => {
     }
   };
 
-  /** Plays the selected movie video. */
-  const handlePlayVideo = (videoUrl: string) => {
+  // 🎬 Actualizado para incluir subtítulos
+  const handlePlayVideo = (videoUrl: string, subtitles?: Movie['subtitles']) => {
     setSelectedVideo(videoUrl);
+    setSelectedVideoSubtitles(subtitles);
   };
 
-  /** Closes the movie player modal. */ 
+  // 🎬 Actualizado para limpiar subtítulos
   const handleCloseVideo = () => {
     setSelectedVideo(null);
+    setSelectedVideoSubtitles(undefined);
   };
 
-  // ⭐ NEW: Opens movie detail page for reviews
+  /**
+   * Fetches reviews for a specific movie from the backend.
+   * @async
+   * @param {number} pexelsId - The Pexels ID of the movie
+   * @returns {Promise<void>}
+   */
+  const fetchMovieReviews = async (pexelsId: number) => {
+    try {
+      const response = await fetch(
+        `https://backend-de-peliculas.onrender.com/api/v1/reviews/${pexelsId}`
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        setMovieReviews(data || []);
+      } else {
+        console.error("Error al cargar reseñas:", response.status);
+        setMovieReviews([]);
+      }
+    } catch (error) {
+      console.error("Error al cargar reseñas:", error);
+      setMovieReviews([]);
+    }
+  };
+
+  /**
+   * Fetches average rating for a specific movie from the backend.
+   * @async
+   * @param {number} pexelsId - The Pexels ID of the movie
+   * @returns {Promise<number>} The average rating
+   */
+  const fetchAverageRating = async (pexelsId: number): Promise<number> => {
+    try {
+      const response = await fetch(
+        `https://backend-de-peliculas.onrender.com/api/v1/average/${pexelsId}`
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        // Asume que el backend devuelve { average: 4.5 } o similar
+        return data.average || data.averageRating || 0;
+      } else {
+        console.error("Error al cargar promedio:", response.status);
+        return 0;
+      }
+    } catch (error) {
+      console.error("Error al cargar promedio:", error);
+      return 0;
+    }
+  };
+
   const handleOpenMovieDetail = (movie: Movie) => {
     setSelectedMovie(movie);
     setShowMovieDetail(true);
     setEditingReviewId(null);
     
-    // Load reviews for this movie
     const movieReviewsFiltered = reviews.filter(r => r.movieId === movie.id);
     setMovieReviews(movieReviewsFiltered);
     
-    // Check if user has already rated this movie
     const existingRating = userMovieRatings.find(
       r => r.movieId === movie.id && r.userId === userName
     );
@@ -390,11 +427,9 @@ const Movies = () => {
       setHasRatedThisMovie(false);
     }
     
-    // Reset review text
     setReviewText("");
   };
 
-  // ⭐ NEW: Closes movie detail page
   const handleCloseMovieDetail = () => {
     setShowMovieDetail(false);
     setSelectedMovie(null);
@@ -405,8 +440,7 @@ const Movies = () => {
     setHasRatedThisMovie(false);
   };
 
-  // ⭐ NEW: Submit review (allows multiple reviews per user, but only ONE rating per movie)
-  const handleSubmitReview = () => {
+  const handleSubmitReview = async () => {
     if (!isLoggedIn) {
       alert("Debes iniciar sesión para dejar una reseña");
       return;
@@ -420,8 +454,12 @@ const Movies = () => {
 
     if (!selectedMovie) return;
 
-    // Si ya calificaste, solo necesitas comentario
-    // Si NO has calificado, necesitas comentario O calificación
+    const token = localStorage.getItem("token");
+    if (!token) {
+      alert("No se encontró token de autenticación");
+      return;
+    }
+
     if (hasRatedThisMovie) {
       if (!reviewText.trim()) {
         alert("Por favor escribe un comentario");
@@ -434,127 +472,171 @@ const Movies = () => {
       }
     }
 
-    if (editingReviewId) {
-      // Editing existing review (only comment, rating cannot be changed)
-      const updatedReviews = reviews.map(r => 
-        r.id === editingReviewId 
-          ? { ...r, comment: reviewText, date: new Date().toLocaleDateString('es-ES') }
-          : r
-      );
-      setReviews(updatedReviews);
-      localStorage.setItem("movieReviews", JSON.stringify(updatedReviews));
-      setMovieReviews(updatedReviews.filter(r => r.movieId === selectedMovie.id));
-      
-      // Reset form after editing
-      setReviewText("");
-      setEditingReviewId(null);
-      
-      alert("¡Comentario actualizado con éxito!");
-      return;
-    }
+    try {
+      if (editingReviewId) {
+        // 🔄 NUEVO: Actualizar review en el backend (PUT)
+        const response = await fetch(
+          `https://backend-de-peliculas.onrender.com/api/v1/reviews/${selectedMovie.id}`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              comment: reviewText,
+            }),
+          }
+        );
 
-    // Check if this is a new rating submission
-    const isSubmittingNewRating = userRating > 0 && !hasRatedThisMovie;
+        if (!response.ok) {
+          throw new Error("Error al actualizar la reseña");
+        }
 
-    // Save rating if it's the first time
-    if (isSubmittingNewRating) {
-      const newRating: UserMovieRating = {
-        movieId: selectedMovie.id,
-        userId: userName,
-        rating: userRating,
-        date: new Date().toLocaleDateString('es-ES')
+        // Recargar reviews
+        await fetchMovieReviews(selectedMovie.id);
+        
+        setReviewText("");
+        setEditingReviewId(null);
+        
+        alert("¡Comentario actualizado con éxito!");
+        return;
+      }
+
+      // 🔄 NUEVO: Crear nueva review en el backend (POST)
+      const isSubmittingNewRating = userRating > 0 && !hasRatedThisMovie;
+
+      const reviewData = {
+        pexelsId: selectedMovie.id,
+        rating: isSubmittingNewRating ? userRating : 0,
+        comment: reviewText,
+        hasRating: isSubmittingNewRating,
       };
 
-      const updatedRatings = [...userMovieRatings, newRating];
-      setUserMovieRatings(updatedRatings);
-      localStorage.setItem("userMovieRatings", JSON.stringify(updatedRatings));
-      setHasRatedThisMovie(true);
-    }
+      const response = await fetch(
+        "https://backend-de-peliculas.onrender.com/api/v1/reviews",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(reviewData),
+        }
+      );
 
-    // Create new review/comment
-    const newReview: Review = {
-      id: `${selectedMovie.id}-${userName}-${Date.now()}`,
-      movieId: selectedMovie.id,
-      userId: userName,
-      userName: userName,
-      rating: isSubmittingNewRating ? userRating : 0, // Only include rating if it's new
-      comment: reviewText,
-      date: new Date().toLocaleDateString('es-ES'),
-      hasRating: isSubmittingNewRating // Only true for the first review with rating
-    };
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || "Error al enviar la reseña");
+      }
 
-    console.log("Creando nueva reseña:", newReview); // Debug
+      // Actualizar ratings locales si es una nueva calificación
+      if (isSubmittingNewRating) {
+        const newRating: UserMovieRating = {
+          movieId: selectedMovie.id,
+          userId: userName,
+          rating: userRating,
+          date: new Date().toLocaleDateString('es-ES')
+        };
 
-    const allReviews = [...reviews, newReview];
-    setReviews(allReviews);
-    localStorage.setItem("movieReviews", JSON.stringify(allReviews));
-    setMovieReviews(allReviews.filter(r => r.movieId === selectedMovie.id));
-    
-    // Reset only the comment field
-    setReviewText("");
-    
-    if (isSubmittingNewRating) {
-      alert("¡Calificación y comentario enviados con éxito!");
-    } else {
-      alert("¡Comentario enviado con éxito!");
+        const updatedRatings = [...userMovieRatings, newRating];
+        setUserMovieRatings(updatedRatings);
+        localStorage.setItem("userMovieRatings", JSON.stringify(updatedRatings));
+        setHasRatedThisMovie(true);
+      }
+
+      // Recargar reviews desde el backend
+      await fetchMovieReviews(selectedMovie.id);
+      
+      // 🆕 NUEVO: Actualizar el average rating después de agregar/editar review
+      const newAvgRating = await fetchAverageRating(selectedMovie.id);
+      setMovieAverageRatings(prev => ({...prev, [selectedMovie.id]: newAvgRating}));
+      
+      setReviewText("");
+      
+      if (isSubmittingNewRating) {
+        alert("¡Calificación y comentario enviados con éxito!");
+      } else {
+        alert("¡Comentario enviado con éxito!");
+      }
+    } catch (error) {
+      console.error("Error al enviar reseña:", error);
+      alert(`Error al enviar reseña: ${error instanceof Error ? error.message : 'Error desconocido'}`);
     }
   };
 
-  // ⭐ NEW: Edit review
   const handleEditReview = (review: Review) => {
     setUserRating(review.rating);
     setReviewText(review.comment);
     setEditingReviewId(review.id);
-    // Scroll to form
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // ⭐ NEW: Delete review
-  const handleDeleteReview = (reviewId: string) => {
+  const handleDeleteReview = async (reviewId: string) => {
     if (!window.confirm("¿Estás seguro de que deseas eliminar esta reseña?")) {
       return;
     }
 
-    const updatedReviews = reviews.filter(r => r.id !== reviewId);
-    setReviews(updatedReviews);
-    localStorage.setItem("movieReviews", JSON.stringify(updatedReviews));
-    
-    if (selectedMovie) {
-      setMovieReviews(updatedReviews.filter(r => r.movieId === selectedMovie.id));
+    if (!selectedMovie) return;
+
+    const token = localStorage.getItem("token");
+    if (!token) {
+      alert("No se encontró token de autenticación");
+      return;
     }
 
-    // Reset form if deleting current editing review
-    if (editingReviewId === reviewId) {
-      setUserRating(0);
-      setReviewText("");
-      setEditingReviewId(null);
-    }
+    try {
+      // 🔄 NUEVO: Eliminar review en el backend (DELETE)
+      const response = await fetch(
+        `https://backend-de-peliculas.onrender.com/api/v1/reviews/${selectedMovie.id}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
-    alert("Reseña eliminada correctamente");
+      if (!response.ok) {
+        throw new Error("Error al eliminar la reseña");
+      }
+
+      // Recargar reviews desde el backend
+      await fetchMovieReviews(selectedMovie.id);
+
+      // 🆕 NUEVO: Actualizar el average rating después de eliminar review
+      const newAvgRating = await fetchAverageRating(selectedMovie.id);
+      setMovieAverageRatings(prev => ({...prev, [selectedMovie.id]: newAvgRating}));
+
+      // Reset form if deleting current editing review
+      if (editingReviewId === reviewId) {
+        setUserRating(0);
+        setReviewText("");
+        setEditingReviewId(null);
+      }
+
+      alert("Reseña eliminada correctamente");
+    } catch (error) {
+      console.error("Error al eliminar reseña:", error);
+      alert("Error al eliminar la reseña. Intenta de nuevo.");
+    }
   };
 
-  // ⭐ NEW: Cancel edit
   const handleCancelEdit = () => {
     setUserRating(0);
     setReviewText("");
     setEditingReviewId(null);
   };
 
-  // ⭐ NEW: Calculate average rating for a movie (based on UserMovieRatings, not reviews)
   const getAverageRating = (movieId: number): number => {
-    const movieRatings = userMovieRatings.filter(r => r.movieId === movieId);
-    if (movieRatings.length === 0) return 0;
-    
-    const sum = movieRatings.reduce((acc, r) => acc + r.rating, 0);
-    return parseFloat((sum / movieRatings.length).toFixed(1));
+    // 🔄 MODIFICADO: Usar el cache de ratings del backend
+    return movieAverageRatings[movieId] || 0;
   };
 
-  /** Checks if a movie is already in favorites. */
   const isFavorite = (movieId: number): boolean => {
     return favorites.some(fav => fav.id === movieId);
   };
 
-  /** Toggles a movie as favorite or removes it. */
   const toggleFavorite = async (movie: Movie) => {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -606,27 +688,21 @@ const Movies = () => {
     }
   };
 
-  /** Toggles between showing all movies or only favorites. */
   const toggleShowFavorites = () => {
     setShowFavorites(!showFavorites);
     setSearchTerm("");
     setSelectedGenre("Todos");
   };
 
-  /** Logs the user out and removes authentication token. */
   const handleLogout = () => {
     localStorage.removeItem("token");
     setIsLoggedIn(false);
     navigate("/");
   };
 
-  // ============================================
-  // ⌨️ KEYBOARD SHORTCUTS IMPLEMENTATION (WCAG 2.1 Level A)
-  // ============================================
-  
+  // Keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = async (e: KeyboardEvent) => {
-      // Ignore if typing in input fields (except Escape)
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
         if (e.key === 'Escape') {
           (e.target as HTMLElement).blur();
@@ -634,13 +710,11 @@ const Movies = () => {
         return;
       }
 
-      // Alt/Option + H: Go to Home
       if ((e.altKey || e.metaKey) && e.key.toLowerCase() === 'h') {
         e.preventDefault();
         window.location.href = '/#/homemovies';
       }
 
-      // Alt/Option + P: Go to Profile
       if ((e.altKey || e.metaKey) && e.key.toLowerCase() === 'p') {
         e.preventDefault();
         if (isLoggedIn) {
@@ -648,25 +722,21 @@ const Movies = () => {
         }
       }
 
-      // Alt/Option + M: Go to Favorites
       if ((e.altKey || e.metaKey) && e.key.toLowerCase() === 'm') {
         e.preventDefault();
         toggleShowFavorites();
       }
 
-      // Alt/Option + K: Show keyboard shortcuts modal
       if ((e.altKey || e.metaKey) && e.key.toLowerCase() === 'k') {
         e.preventDefault();
         setShowShortcuts(!showShortcuts);
       }
 
-      // Forward slash (/): Focus search
       if (e.key === '/' && !showShortcuts && !selectedVideo && !showMovieDetail) {
         e.preventDefault();
         searchInputRef.current?.focus();
       }
 
-      // Arrow keys: Navigate between movies
       if (!showShortcuts && !selectedVideo && !showMovieDetail && filteredMovies.length > 0) {
         if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
           e.preventDefault();
@@ -681,7 +751,6 @@ const Movies = () => {
         }
       }
 
-      // Enter: Open movie detail
       if (e.key === 'Enter' && !showShortcuts && !selectedVideo && !showMovieDetail) {
         if (filteredMovies[focusedMovieIndex]) {
           e.preventDefault();
@@ -689,7 +758,6 @@ const Movies = () => {
         }
       }
 
-      // F: Toggle favorite on focused movie
       if (e.key.toLowerCase() === 'f' && !showShortcuts && !selectedVideo && !showMovieDetail) {
         if (filteredMovies[focusedMovieIndex]) {
           e.preventDefault();
@@ -697,7 +765,6 @@ const Movies = () => {
         }
       }
 
-      // Escape: Close modals (no keyboard trap)
       if (e.key === 'Escape') {
         if (showShortcuts) {
           setShowShortcuts(false);
@@ -715,7 +782,6 @@ const Movies = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [showShortcuts, selectedVideo, showMovieDetail, showDropdown, filteredMovies, focusedMovieIndex, showFavorites, isLoggedIn]);
 
-  // ⌨️ Scroll focused movie into view
   useEffect(() => {
     if (movieGridRef.current && filteredMovies.length > 0) {
       const movieCards = movieGridRef.current.querySelectorAll('.movie-card');
@@ -857,7 +923,14 @@ const Movies = () => {
         <div ref={movieGridRef} className="movies-grid" role="list" aria-label="Lista de películas">
           {filteredMovies.map((movie, index) => {
             const avgRating = getAverageRating(movie.id);
-            const reviewCount = reviews.filter(r => r.movieId === movie.id).length;
+            const reviewCount = movieReviews.filter(r => r.movieId === movie.id).length;
+            
+            // 🆕 NUEVO: Cargar rating si no existe en cache (async pero no bloqueante)
+            if (!movieAverageRatings[movie.id]) {
+              fetchAverageRating(movie.id).then(rating => {
+                setMovieAverageRatings(prev => ({...prev, [movie.id]: rating}));
+              });
+            }
             
             return (
               <div 
@@ -923,7 +996,7 @@ const Movies = () => {
         )}
       </div>
 
-      {/* ⭐ NEW: Movie Detail Page with Reviews */}
+      {/* Movie Detail Page with Reviews */}
       {showMovieDetail && selectedMovie && (
         <div className="movie-detail-page">
           <div className="movie-detail-header">
@@ -940,11 +1013,12 @@ const Movies = () => {
             <div className="movie-detail-hero">
               <div className="movie-detail-poster">
                 <img src={selectedMovie.image} alt={selectedMovie.title} />
+                {/* 🎬 Actualizado para incluir subtítulos */}
                 <button 
                   className="play-trailer-btn"
-                  onClick={() => handlePlayVideo(selectedMovie.videoUrl)}
+                  onClick={() => handlePlayVideo(selectedMovie.videoUrl, selectedMovie.subtitles)}
                 >
-                  <FaPlay /> Ver Pelicula
+                  <FaPlay /> Ver Película
                 </button>
               </div>
               
@@ -989,7 +1063,6 @@ const Movies = () => {
             <div className="reviews-section">
               <h2>Reseñas y Puntuaciones</h2>
               
-              {/* Add Review Form */}
               {isLoggedIn ? (
                 <div className="add-review-form">
                   <div className="review-form-user-info">
@@ -1006,7 +1079,6 @@ const Movies = () => {
                     </div>
                   </div>
                   
-                  {/* Rating Section */}
                   <div className="rating-input">
                     <label>Tu puntuación:</label>
                     {hasRatedThisMovie ? (
@@ -1087,7 +1159,6 @@ const Movies = () => {
                 </div>
               )}
 
-              {/* Reviews List */}
               <div className="reviews-list">
                 <h3>Todas las reseñas ({movieReviews.length})</h3>
                 {movieReviews.length === 0 ? (
@@ -1106,7 +1177,6 @@ const Movies = () => {
                           </div>
                         </div>
                         <div className="review-rating-actions">
-                          {/* Only show stars if this review includes a rating */}
                           {review.hasRating && review.rating > 0 && (
                             <div className="review-rating">
                               {[1, 2, 3, 4, 5].map(star => (
@@ -1117,7 +1187,6 @@ const Movies = () => {
                               ))}
                             </div>
                           )}
-                          {/* Show edit/delete buttons only for user's own reviews */}
                           {isLoggedIn && review.userName === userName && (
                             <div className="review-actions">
                               <button 
@@ -1152,7 +1221,7 @@ const Movies = () => {
         </div>
       )}
 
-      {/* Video Modal */}
+      {/* 🎬 Video Modal con Subtítulos */}
       {selectedVideo && (
         <div 
           className="video-modal" 
@@ -1174,12 +1243,26 @@ const Movies = () => {
               autoPlay 
               src={selectedVideo}
               aria-label="Video de película"
-            />
+              crossOrigin="anonymous"
+            >
+              {/* 🎬 Subtítulos dinámicos */}
+              {selectedVideoSubtitles?.map((subtitle) => (
+                <track
+                  key={subtitle.language}
+                  kind="subtitles"
+                  src={subtitle.url}
+                  srcLang={subtitle.language}
+                  label={subtitle.label}
+                  default={subtitle.language === 'es'}
+                />
+              ))}
+              Tu navegador no soporta el elemento de video.
+            </video>
           </div>
         </div>
       )}
 
-      {/* ⌨️ Keyboard Shortcuts Modal */}
+      {/* Keyboard Shortcuts Modal */}
       {showShortcuts && (
         <div 
           className="shortcuts-modal" 
@@ -1206,7 +1289,6 @@ const Movies = () => {
             </div>
 
             <div className="shortcuts-sections">
-              {/* Navigation Section */}
               <div className="shortcuts-section">
                 <h3 className="section-title">🧭 Navegación General</h3>
                 <div className="shortcuts-list">
@@ -1243,7 +1325,6 @@ const Movies = () => {
                 </div>
               </div>
 
-              {/* Video Interaction Section */}
               <div className="shortcuts-section">
                 <h3 className="section-title yellow">🎬 Interacción con Videos</h3>
                 <div className="shortcuts-list">
@@ -1278,7 +1359,6 @@ const Movies = () => {
                 </div>
               </div>
 
-              {/* Basic Navigation Section */}
               <div className="shortcuts-section">
                 <h3 className="section-title blue">🖱️ Navegación Básica</h3>
                 <div className="shortcuts-list">
