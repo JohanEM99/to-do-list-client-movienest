@@ -3,9 +3,11 @@
  * @description React component that renders the "About Us" page for MovieNest.
  * Includes sections for mission, features, statistics, and contact information.
  * Also manages user authentication state and dropdown menu with keyboard shortcuts.
+ * 
+ * Cumple con WCAG 2.2 Nivel AA - Criterio 1.4.13 (Contenido en hover o foco)
  */
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/AboutUs.scss";
 import { FaFilm, FaAward, FaUsers, FaUser, FaCog, FaSignOutAlt, FaKeyboard } from "react-icons/fa";
@@ -38,6 +40,14 @@ const AboutUs: React.FC = () => {
   const [showShortcuts, setShowShortcuts] = useState(false);
 
   /**
+   * WCAG 2.2 - Criterio 1.4.13: Hoverable
+   * Estados para manejar hover del menú desplegable
+   */
+  const [isHoveringMenu, setIsHoveringMenu] = useState(false);
+  const [isHoveringDropdown, setIsHoveringDropdown] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  /**
    * Navigation hook used to redirect between routes.
    */
   const navigate = useNavigate();
@@ -49,6 +59,100 @@ const AboutUs: React.FC = () => {
   useEffect(() => {
     fetchUserProfile();
   }, []);
+
+  /**
+   * WCAG 2.2 - Criterio 1.4.13: Hoverable y Persistente
+   * Control de visibilidad del dropdown basado en hover
+   */
+  useEffect(() => {
+    if (isHoveringMenu || isHoveringDropdown) {
+      setShowDropdown(true);
+    } else {
+      // Pequeño delay para permitir transición suave
+      const timer = setTimeout(() => {
+        setShowDropdown(false);
+      }, 150);
+      return () => clearTimeout(timer);
+    }
+  }, [isHoveringMenu, isHoveringDropdown]);
+
+  /**
+   * WCAG 2.2 - Criterio 1.4.13: Desestimable
+   * Cierre del dropdown al hacer click fuera
+   */
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowDropdown(false);
+        setIsHoveringMenu(false);
+        setIsHoveringDropdown(false);
+      }
+    };
+
+    if (showDropdown) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showDropdown]);
+
+  /**
+   * Keyboard shortcuts y manejo de Escape
+   * WCAG 2.2 - Criterio 1.4.13: Desestimable (Escape cierra contenido adicional)
+   */
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Si estamos en un input o textarea, solo permitir ESC
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
+        if (e.key === 'Escape') {
+          (e.target as HTMLElement).blur();
+        }
+        return;
+      }
+
+      // Alt+H: Ir a Home
+      if ((e.altKey || e.metaKey) && e.key.toLowerCase() === 'h') {
+        e.preventDefault();
+        window.location.href = '/#/homemovies';
+      }
+
+      // Alt+P: Ir al Perfil (solo si está logueado)
+      if ((e.altKey || e.metaKey) && e.key.toLowerCase() === 'p') {
+        e.preventDefault();
+        if (user) {
+          window.location.href = '/#/profile';
+        }
+      }
+
+      // Alt+M: Ir a Películas
+      if ((e.altKey || e.metaKey) && e.key.toLowerCase() === 'm') {
+        e.preventDefault();
+        window.location.href = '/#/movies';
+      }
+
+      // Alt+K: Mostrar/ocultar atajos de teclado
+      if ((e.altKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setShowShortcuts(!showShortcuts);
+      }
+
+      // ESC: Cerrar modal de atajos o dropdown (WCAG 2.2 - Desestimable)
+      if (e.key === 'Escape') {
+        if (showShortcuts) {
+          setShowShortcuts(false);
+        } else if (showDropdown) {
+          setShowDropdown(false);
+          setIsHoveringMenu(false);
+          setIsHoveringDropdown(false);
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [showShortcuts, showDropdown, user]);
 
   /**
    * Fetches the authenticated user's profile from the backend API.
@@ -92,57 +196,6 @@ const AboutUs: React.FC = () => {
     navigate("/");
   };
 
-  // Keyboard shortcuts
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      // Si estamos en un input o textarea, solo permitir ESC
-      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
-        if (e.key === 'Escape') {
-          (e.target as HTMLElement).blur();
-        }
-        return;
-      }
-
-      // Alt+H: Ir a Home
-      if ((e.altKey || e.metaKey) && e.key.toLowerCase() === 'h') {
-        e.preventDefault();
-        window.location.href = '/#/homemovies';
-      }
-
-      // Alt+P: Ir al Perfil (solo si está logueado)
-      if ((e.altKey || e.metaKey) && e.key.toLowerCase() === 'p') {
-        e.preventDefault();
-        if (user) {
-          window.location.href = '/#/profile';
-        }
-      }
-
-      // Alt+M: Ir a Películas
-      if ((e.altKey || e.metaKey) && e.key.toLowerCase() === 'm') {
-        e.preventDefault();
-        window.location.href = '/#/movies';
-      }
-
-      // Alt+K: Mostrar/ocultar atajos de teclado
-      if ((e.altKey || e.metaKey) && e.key.toLowerCase() === 'k') {
-        e.preventDefault();
-        setShowShortcuts(!showShortcuts);
-      }
-
-      // ESC: Cerrar modal de atajos o dropdown
-      if (e.key === 'Escape') {
-        if (showShortcuts) {
-          setShowShortcuts(false);
-        } else if (showDropdown) {
-          setShowDropdown(false);
-        }
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [showShortcuts, showDropdown, user]);
-
   return (
     <div className="about-container">
       {/* Header Section */}
@@ -166,10 +219,19 @@ const AboutUs: React.FC = () => {
           </button>
 
           {user ? (
-            <div className="user-menu">
+            <div 
+              className="user-menu"
+              ref={dropdownRef}
+              onMouseEnter={() => setIsHoveringMenu(true)}
+              onMouseLeave={() => setIsHoveringMenu(false)}
+            >
               <button 
                 className="user-button"
                 onClick={() => setShowDropdown(!showDropdown)}
+                aria-expanded={showDropdown}
+                aria-haspopup="true"
+                aria-label="Menú de usuario"
+                title="Abrir menú de usuario"
               >
                 <div className="user-avatar-small">
                   <FaUser />
@@ -177,11 +239,27 @@ const AboutUs: React.FC = () => {
                 <span>{user.name || "Usuario"}</span>
               </button>
               {showDropdown && (
-                <div className="dropdown-menu">
-                  <a href="#/profile" className="dropdown-item">
+                <div 
+                  className="dropdown-menu"
+                  role="menu"
+                  aria-label="Opciones de usuario"
+                  onMouseEnter={() => setIsHoveringDropdown(true)}
+                  onMouseLeave={() => setIsHoveringDropdown(false)}
+                >
+                  <a 
+                    href="#/profile" 
+                    className="dropdown-item"
+                    role="menuitem"
+                    tabIndex={0}
+                  >
                     <FaCog /> Editar Perfil
                   </a>
-                  <button onClick={handleLogout} className="dropdown-item">
+                  <button 
+                    onClick={handleLogout} 
+                    className="dropdown-item"
+                    role="menuitem"
+                    tabIndex={0}
+                  >
                     <FaSignOutAlt /> Cerrar Sesión
                   </button>
                 </div>
@@ -347,7 +425,7 @@ const AboutUs: React.FC = () => {
         </div>
       </footer>
 
-      {/* Keyboard Shortcuts Modal */}
+      {/* Keyboard Shortcuts Modal - WCAG 2.2 AA Compatible */}
       {showShortcuts && (
         <div 
           className="shortcuts-modal" 
@@ -367,7 +445,8 @@ const AboutUs: React.FC = () => {
               <button 
                 className="close-btn" 
                 onClick={() => setShowShortcuts(false)}
-                aria-label="Cerrar (Esc)"
+                aria-label="Cerrar"
+                title="Cerrar (o presiona Escape)"
               >
                 ✕
               </button>
