@@ -106,7 +106,7 @@ export default function Register() {
             required
           />
 
-          <label>Fecha de Nacimiento</label>
+          
           <input
             className="date-color"
             type="date"
