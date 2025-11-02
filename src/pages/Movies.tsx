@@ -548,7 +548,7 @@ const Movies = () => {
       if (editingReviewId) {
         // 🔄 NUEVO: Actualizar review en el backend (PUT)
        const response = await fetch(
-             `https://backend-de-peliculas.onrender.com/api/v1/reviews/${editingReviewId}`,
+             `https://backend-de-peliculas.onrender.com/api/v1/reviews/${selectedMovie.id}`,
               {
                 method: "PUT",
                 headers: {
@@ -666,7 +666,7 @@ const Movies = () => {
     try {
       // 🔄 NUEVO: Eliminar review en el backend (DELETE)
       const response = await fetch(
-        `https://backend-de-peliculas.onrender.com/api/v1/reviews/${reviewId}`,
+        `https://backend-de-peliculas.onrender.com/api/v1/reviews/${selectedMovie.id}`,
         {
           method: "DELETE",
           headers: {
