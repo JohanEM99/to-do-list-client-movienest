@@ -104,7 +104,7 @@ const Movies = () => {
   const [hoverRating, setHoverRating] = useState(0);
   const [reviewText, setReviewText] = useState("");
   const [reviews] = useState<Review[]>([]);
-  console.log(reviews);
+  // Evitar logs ruidosos en producción
   const [movieReviews, setMovieReviews] = useState<Review[]>([]);
   const [editingReviewId, setEditingReviewId] = useState<string | null>(null);
   const [userMovieRatings, setUserMovieRatings] = useState<UserMovieRating[]>([]);
@@ -371,7 +371,35 @@ const Movies = () => {
 
       if (response.ok) {
         const data = await response.json();
-        setMovieReviews(data || []);
+        // Normalizar los datos que vienen del backend a la interfaz Review
+        const normalized: Review[] = (data || []).map((r: any) => {
+          // intentar extraer userId de varias formas según el backend
+          const resolvedUserId = r.userId || r.user?.id || r.user?.userId || r.authorId || null;
+          const ratingNum = r.rating ? Number(r.rating) : 0;
+          return {
+            id: String(r.id || r._id || `${pexelsId}-${Math.random()}`),
+            movieId: Number(r.pexelsId ?? r.movieId ?? pexelsId),
+            userId: resolvedUserId,
+            userName: r.userName || r.username || r.user?.name || r.user?.username || 'Usuario',
+            rating: isNaN(ratingNum) ? 0 : ratingNum,
+            comment: r.comment || r.text || r.body || "",
+            date: r.date || r.createdAt || new Date().toLocaleDateString('es-ES'),
+            hasRating: !!resolvedUserId && ratingNum > 0,
+          } as Review;
+        });
+
+        setMovieReviews(normalized);
+
+        // Calcular promedio solo con reseñas de usuarios registrados que tengan rating
+        const rated = normalized.filter(rv => rv.hasRating && rv.movieId === pexelsId);
+        if (rated.length > 0) {
+          const sum = rated.reduce((acc, r) => acc + (r.rating || 0), 0);
+          const avg = Math.round((sum / rated.length) * 10) / 10;
+          setMovieAverageRatings(prev => ({ ...prev, [pexelsId]: avg }));
+        } else {
+          // No hay ratings de usuarios registrados: dejar el valor actual o 0
+          setMovieAverageRatings(prev => ({ ...prev, [pexelsId]: prev[pexelsId] || 0 }));
+        }
       } else {
         console.error("Error al cargar reseñas:", response.status);
         setMovieReviews([]);
@@ -399,6 +427,10 @@ const Movies = () => {
         // Asume que el backend devuelve { average: 4.5 } o similar
         return data.average || data.averageRating || 0;
       } else {
+        // Si el backend responde 404 suele significar "no hay promedio aún" — no es error crítico
+        if (response.status === 404) {
+          return 0;
+        }
         console.error("Error al cargar promedio:", response.status);
         return 0;
       }
@@ -452,8 +484,7 @@ const Movies = () => {
   
     // ✅ Cargar reseñas y promedio desde backend
     await fetchMovieReviews(movie.id); // 👈 Carga las reseñas desde el backend
-    const newAvg = await fetchAverageRating(movie.id);
-    setMovieAverageRatings(prev => ({ ...prev, [movie.id]: newAvg }));
+  // El promedio se calcula dentro de fetchMovieReviews a partir de reseñas de usuarios registrados
 
     const existingRating = userMovieRatings.find(
     r => r.movieId === movie.id && r.userId === userName
@@ -517,7 +548,7 @@ const Movies = () => {
       if (editingReviewId) {
         // 🔄 NUEVO: Actualizar review en el backend (PUT)
        const response = await fetch(
-              `https://backend-de-peliculas.onrender.com/api/v1/reviews/${selectedMovie.id}`,
+             `https://backend-de-peliculas.onrender.com/api/v1/reviews/${editingReviewId}`,
               {
                 method: "PUT",
                 headers: {
@@ -553,7 +584,10 @@ const Movies = () => {
         pexelsId: selectedMovie.id,
         userName,
         rating: isSubmittingNewRating ? userRating : 0,
-        comment: reviewText,
+        // Algunos endpoints pueden requerir un comment no vacío — si el usuario solo pone rating
+        // rellenamos con '-' para evitar 400 del backend. Si prefieres validar y exigir comment,
+        // cámbialo por `comment: reviewText` y mostrar un alert.
+        comment: reviewText.trim() ? reviewText : "-",
       };
 
 
@@ -632,7 +666,7 @@ const Movies = () => {
     try {
       // 🔄 NUEVO: Eliminar review en el backend (DELETE)
       const response = await fetch(
-        `https://backend-de-peliculas.onrender.com/api/v1/reviews/${selectedMovie.id}`,
+        `https://backend-de-peliculas.onrender.com/api/v1/reviews/${reviewId}`,
         {
           method: "DELETE",
           headers: {
@@ -673,7 +707,17 @@ const Movies = () => {
   };
 
   const getAverageRating = (movieId: number): number => {
-    // 🔄 MODIFICADO: Usar el cache de ratings del backend
+    // Priorizar el cálculo del promedio a partir de reseñas de usuarios registrados
+    // (aquellas que tienen `hasRating === true` y `userId` definido).
+    // Si no hay calificaciones de usuarios logueados, usar el cache del backend.
+    const reviewsForMovie = movieReviews.filter(r => r.movieId === movieId && r.hasRating && r.userId);
+    if (reviewsForMovie.length > 0) {
+      const sum = reviewsForMovie.reduce((acc, r) => acc + (r.rating || 0), 0);
+      const avg = sum / reviewsForMovie.length;
+      // devolver con un decimal para consistencia visual
+      return Math.round(avg * 10) / 10;
+    }
+
     return movieAverageRatings[movieId] || 0;
   };
 
