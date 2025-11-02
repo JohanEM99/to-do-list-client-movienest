@@ -422,7 +422,20 @@ const AboutUs: React.FC = () => {
             <span> </span>
             <a href="/terms"> </a>
           </div>
+
+          <div className="footer-links">
+            {/* Enlace al PDF en la carpeta docs */}
+            <a
+              href="/docs/Manual.pdf"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="pdf-link"
+            >
+              Manual de Usuario
+            </a>
+          </div>
         </div>
+        
       </footer>
 
       {/* Keyboard Shortcuts Modal - WCAG 2.2 AA Compatible */}
