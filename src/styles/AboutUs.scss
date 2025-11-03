@@ -1,4 +1,4 @@
-// Paleta de colores
+// Color palette
 $primary: #e50914;
 $secondary: #b20710;
 $background: #f8f9fa;
@@ -7,7 +7,7 @@ $white: #ffffff;
 $gray-light: #f3f4f6;
 $gray-medium: #6b7280;
 
-// Reset y estilos base
+// Reset and base styles
 * {
   margin: 0;
   padding: 0;
@@ -156,7 +156,7 @@ body, html {
   }
 }
 
-// 👤 Menú de usuario
+// 👤 User menu
 .user-menu {
   position: relative;
 
@@ -650,9 +650,9 @@ body, html {
   }
 }
 
-/* 🌍 RESPONSIVIDAD GLOBAL OPTIMIZADA */
+/* 🌍 OPTIMIZED GLOBAL RESPONSIBILITY */
 
-/* 🖥️ Pantallas grandes (max 1200px) */
+/* 🖥️ Big screens (max 1200px) */
 @media (max-width: 1200px) {
   .about-header {
     padding: 1rem 3rem;
@@ -670,7 +670,7 @@ body, html {
   }
 }
 
-/* 💻 Pantallas medianas (max 992px) */
+/* 💻 Medium screens (max 992px) */
 @media (max-width: 992px) {
   .about-header {
     flex-wrap: wrap;
@@ -810,7 +810,7 @@ body, html {
   }
 }
 
-/* 📲 Móviles pequeños (max 480px) */
+/* 📲 Small cell phones (max 480px) */
 @media (max-width: 480px) {
   .hero-section {
     padding: 2rem 1rem;
@@ -892,10 +892,10 @@ body, html {
 }
 
 // ==========================================
-// WCAG 2.2 Nivel AA - Accesibilidad
+// WCAG 2.2 Level AA - Accessibility
 // ==========================================
 
-// Clase para lectores de pantalla (screen reader only)
+// Screen reader class (screen reader only)
 .sr-only {
   position: absolute;
   width: 1px;
@@ -908,16 +908,16 @@ body, html {
   border-width: 0;
 }
 
-// Mejoras de accesibilidad para el menú de usuario
+// Accessibility improvements for the user menu
 .user-menu {
   position: relative;
 
   .dropdown-menu {
-    // WCAG 2.2 - Hoverable: Permite que el cursor se mueva sobre el dropdown
+    // WCAG 2.2 - Hoverable: Allows the cursor to move over the dropdown
     pointer-events: auto;
     
     .dropdown-item {
-      // Indicadores de foco para navegación por teclado
+      // Focus indicators for keyboard navigation
       &:focus {
         outline: 2px solid $primary;
         outline-offset: -2px;
@@ -932,7 +932,7 @@ body, html {
   }
 }
 
-// Mejoras para el botón de atajos de teclado
+// Improvements to the keyboard shortcuts button
 .shortcuts-btn {
   background: transparent;
   border: none;
@@ -962,7 +962,7 @@ body, html {
   }
 }
 
-// Mejoras de accesibilidad para el modal de shortcuts
+// Accessibility improvements for the shortcuts modal
 .shortcuts-modal {
   .close-btn {
     &:focus {
@@ -984,7 +984,7 @@ body, html {
   }
 }
 
-// Indicadores de foco mejorados para navegación por teclado
+// Improved focus indicators for keyboard navigation
 .nav-menu a,
 .auth-buttons .login-btn,
 .auth-buttons .signup-btn,
@@ -995,7 +995,7 @@ body, html {
   }
 }
 
-// Asegura que los enlaces del footer tengan indicadores claros
+// Ensure that the links in the footer have clear indicators
 .about-footer {
   a {
     &:focus-visible {
@@ -1005,7 +1005,7 @@ body, html {
   }
 }
 
-// Mejoras para las tarjetas interactivas
+// Improvements for interactive cards
 .feature-card,
 .stat-card {
   &:focus-within {

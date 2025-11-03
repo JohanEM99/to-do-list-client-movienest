@@ -1,4 +1,4 @@
-// Paleta de colores
+// Color palette
 $primary: #e50914;
 $secondary: #b20710;
 $background: #ffffff;
@@ -11,7 +11,7 @@ $text: #333333;
   min-height: 100vh;
   background: linear-gradient(135deg, #ffffff, #ffffff);
 
-  // Mensajes de error y éxito
+  // Error and success messages
 .error-message {
   background: rgba(239, 68, 68, 0.1);
   color: #ef4444;
@@ -72,7 +72,7 @@ $text: #333333;
       color: $text;
     }
 
-    // Estilos específicos para input date
+    // Specific styles for input date
     input[type="date"]::-webkit-calendar-picker-indicator {
       cursor: pointer;
       filter: invert(50%); // Gris

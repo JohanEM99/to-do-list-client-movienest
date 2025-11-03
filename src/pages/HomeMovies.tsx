@@ -85,13 +85,13 @@ const HomeMovies: React.FC = () => {
 
   /**
    * WCAG 2.2 - Criterio 1.4.13: Hoverable y Persistente
-   * Control de visibilidad del dropdown basado en hover
+   * Hover-based dropdown visibility control
    */
   useEffect(() => {
     if (isHoveringMenu || isHoveringDropdown) {
       setShowDropdown(true);
     } else {
-      // Pequeño delay para permitir transición suave
+      // A slight delay allows for a smooth transition.
       const timer = setTimeout(() => {
         setShowDropdown(false);
       }, 150);
@@ -101,7 +101,7 @@ const HomeMovies: React.FC = () => {
 
   /**
    * WCAG 2.2 - Criterio 1.4.13: Desestimable
-   * Cierre del dropdown al hacer click fuera
+   * The dropdown menu closes when you click outside.
    */
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -125,12 +125,12 @@ const HomeMovies: React.FC = () => {
   }, [showDropdown]);
 
   /**
-   * Keyboard shortcuts y manejo de Escape
-   * WCAG 2.2 - Criterio 1.4.13: Desestimable (Escape cierra contenido adicional)
+   * Keyboard shortcuts and Escape handling
+   * WCAG 2.2 - Criterion 1.4.13: Dismissable (Escape closes additional content)
    */
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Si estamos en un input o textarea, solo permitir ESC
+      // If we are in an input or textarea, only allow ESC
       if (
         e.target instanceof HTMLInputElement ||
         e.target instanceof HTMLTextAreaElement
@@ -141,13 +141,13 @@ const HomeMovies: React.FC = () => {
         return;
       }
 
-      // Alt+H: Quedarse en Home (o refrescar)
+      // Alt+H: Stay on Home (or refresh)
       if ((e.altKey || e.metaKey) && e.key.toLowerCase() === "h") {
         e.preventDefault();
         window.location.href = "/#/homemovies";
       }
 
-      // Alt+P: Ir al Perfil (solo si está logueado)
+      // Alt+P: Go to Profile (only if logged in)
       if ((e.altKey || e.metaKey) && e.key.toLowerCase() === "p") {
         e.preventDefault();
         if (user) {
@@ -155,25 +155,25 @@ const HomeMovies: React.FC = () => {
         }
       }
 
-      // Alt+M: Ir a Películas
+      // Alt+M: Go to Movies
       if ((e.altKey || e.metaKey) && e.key.toLowerCase() === "m") {
         e.preventDefault();
         window.location.href = "/#/movies";
       }
 
-      // Alt+A: Ir a Sobre Nosotros
+      // Alt+A: Go to About Us
       if ((e.altKey || e.metaKey) && e.key.toLowerCase() === "a") {
         e.preventDefault();
         window.location.href = "/#/about";
       }
 
-      // Alt+K: Mostrar/ocultar atajos de teclado
+      // Alt+K: Show/hide keyboard shortcuts
       if ((e.altKey || e.metaKey) && e.key.toLowerCase() === "k") {
         e.preventDefault();
         setShowShortcuts(!showShortcuts);
       }
 
-      // ESC: Cerrar modal de video, atajos o dropdown (WCAG 2.2 - Desestimable)
+      // ESC: Close video modal, shortcuts or dropdown (WCAG 2.2 - Negligible)
       if (e.key === "Escape") {
         if (showShortcuts) {
           setShowShortcuts(false);

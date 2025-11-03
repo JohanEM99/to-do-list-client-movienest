@@ -1,4 +1,4 @@
-// 🎨 Paleta de colores
+// 🎨 Color palette
 $primary: #e50914;
 $secondary: #b20710;
 $background: #ffffff;
@@ -29,7 +29,7 @@ html {
     "Helvetica Neue", Arial, sans-serif;
 }
 
-// 🧭 Header - Responsive optimizado
+// 🧭 Header - Optimized Responsive
 .movies-header {
   display: flex;
   justify-content: space-between;
@@ -221,7 +221,7 @@ html {
     }
   }
 
-  // 📱 Tablet pequeña (max 768px)
+  // 📱 Small tablet (max 768px)
   @media (max-width: 768px) {
     padding: 1rem 2rem;
     flex-wrap: wrap;
@@ -296,7 +296,7 @@ html {
   }
 }
 
-// 🎬 Contenido principal
+// 🎬 Main content
 .movies-content {
   width: 100%;
   padding: 2.5rem 5rem;
@@ -321,7 +321,7 @@ html {
     }
   }
 
-  // 💻 Desktop grande (max 1400px)
+  // 💻 Large desktop (max 1400px)
   @media (max-width: 1400px) {
     padding: 2.5rem 3rem;
   }
@@ -359,7 +359,7 @@ html {
   }
 }
 
-// 🔍 Buscador con filtros
+// 🔍 Search engine with filters
 .search-filter-section {
   background-color: $gray-light;
   padding: 3rem 2rem;
@@ -549,7 +549,7 @@ html {
   }
 }
 
-// 🧱 Grid de películas - Responsive
+// 🧱 Movie grid - Responsive
 .movies-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -557,7 +557,7 @@ html {
   width: 100%;
   max-width: 1400px;
 
-  // 💻 Desktop grande (max 1400px)
+  // 💻 Large desktop (max. 1400px)
   @media (max-width: 1400px) {
     gap: 2rem;
   }
@@ -568,7 +568,7 @@ html {
     gap: 1.8rem;
   }
 
-  // 📱 Tablet pequeña (max 768px)
+  // 📱 Small tablet (max 768px)
   @media (max-width: 768px) {
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     gap: 1.5rem;
@@ -587,7 +587,7 @@ html {
   }
 }
 
-// 🎞️ Tarjeta de película con indicador de foco
+// 🎞️ Film card with focus indicator
 .movie-card {
   background: $white;
   border-radius: 12px;
@@ -597,7 +597,7 @@ html {
   cursor: pointer;
   position: relative;
 
-  // Indicador de foco para accesibilidad
+  // Focus indicator for accessibility
   &:focus,
   &:focus-visible {
     outline: none;
@@ -610,7 +610,7 @@ html {
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
   }
 
-  // Ring indicator cuando está enfocado con teclado
+  // Ring indicator when focused with keyboard
   &.focused {
     box-shadow: 0 0 0 4px $primary;
     transform: translateY(-6px);
@@ -866,7 +866,7 @@ html {
   }
 }
 
-// 🎬 Modal de reproducción
+// 🎬 Playback mode
 .video-modal {
   position: fixed;
   inset: 0;
@@ -954,7 +954,7 @@ html {
   }
 }
 
-// 👤 Menú de usuario
+// 👤 User menu
 .user-menu {
   position: relative;
 
@@ -1102,7 +1102,7 @@ html {
   }
 }
 
-// ❤️ Botón de favorito en cada tarjeta
+// ❤️ Favorite button on each card
 .favorite-btn {
   position: absolute;
   top: 1rem;
@@ -1205,7 +1205,7 @@ html {
   }
 }
 
-// ⌨️ Modal de atajos de teclado
+// ⌨️ Keyboard shortcut mode
 .shortcuts-modal {
   position: fixed;
   inset: 0;
@@ -2105,7 +2105,7 @@ html {
   opacity: 0.9;
 }
 
-// Estilos para los botones de editar/eliminar reseñas
+// Styles for the edit/delete review buttons
 .review-rating-actions {
   display: flex;
   align-items: center;
@@ -2216,19 +2216,19 @@ html {
   font-style: italic;
 }
 
-// Actualiza el review-count en el badge
+// Update the review-count on the badge
 .review-count-text {
   font-size: 0.9rem;
   color: #bdc3c7;
 }
 
-// 🎯 Accesibilidad: Focus visible mejorado
+// 🎯 Accessibility: Improved visible focus
 *:focus-visible {
   outline: 2px solid $primary;
   outline-offset: 2px;
 }
 
-// 🎯 Reducir movimiento para usuarios con preferencias de accesibilidad
+// 🎯 Reduce motion for users with accessibility preferences
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

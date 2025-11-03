@@ -239,15 +239,15 @@ const Movies = () => {
           const hdVideo = video.video_files.find(file => file.quality === "hd") || video.video_files[0];
           const durationMinutes = Math.floor(video.duration / 60);
           
-          // 🎬 Agregar subtítulos solo al primer video como ejemplo
+          // 🎬 Add subtitles only to the first video as an example
           const subtitles = index === 0 ? [
             {
               language: "es",
               label: "Español",
-              // ⚠️ IMPORTANTE: Reemplaza esta URL con la URL de tu archivo .vtt en Cloudinary
+              // ⚠️ IMPORTANT: Replace this URL with the URL of your .vtt file in Cloudinary
               url: "https://res.cloudinary.com/dvqhhcmrs/raw/upload/v1761885200/subtitles/dialog-es.vtt"
             }
-            // Puedes agregar más idiomas:
+            // You can add more languages:
             // {
             //   language: "en",
             //   label: "English",
@@ -265,7 +265,7 @@ const Movies = () => {
             genre: getGenreFromQuery(query),
             image: video.video_pictures[0]?.picture || video.image,
             videoUrl: hdVideo?.link || "",
-            subtitles: subtitles // 🎬 Agregar subtítulos
+            subtitles: subtitles // 🎬 Add subtitles
           };
         });
 
@@ -345,13 +345,13 @@ const Movies = () => {
     }
   };
 
-  // 🎬 Actualizado para incluir subtítulos
+  // 🎬 Updated to include subtitles
   const handlePlayVideo = (videoUrl: string, subtitles?: Movie['subtitles']) => {
     setSelectedVideo(videoUrl);
     setSelectedVideoSubtitles(subtitles);
   };
 
-  // 🎬 Actualizado para limpiar subtítulos
+  // 🎬 Updated to clean subtitles
   const handleCloseVideo = () => {
     setSelectedVideo(null);
     setSelectedVideoSubtitles(undefined);
@@ -390,14 +390,14 @@ const Movies = () => {
 
         setMovieReviews(normalized);
 
-        // Calcular promedio solo con reseñas de usuarios registrados que tengan rating
+        // Calculate average using only reviews from registered users who have a rating
         const rated = normalized.filter(rv => rv.hasRating && rv.movieId === pexelsId);
         if (rated.length > 0) {
           const sum = rated.reduce((acc, r) => acc + (r.rating || 0), 0);
           const avg = Math.round((sum / rated.length) * 10) / 10;
           setMovieAverageRatings(prev => ({ ...prev, [pexelsId]: avg }));
         } else {
-          // No hay ratings de usuarios registrados: dejar el valor actual o 0
+          // There are no ratings from registered users: leave the current value or 0
           setMovieAverageRatings(prev => ({ ...prev, [pexelsId]: prev[pexelsId] || 0 }));
         }
       } else {
@@ -424,10 +424,10 @@ const Movies = () => {
 
       if (response.ok) {
         const data = await response.json();
-        // Asume que el backend devuelve { average: 4.5 } o similar
+        // Assume that the backend returns { average: 4.5 } or similar
         return data.average || data.averageRating || 0;
       } else {
-        // Si el backend responde 404 suele significar "no hay promedio aún" — no es error crítico
+        // If the backend responds with 404, it usually means "no average yet" — it's not a critical error.
         if (response.status === 404) {
           return 0;
         }
@@ -440,11 +440,11 @@ const Movies = () => {
     }
   };
 
-  // Carga ratings en lote con límite de concurrencia para evitar peticiones masivas
+  // Load ratings in batches with a concurrency limit to avoid massive requests
   const loadAverageRatings = async (ids: number[]) => {
     if (!ids || ids.length === 0) return;
 
-    const concurrency = 3; // número de peticiones simultáneas permitidas
+    const concurrency = 3; // Number of simultaneous requests allowed
     let index = 0;
 
     const worker = async () => {
@@ -459,19 +459,19 @@ const Movies = () => {
       }
     };
 
-    // lanzar N workers en paralelo (pool)
+    // launch N workers in parallel (pool)
     const workers = Array.from({ length: Math.min(concurrency, ids.length) }, () => worker());
     await Promise.all(workers);
   };
 
-  // useEffect para cargar ratings faltantes cuando cambian las películas filtradas
+  // useEffect to load missing ratings when filtered movies change
   useEffect(() => {
     const idsToLoad = filteredMovies
       .map(m => m.id)
       .filter(id => movieAverageRatings[id] === undefined || movieAverageRatings[id] === 0);
 
     if (idsToLoad.length > 0) {
-      // no bloquear el render: lanzar en background
+      // Do not block rendering: launch in background
       loadAverageRatings(idsToLoad).catch(err => console.error('Error cargando ratings en lote:', err));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -482,9 +482,9 @@ const Movies = () => {
     setShowMovieDetail(true);
     setEditingReviewId(null);
   
-    // ✅ Cargar reseñas y promedio desde backend
-    await fetchMovieReviews(movie.id); // 👈 Carga las reseñas desde el backend
-  // El promedio se calcula dentro de fetchMovieReviews a partir de reseñas de usuarios registrados
+    // ✅ Load reviews and average from backend
+    await fetchMovieReviews(movie.id); // 👈 Upload reviews from the backend
+  // The average is calculated within fetchMovieReviews based on reviews from registered users.
 
     const existingRating = userMovieRatings.find(
     r => r.movieId === movie.id && r.userId === userName
@@ -546,7 +546,7 @@ const Movies = () => {
 
     try {
       if (editingReviewId) {
-        // 🔄 NUEVO: Actualizar review en el backend (PUT)
+        // 🔄 NEW: Update review in the backend (PUT)
        const response = await fetch(
              `https://backend-de-peliculas.onrender.com/api/v1/reviews/${selectedMovie.id}`,
               {
@@ -567,7 +567,7 @@ const Movies = () => {
           throw new Error("Error al actualizar la reseña");
         }
 
-        // Recargar reviews
+        // Reload reviews
         await fetchMovieReviews(selectedMovie.id);
         
         setReviewText("");
@@ -577,16 +577,16 @@ const Movies = () => {
         return;
       }
 
-      // 🔄 NUEVO: Crear nueva review en el backend (POST)
+      // 🔄 NEW: Create a new review in the backend (POST)
       const isSubmittingNewRating = userRating > 0 && !hasRatedThisMovie;
 
       const reviewData = {
         pexelsId: selectedMovie.id,
         userName,
         rating: isSubmittingNewRating ? userRating : 0,
-        // Algunos endpoints pueden requerir un comment no vacío — si el usuario solo pone rating
-        // rellenamos con '-' para evitar 400 del backend. Si prefieres validar y exigir comment,
-        // cámbialo por `comment: reviewText` y mostrar un alert.
+        // Some endpoints may require a non-empty comment — if the user only enters a rating
+        // We fill in the blanks with '-' to avoid 400 errors from the backend. If you prefer to validate and require a comment,
+        // Change it to `comment: reviewText` and display an alert.
         comment: reviewText.trim() ? reviewText : "-",
       };
 
@@ -608,7 +608,7 @@ const Movies = () => {
         throw new Error(errorData.message || "Error al enviar la reseña");
       }
 
-      // Actualizar ratings locales si es una nueva calificación
+      // Update local ratings if it's a new rating
       if (isSubmittingNewRating) {
         const newRating: UserMovieRating = {
           movieId: selectedMovie.id,
@@ -623,10 +623,10 @@ const Movies = () => {
         setHasRatedThisMovie(true);
       }
 
-      // Recargar reviews desde el backend
+      // Reload reviews from the backend
       await fetchMovieReviews(selectedMovie.id);
       
-      // 🆕 NUEVO: Actualizar el average rating después de agregar/editar review
+      // 🆕 NEW: Update the average rating after adding/editing a review
       const newAvgRating = await fetchAverageRating(selectedMovie.id);
       setMovieAverageRatings(prev => ({...prev, [selectedMovie.id]: newAvgRating}));
       
@@ -664,7 +664,7 @@ const Movies = () => {
     }
 
     try {
-      // 🔄 NUEVO: Eliminar review en el backend (DELETE)
+      // 🔄 NEW: Delete review in the backend (DELETE)
       const response = await fetch(
         `https://backend-de-peliculas.onrender.com/api/v1/reviews/${selectedMovie.id}`,
         {
@@ -679,10 +679,10 @@ const Movies = () => {
         throw new Error("Error al eliminar la reseña");
       }
 
-      // Recargar reviews desde el backend
+      // Reload reviews from the backend
       await fetchMovieReviews(selectedMovie.id);
 
-      // 🆕 NUEVO: Actualizar el average rating después de eliminar review
+      // 🆕 NEW: Update the average rating after deleting a review
       const newAvgRating = await fetchAverageRating(selectedMovie.id);
       setMovieAverageRatings(prev => ({...prev, [selectedMovie.id]: newAvgRating}));
 
@@ -707,14 +707,14 @@ const Movies = () => {
   };
 
   const getAverageRating = (movieId: number): number => {
-    // Priorizar el cálculo del promedio a partir de reseñas de usuarios registrados
-    // (aquellas que tienen `hasRating === true` y `userId` definido).
-    // Si no hay calificaciones de usuarios logueados, usar el cache del backend.
+    // Prioritize calculating the average based on reviews from registered users
+    // (those that have `hasRating === true` and `userId` defined).
+    // If there are no ratings from logged-in users, use the backend cache.
     const reviewsForMovie = movieReviews.filter(r => r.movieId === movieId && r.hasRating && r.userId);
     if (reviewsForMovie.length > 0) {
       const sum = reviewsForMovie.reduce((acc, r) => acc + (r.rating || 0), 0);
       const avg = sum / reviewsForMovie.length;
-      // devolver con un decimal para consistencia visual
+      // Return with one decimal place for visual consistency
       return Math.round(avg * 10) / 10;
     }
 
@@ -1013,7 +1013,7 @@ const Movies = () => {
             const avgRating = getAverageRating(movie.id);
             const reviewCount = movieReviews.filter(r => r.movieId === movie.id).length;
             
-            // ratings se cargan desde useEffect en lote para evitar muchas peticiones simultáneas
+            // Ratings are loaded from useEffect in batches to avoid many simultaneous requests.
             
             return (
               <div 
@@ -1304,7 +1304,7 @@ const Movies = () => {
         </div>
       )}
 
-      {/* 🎬 Video Modal con Subtítulos */}
+      {/* 🎬 Modal Video with Subtitles */}
       {selectedVideo && (
         <div 
           className="video-modal" 

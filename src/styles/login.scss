@@ -1,4 +1,4 @@
-// Paleta de colores
+// Color palette
 $primary: #e50914; // morado elegante
 $secondary: #b20710;
 $background: #ffffff;
@@ -6,11 +6,11 @@ $text: #333333;
 $white: #ffffff;
 $error: #ef4444;
 
-// Fuente y transiciones
+// Source and transitions
 $font: "Inter", sans-serif;
 $transition: all 0.3s ease;
 
-// RESET básico
+// Basic RESET
 * {
   margin: 0;
   padding: 0;
@@ -172,7 +172,7 @@ body {
   }
 }
 
-// Mensajes
+// Messages
 #loginMsg {
   margin-top: 1rem;
   color: $error;
